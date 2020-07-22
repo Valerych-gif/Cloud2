@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+   <AnchorPane prefHeight="365.0" prefWidth="443.0">
+      <Button fx:id="send" layoutX="377.0" layoutY="326.0" mnemonicParsing="false" onAction="#sendCommand" text="Send" />
+      <ListView fx:id="listView" layoutX="14.0" layoutY="14.0" prefHeight="298.0" prefWidth="414.0" />
+      <TextField fx:id="text" layoutX="14.0" layoutY="326.0" prefHeight="25.0" prefWidth="351.0" />
+   </AnchorPane>
+   <columnConstraints>
+      <ColumnConstraints />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints />
+   </rowConstraints>
+</GridPane>
