@@ -10,6 +10,11 @@ public class CloudFile extends File {
         this.fileLength = fileLength;
     }
 
+    public CloudFile(String pathname) {
+        super(pathname);
+        this.fileLength = 0;
+    }
+
     public long getFileLength() {
         return fileLength;
     }

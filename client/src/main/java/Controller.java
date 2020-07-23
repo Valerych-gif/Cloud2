@@ -8,16 +8,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class Controller implements Initializable {
 
@@ -27,15 +21,50 @@ public class Controller implements Initializable {
     private List<File> clientFileList;
     public static Socket socket;
     private DataInputStream is;
-    private DataOutputStream os;
+    private static DataOutputStream os;
+    private File clientDir;
 
-    public void sendCommand(ActionEvent actionEvent) {
-        System.out.println("SEND!");
+    public void downloadFileAction(ActionEvent actionEvent) {
+        String fileName = text.getCharacters().toString();
+        downLoadFile(fileName);
+    }
+
+    public void downLoadFile(String fileName){
+        try {
+            os.writeUTF("./download");
+            os.writeUTF(fileName);
+            String response = is.readUTF();
+            if (response.equals("./take")){
+                String downloadedFileName = clientDir + "/" + is.readUTF();
+                System.out.println(downloadedFileName);
+                long downloadedFileSize = is.readLong();
+                File downloadedFile = new File(downloadedFileName);
+                if (!downloadedFile.exists()) {
+                    if (!downloadedFile.createNewFile());
+                }
+                int bufferSize = 1024;
+                byte[] buffer = new byte[bufferSize];
+                try {
+                    System.out.println("Получение файла");
+                    FileOutputStream fos = new FileOutputStream(downloadedFile);
+                    for (long i = 0; i < (downloadedFileSize / bufferSize == 0 ? 1 : downloadedFileSize / bufferSize); i++) {
+                        int bytesRead = is.read(buffer);
+                        fos.write(buffer, 0, bytesRead);
+                        fos.flush();
+                    }
+                    os.writeUTF("Ok");
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // TODO: 7/21/2020 init connect to server
+
         try{
             socket = new Socket("localhost", 8189);
             is = new DataInputStream(socket.getInputStream());
@@ -43,11 +72,11 @@ public class Controller implements Initializable {
             Thread.sleep(1000);
             clientFileList = new ArrayList<>();
             String clientPath = "./client/src/main/resources/";
-            File dir = new File(clientPath);
-            if (!dir.exists()) {
+            clientDir = new File(clientPath);
+            if (!clientDir.exists()) {
                 throw new RuntimeException("directory resource not exists on client");
             }
-            for (File file : Objects.requireNonNull(dir.listFiles())) {
+            for (File file : Objects.requireNonNull(clientDir.listFiles())) {
                 clientFileList.add(file);
                 listView.getItems().add(file.getName());
             }
@@ -87,5 +116,13 @@ public class Controller implements Initializable {
             }
         }
         return null;
+    }
+
+    public static void closeClient(){
+        try {
+            os.writeUTF("/close");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

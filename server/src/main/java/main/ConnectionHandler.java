@@ -16,10 +16,12 @@ public class ConnectionHandler implements Runnable {
 
     private DataInputStream is;
     private DataOutputStream os;
+    private Socket socket;
     private FileHandler fileHandler;
 
     public ConnectionHandler(Socket socket) throws IOException, InterruptedException {
         logger.info("Connection accepted");
+        this.socket = socket;
         is = new DataInputStream(socket.getInputStream());
         os = new DataOutputStream(socket.getOutputStream());
         Thread.sleep(2000);
@@ -35,17 +37,48 @@ public class ConnectionHandler implements Runnable {
             try {
                 String command = is.readUTF();
                 if (command.equals("./upload")) {
-                    String fileName = is.readUTF();
-                    System.out.println("fileName: " + fileName);
-                    long fileLength = is.readLong();
-                    System.out.println("fileLength: " + fileLength);
-                    CloudFile file = new CloudFile(Cloud2ServerStarter.storageRootDir + "/" + fileName, fileLength);
-                    fileHandler.loadFileToStorage(file);
-                    os.writeUTF("OK");
+                    receiveFileFromClient();
+                } else if (command.equals("./download")){
+                    sendFileToClient();
+                } else if (command.equals("./close")){
+                    closeConnection();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+
+
+    private void sendFileToClient() throws IOException {
+        String fileName = is.readUTF();
+        CloudFile file = new CloudFile(Cloud2ServerStarter.storageRootDir + "/" + fileName);
+        fileHandler.getFileFromStorage(file);
+    }
+
+    private void receiveFileFromClient() throws IOException {
+        String fileName = is.readUTF();
+        long fileLength = is.readLong();
+        CloudFile file = new CloudFile(Cloud2ServerStarter.storageRootDir + "/" + fileName, fileLength);
+        fileHandler.loadFileToStorage(file);
+    }
+
+    private void closeConnection() {
+        try {
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            os.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
