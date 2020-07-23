@@ -1,3 +1,6 @@
+package main;
+
+import main.Cloud2Server;
 import org.junit.jupiter.api.*;
 
 import java.io.File;

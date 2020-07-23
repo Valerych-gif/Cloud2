@@ -1,3 +1,5 @@
+package main;
+
 import exceptions.CantToCreateStorageException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,11 +12,11 @@ import java.util.concurrent.Executors;
 
 public class Cloud2Server {
 
-    private ServerSocket server;
+    private ServerSocket serverSocket;
     private ExecutorService executor;
     private Socket socket;
-    private File storage = new File(Cloud2ServerStarter.STORAGE_ROOT_DIR);
-    private Logger logger = LogManager.getLogger(Cloud2ServerStarter.class);
+    private File storage = new File(Cloud2ServerStarter.storageRootDir);
+    private Logger logger = LogManager.getLogger(Cloud2Server.class);
     private static Cloud2Server instance;
 
     private Cloud2Server() {
@@ -37,11 +39,11 @@ public class Cloud2Server {
 
     public void waitConnection() {
         try {
-            server = new ServerSocket(Cloud2ServerStarter.PORT);
+            serverSocket = new ServerSocket(Cloud2ServerStarter.PORT);
             executor = Executors.newCachedThreadPool();
             logger.info("Server started.");
             while (true) {
-                socket = server.accept();
+                socket = serverSocket.accept();
                 executor.execute(new ConnectionHandler(socket));
                 logger.info("Client connected");
             }
@@ -65,5 +67,9 @@ public class Cloud2Server {
 
     public void setTestStorage(File storage) {
         this.storage = storage;
+    }
+
+    public File getStorage() {
+        return storage;
     }
 }

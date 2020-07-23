@@ -49,7 +49,7 @@ public class Controller implements Initializable {
             }
             for (File file : Objects.requireNonNull(dir.listFiles())) {
                 clientFileList.add(file);
-                listView.getItems().add(file.getName() + " : " + file.length());
+                listView.getItems().add(file.getName());
             }
             listView.setOnMouseClicked(a -> {
                 if (a.getClickCount() == 2) {
