@@ -4,7 +4,6 @@ import main.Cloud2ServerStarter;
 import main.ConnectionHandler;
 
 import java.io.*;
-import java.util.Arrays;
 
 public class FileHandler {
 
@@ -14,7 +13,7 @@ public class FileHandler {
     private DataInputStream is;
     private DataOutputStream os;
     private int bufferSize;
-    private String storageRootDir;
+    private String storageRootDirPath;
 
 
     public FileHandler(ConnectionHandler connectionHandler) {
@@ -23,17 +22,16 @@ public class FileHandler {
         this.is = connectionHandler.getDataInputStream();
         this.os = connectionHandler.getDataOutputStream();
         this.bufferSize = Cloud2ServerStarter.BUFFER_SIZE;
-        this.storageRootDir = Cloud2ServerStarter.storageRootDir;
+        this.storageRootDirPath = connectionHandler.getStorage().getAbsolutePath();
     }
 
     public boolean loadFileToStorage(CloudFile clientFile) throws IOException {
-        File cloudFile = new File( storageRootDir + "/" + clientFile.getName());
+        File cloudFile = new File( storageRootDirPath + "/" + clientFile.getName());
         if (!cloudFile.exists()) {
             if (!cloudFile.createNewFile()) return false;
         }
         long fileLength = clientFile.getFileLength();
         try {
-            System.out.println("Получение файла");
             FileOutputStream fos = new FileOutputStream(cloudFile);
             for (long i = 0; i < (fileLength / bufferSize == 0 ? 1 : fileLength / bufferSize); i++) {
                 int bytesRead = is.read(buffer);

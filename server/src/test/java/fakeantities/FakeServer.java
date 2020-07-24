@@ -28,7 +28,7 @@ public class FakeServer extends Cloud2Server {
         try {
             serverSocket = new ServerSocket(Cloud2ServerStarter.PORT);
             socket = serverSocket.accept();
-            connectionHandler = new ConnectionHandler(socket);
+            connectionHandler = new ConnectionHandler(this, socket);
         } catch (Exception e) {
             e.printStackTrace();
         }

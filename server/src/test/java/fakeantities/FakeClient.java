@@ -39,17 +39,22 @@ public class FakeClient {
             String fileName1 = PATH_FOR_TEST_FILE + TEST_FILE1_NAME;
             File currentFile1 = new File(fileName1);
             sendFile(currentFile1);
-            String fileName2 = PATH_FOR_TEST_FILE + TEST_FILE1_NAME;
+            String fileName2 = PATH_FOR_TEST_FILE + TEST_FILE2_NAME;
             File currentFile2 = new File(fileName2);
             sendFile(currentFile2);
+            try {
+                Thread.sleep(1000);
+                os.writeUTF("./close");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }).start();
     }
 
     public void sendFile(File currentFile) {
         try {
-            Thread.sleep(1000);
+            Thread.sleep(500);
             os.writeUTF("./upload");
-            System.out.println("./upload");
             os.writeUTF(currentFile.getName());
             os.writeLong(currentFile.length());
             FileInputStream fis = new FileInputStream(currentFile);
@@ -64,13 +69,15 @@ public class FakeClient {
         }
     }
 
-    public void sendCommand(){
-        try {
-            Thread.sleep(1000);
-            os.writeUTF("./somecommand");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void sendCommand(String command){
+        new Thread(()->{
+            try {
+                Thread.sleep(500);
+                os.writeUTF(command);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
 

@@ -13,10 +13,12 @@ import java.net.Socket;
 
 public class Utils {
 
-    public final static String TEST_STORAGE_ROOT_DIR = "src/test/resources/storage";
-
-    private static Socket socket;
-    private static ServerSocket serverSocket;
+    public static void clearStorage(File testStorage) {
+        Utils.recursiveDelete(testStorage);
+        if (!testStorage.exists()){
+            testStorage.mkdir();
+        }
+    }
 
     public static void recursiveDelete(File file) {
         if (!file.exists())
@@ -29,33 +31,5 @@ public class Utils {
         }
 
         file.delete();
-    }
-
-    public static ConnectionHandler getConnectionHandler(FakeClient client){
-        Cloud2Server testServer = Cloud2IOServer.getInstance();
-        Cloud2ServerStarter.setStorageRootDir(TEST_STORAGE_ROOT_DIR);
-        testServer.init();
-        client.connect();
-        ConnectionHandler connectionHandler = null;
-
-        try {
-            serverSocket = new ServerSocket(Cloud2ServerStarter.PORT);
-            socket = serverSocket.accept();
-            connectionHandler = new ConnectionHandler(socket);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return connectionHandler;
-    }
-
-    public static ConnectionHandler killConnectionHandler(FakeClient client) {
-        try {
-            socket.close();
-            serverSocket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }

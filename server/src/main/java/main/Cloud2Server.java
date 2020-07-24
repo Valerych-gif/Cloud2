@@ -37,7 +37,7 @@ public abstract class Cloud2Server {
             logger.info("Server started.");
             while (true) {
                 socket = serverSocket.accept();
-                executor.execute(new ConnectionHandler(socket));
+                executor.execute(new ConnectionHandler(this, socket));
                 logger.info("Client connected");
             }
         } catch (Exception e) {
@@ -62,9 +62,9 @@ public abstract class Cloud2Server {
         return storage;
     }
 
-    protected ConnectionHandler getConnectionHandler(){
+    public ConnectionHandler getConnectionHandler(){
         return null;
     }
 
-    protected abstract void closeConnection();
+    public abstract void closeConnection();
 }

@@ -12,8 +12,8 @@ import java.io.IOException;
 public class TestConnectionHandler {
 
     private Cloud2Server testServer;
-    public FakeClient client;
-    public ConnectionHandler connectionHandler;
+    private FakeClient client;
+    private ConnectionHandler connectionHandler;
 
     @BeforeEach
     public void setUpTest(){
@@ -35,15 +35,14 @@ public class TestConnectionHandler {
         Assertions.assertNotNull(connectionHandler);
     }
 
-    @Disabled
     @Test
     @DisplayName("Проверка полученения команды от клиента")
     public void testClientCommandReceive() throws IOException {
-        client.sendCommand();
-        DataInputStream is = connectionHandler.getDataInputStream();System.out.println("commandText");
+        String command = "./somecommand";
+        client.sendCommand(command);
+        DataInputStream is = connectionHandler.getDataInputStream();
         String commandText = is.readUTF();
-
-        Assertions.assertEquals("./somecommand", commandText);
+        Assertions.assertEquals(command, commandText);
     }
 
 }

@@ -14,19 +14,21 @@ public class ConnectionHandler implements Runnable {
 
     private Logger logger = LogManager.getLogger(ConnectionHandler.class);
 
+    private Cloud2Server server;
+    private Socket socket;
     private DataInputStream is;
     private DataOutputStream os;
-    private Socket socket;
     private FileHandler fileHandler;
-    private boolean connectionIsActive;
+    private File storage;
 
-    public ConnectionHandler(Socket socket) throws IOException, InterruptedException {
+    public ConnectionHandler(Cloud2Server server, Socket socket) throws IOException, InterruptedException {
         logger.info("Connection accepted");
-        this.connectionIsActive = true;
+        this.server = server;
         this.socket = socket;
         this.is = new DataInputStream(socket.getInputStream());
         this.os = new DataOutputStream(socket.getOutputStream());
-        Thread.sleep(2000);
+        this.storage = server.getStorage();
+        //Thread.sleep(2000);
     }
 
 
@@ -35,7 +37,7 @@ public class ConnectionHandler implements Runnable {
     public void run() {
 
         fileHandler = new FileHandler(this);
-        while (connectionIsActive) {
+        while (true) {
             try {
                 String command = is.readUTF();
                 if (command.equals("./upload")) {
@@ -44,6 +46,7 @@ public class ConnectionHandler implements Runnable {
                     sendFileToClient();
                 } else if (command.equals("./close")){
                     closeConnection();
+                    break;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -55,14 +58,14 @@ public class ConnectionHandler implements Runnable {
 
     private void sendFileToClient() throws IOException {
         String fileName = is.readUTF();
-        CloudFile file = new CloudFile(Cloud2ServerStarter.storageRootDir + "/" + fileName);
+        CloudFile file = new CloudFile(storage + "/" + fileName);
         fileHandler.getFileFromStorage(file);
     }
 
     private void receiveFileFromClient() throws IOException {
         String fileName = is.readUTF();
         long fileLength = is.readLong();
-        CloudFile file = new CloudFile(Cloud2ServerStarter.storageRootDir + "/" + fileName, fileLength);
+        CloudFile file = new CloudFile(storage + "/" + fileName, fileLength);
         fileHandler.loadFileToStorage(file);
     }
 
@@ -82,7 +85,6 @@ public class ConnectionHandler implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        connectionIsActive = false;
     }
 
     public DataInputStream getDataInputStream() {
@@ -91,5 +93,9 @@ public class ConnectionHandler implements Runnable {
 
     public DataOutputStream getDataOutputStream() {
         return os;
+    }
+
+    public File getStorage() {
+        return storage;
     }
 }
