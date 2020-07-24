@@ -20,11 +20,10 @@ public class Main extends Application {
         primaryStage.show();
         primaryStage.setOnCloseRequest(event -> {
             try {
-                Controller.socket.getOutputStream().write("close".getBytes());
+                Controller.socket.getOutputStream().write("./close".getBytes());
             } catch (IOException e) {
                 e.printStackTrace();
-            }
-            Controller.closeClient();
+            };
             Platform.exit();
         });
     }

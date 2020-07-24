@@ -118,11 +118,4 @@ public class Controller implements Initializable {
         return null;
     }
 
-    public static void closeClient(){
-        try {
-            os.writeUTF("/close");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }

@@ -2,6 +2,7 @@ package main;
 
 import main.Cloud2Server;
 import org.junit.jupiter.api.*;
+import utils.Utils;
 
 import java.io.File;
 
@@ -43,7 +44,7 @@ public class TestServer {
 
     private void removeTestStorage() {
         if (testStorage.exists()){
-            testStorage.delete();
+            Utils.recursiveDelete(testStorage);
         }
     }
 

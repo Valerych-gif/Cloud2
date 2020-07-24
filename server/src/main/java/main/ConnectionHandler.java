@@ -18,12 +18,14 @@ public class ConnectionHandler implements Runnable {
     private DataOutputStream os;
     private Socket socket;
     private FileHandler fileHandler;
+    private boolean connectionIsActive;
 
     public ConnectionHandler(Socket socket) throws IOException, InterruptedException {
         logger.info("Connection accepted");
+        this.connectionIsActive = true;
         this.socket = socket;
-        is = new DataInputStream(socket.getInputStream());
-        os = new DataOutputStream(socket.getOutputStream());
+        this.is = new DataInputStream(socket.getInputStream());
+        this.os = new DataOutputStream(socket.getOutputStream());
         Thread.sleep(2000);
     }
 
@@ -33,7 +35,7 @@ public class ConnectionHandler implements Runnable {
     public void run() {
 
         fileHandler = new FileHandler(this);
-        while (true) {
+        while (connectionIsActive) {
             try {
                 String command = is.readUTF();
                 if (command.equals("./upload")) {
@@ -80,6 +82,7 @@ public class ConnectionHandler implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        connectionIsActive = false;
     }
 
     public DataInputStream getDataInputStream() {

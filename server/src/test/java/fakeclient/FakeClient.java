@@ -48,20 +48,27 @@ public class FakeClient {
 
     public void sendFile(File currentFile) {
         try {
-
-            Thread.sleep(2000);
+            Thread.sleep(1000);
             os.writeUTF("./upload");
+            System.out.println("./upload");
             os.writeUTF(currentFile.getName());
             os.writeLong(currentFile.length());
             FileInputStream fis = new FileInputStream(currentFile);
             byte[] buffer = new byte[1024];
-            while (fis.available() > 0) {System.out.println("Ok");
+            while (fis.available() > 0) {
                 int bytesRead = fis.read(buffer);
                 os.write(buffer, 0, bytesRead);
             }
             os.flush();
-            String response = is.readUTF();
-            System.out.println(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendCommand(){
+        try {
+            Thread.sleep(1000);
+            os.writeUTF("./somecommand");
         } catch (Exception e) {
             e.printStackTrace();
         }
