@@ -1,5 +1,6 @@
 package main;
 
+import fakeantities.FakeServer;
 import main.Cloud2Server;
 import org.junit.jupiter.api.*;
 import utils.Utils;
@@ -7,19 +8,16 @@ import utils.Utils;
 import java.io.File;
 
 @DisplayName("Общие тесты для всего сервера")
-public class TestServer {
-
-    public final static String TEST_STORAGE_ROOT_DIR = "src/test/resources/storage";
+public class TestCloud2Server {
 
     private static Cloud2Server testServer;
     private static File testStorage;
 
     @BeforeAll
     public static void setUp(){
-        testServer = Cloud2Server.getInstance();
-        testStorage = new File(TEST_STORAGE_ROOT_DIR);
-        testServer.setTestStorage(testStorage);
+        testServer = FakeServer.getInstance();
         testServer.init();
+        testStorage=testServer.getStorage();
     }
 
     @Test

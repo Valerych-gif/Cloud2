@@ -10,23 +10,16 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Cloud2Server {
+public abstract class Cloud2Server {
 
-    private ServerSocket serverSocket;
-    private ExecutorService executor;
-    private Socket socket;
-    private File storage = new File(Cloud2ServerStarter.storageRootDir);
+    protected ServerSocket serverSocket;
+    protected ExecutorService executor;
+    protected Socket socket;
+    protected File storage;
     private Logger logger = LogManager.getLogger(Cloud2Server.class);
-    private static Cloud2Server instance;
 
-    private Cloud2Server() {
-    }
-
-    public static Cloud2Server getInstance() {
-        if (instance == null) {
-            instance = new Cloud2Server();
-        }
-        return instance;
+    public  Cloud2Server() {
+        storage = new File(Cloud2ServerStarter.storageRootDir);
     }
 
     public void init() {
@@ -65,11 +58,13 @@ public class Cloud2Server {
         return storage.exists();
     }
 
-    public void setTestStorage(File storage) {
-        this.storage = storage;
-    }
-
     public File getStorage() {
         return storage;
     }
+
+    protected ConnectionHandler getConnectionHandler(){
+        return null;
+    }
+
+    protected abstract void closeConnection();
 }

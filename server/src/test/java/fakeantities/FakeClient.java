@@ -1,4 +1,4 @@
-package fakeclient;
+package fakeantities;
 
 import java.io.*;
 import java.net.Socket;
@@ -17,16 +17,15 @@ public class FakeClient {
     public FakeClient() {
         file1 = new File(PATH_FOR_TEST_FILE + TEST_FILE1_NAME);
         file2 = new File(PATH_FOR_TEST_FILE + TEST_FILE2_NAME);
-        connect();
     }
 
     public void connect() {
         new Thread(() -> {
             try {
+                Thread.sleep(500);
                 socket = new Socket("localhost", 8189);
                 is = new DataInputStream(socket.getInputStream());
                 os = new DataOutputStream(socket.getOutputStream());
-                Thread.sleep(1000);
             } catch (Exception e) {
                 e.printStackTrace();
             }

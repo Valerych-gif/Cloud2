@@ -1,18 +1,15 @@
 package files;
 
-import fakeclient.FakeClient;
+import fakeantities.FakeClient;
 import main.Cloud2Server;
-import main.Cloud2ServerStarter;
 import main.ConnectionHandler;
 import org.junit.jupiter.api.*;
 import utils.Utils;
 
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
 
+@Disabled
 @DisplayName("Тесты класса управления файлами")
 public class TestFileHandler {
 
@@ -50,7 +47,7 @@ public class TestFileHandler {
         client = null;
     }
 
-    //@Disabled
+    @Disabled
     @Test
     @DisplayName("Помещение файла в хранилище")
     public void testPutFileIntoStorage() throws IOException {

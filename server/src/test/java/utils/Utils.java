@@ -1,6 +1,7 @@
 package utils;
 
-import fakeclient.FakeClient;
+import fakeantities.FakeClient;
+import main.Cloud2IOServer;
 import main.Cloud2Server;
 import main.Cloud2ServerStarter;
 import main.ConnectionHandler;
@@ -31,7 +32,7 @@ public class Utils {
     }
 
     public static ConnectionHandler getConnectionHandler(FakeClient client){
-        Cloud2Server testServer = Cloud2Server.getInstance();
+        Cloud2Server testServer = Cloud2IOServer.getInstance();
         Cloud2ServerStarter.setStorageRootDir(TEST_STORAGE_ROOT_DIR);
         testServer.init();
         client.connect();
