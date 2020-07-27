@@ -69,7 +69,8 @@ public class ConnectionHandler implements Runnable {
         fileHandler.loadFileToStorage(file);
     }
 
-    private void closeConnection() {
+    public void closeConnection() {
+
         try {
             is.close();
         } catch (IOException e) {
@@ -93,6 +94,10 @@ public class ConnectionHandler implements Runnable {
 
     public DataOutputStream getDataOutputStream() {
         return os;
+    }
+
+    public Socket getSocket() {
+        return socket;
     }
 
     public File getStorage() {

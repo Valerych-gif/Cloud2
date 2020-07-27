@@ -1,5 +1,7 @@
 package main;
 
+import java.io.IOException;
+
 public class Cloud2IOServer extends Cloud2Server{
 
     private static Cloud2Server instance;
@@ -14,8 +16,4 @@ public class Cloud2IOServer extends Cloud2Server{
         return instance;
     }
 
-    @Override
-    public void closeConnection() {
-
-    }
 }

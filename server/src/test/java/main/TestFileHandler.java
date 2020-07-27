@@ -1,7 +1,9 @@
-package files;
+package main;
 
 import fakeantities.FakeClient;
 import fakeantities.FakeServer;
+import files.CloudFile;
+import files.FileHandler;
 import main.Cloud2Server;
 import main.ConnectionHandler;
 import org.junit.jupiter.api.*;
@@ -40,7 +42,7 @@ public class TestFileHandler {
 
     @AfterEach
     public void tearsDownTest(){
-        testServer.closeConnection();
+        connectionHandler.closeConnection();
     }
 
     @Test

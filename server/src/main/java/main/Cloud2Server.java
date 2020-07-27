@@ -66,5 +66,4 @@ public abstract class Cloud2Server {
         return null;
     }
 
-    public abstract void closeConnection();
 }
