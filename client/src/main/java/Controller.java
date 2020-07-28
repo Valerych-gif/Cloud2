@@ -8,34 +8,82 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class Controller implements Initializable {
+
+    public static String DOWNLOAD_COMMAND = "./download";
+    public static String CLOSE_CONNECTION_COMMAND = "./closeconnection";
 
     public Button send;
     public ListView<String> listView;
     public TextField text;
     private List<File> clientFileList;
-    public static Socket socket;
+    private Socket socket;
     private DataInputStream is;
     private DataOutputStream os;
+    private File clientDir;
 
-    public void sendCommand(ActionEvent actionEvent) {
-        System.out.println("SEND!");
+    public void downloadFileAction(ActionEvent actionEvent) {
+        String command = text.getCharacters().toString();
+        if (command.startsWith(DOWNLOAD_COMMAND)){
+            downLoadFile(command);
+        }
+        if (command.startsWith(CLOSE_CONNECTION_COMMAND)){
+            sendCommand(CLOSE_CONNECTION_COMMAND);
+        }
+    }
+
+    private void sendCommand(String command){
+        try {
+            os.writeUTF(command);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void downLoadFile(String commandToDownloadFile){
+        try {
+            String[] commands = commandToDownloadFile.split(" ");
+            String downloadCommand = commands[0];
+            String downloadedFileName = commands[1];
+            os.writeUTF(downloadCommand);
+            os.writeUTF(downloadedFileName);
+            String response = is.readUTF();
+            if (response.equals("./take")){
+                String downloadedFileFullName = clientDir + "/" + is.readUTF();
+                System.out.println(downloadedFileFullName);
+                long downloadedFileSize = is.readLong();
+                File downloadedFile = new File(downloadedFileFullName);
+                if (!downloadedFile.exists()) {
+                    if (!downloadedFile.createNewFile());
+                }
+                int bufferSize = 1024;
+                byte[] buffer = new byte[bufferSize];
+                try {
+                    System.out.println("Получение файла");
+                    FileOutputStream fos = new FileOutputStream(downloadedFile);
+                    for (long i = 0; i < (downloadedFileSize / bufferSize == 0 ? 1 : downloadedFileSize / bufferSize); i++) {
+                        int bytesRead = is.read(buffer);
+                        fos.write(buffer, 0, bytesRead);
+                        fos.flush();
+                    }
+                    os.writeUTF("Ok");
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // TODO: 7/21/2020 init connect to server
+
         try{
             socket = new Socket("localhost", 8189);
             is = new DataInputStream(socket.getInputStream());
@@ -43,13 +91,13 @@ public class Controller implements Initializable {
             Thread.sleep(1000);
             clientFileList = new ArrayList<>();
             String clientPath = "./client/src/main/resources/";
-            File dir = new File(clientPath);
-            if (!dir.exists()) {
+            clientDir = new File(clientPath);
+            if (!clientDir.exists()) {
                 throw new RuntimeException("directory resource not exists on client");
             }
-            for (File file : Objects.requireNonNull(dir.listFiles())) {
+            for (File file : Objects.requireNonNull(clientDir.listFiles())) {
                 clientFileList.add(file);
-                listView.getItems().add(file.getName() + " : " + file.length());
+                listView.getItems().add(file.getName());
             }
             listView.setOnMouseClicked(a -> {
                 if (a.getClickCount() == 2) {
@@ -87,5 +135,17 @@ public class Controller implements Initializable {
             }
         }
         return null;
+    }
+
+    public Socket getSocket() {
+        return socket;
+    }
+
+    public DataInputStream getIs() {
+        return is;
+    }
+
+    public DataOutputStream getOs() {
+        return os;
     }
 }
