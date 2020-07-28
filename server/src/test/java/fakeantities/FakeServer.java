@@ -34,6 +34,12 @@ public class FakeServer extends Cloud2Server {
         }
     }
 
+    public void run(){
+        new Thread(()->{
+            connectionHandler.run();
+        }).start();
+    }
+
     public ConnectionHandler getConnectionHandler() {
         return connectionHandler;
     }

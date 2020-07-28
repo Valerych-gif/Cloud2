@@ -12,6 +12,10 @@ import java.net.Socket;
 @Getter
 public class ConnectionHandler implements Runnable {
 
+    public static String DOWNLOAD_COMMAND = "./download";
+    public static String UPLOAD_COMMAND = "./upload";
+    public static String CLOSE_CONNECTION_COMMAND = "./closeconnection";
+
     private Logger logger = LogManager.getLogger(ConnectionHandler.class);
 
     private Cloud2Server server;
@@ -20,15 +24,16 @@ public class ConnectionHandler implements Runnable {
     private DataOutputStream os;
     private FileHandler fileHandler;
     private File storage;
+    private boolean isConnectionActive;
 
-    public ConnectionHandler(Cloud2Server server, Socket socket) throws IOException, InterruptedException {
+    public ConnectionHandler(Cloud2Server server, Socket socket) throws IOException{
         logger.info("Connection accepted");
+        isConnectionActive = true;
         this.server = server;
         this.socket = socket;
         this.is = new DataInputStream(socket.getInputStream());
         this.os = new DataOutputStream(socket.getOutputStream());
         this.storage = server.getStorage();
-        //Thread.sleep(2000);
     }
 
 
@@ -37,16 +42,16 @@ public class ConnectionHandler implements Runnable {
     public void run() {
 
         fileHandler = new FileHandler(this);
-        while (true) {
+        while (isConnectionActive) {
             try {
                 String command = is.readUTF();
-                if (command.equals("./upload")) {
+                if (command.equals(UPLOAD_COMMAND)) {
                     receiveFileFromClient();
-                } else if (command.equals("./download")){
+                } else if (command.equals(DOWNLOAD_COMMAND)){
                     sendFileToClient();
-                } else if (command.equals("./close")){
+                } else if (command.equals(CLOSE_CONNECTION_COMMAND)){
                     closeConnection();
-                    break;
+                    System.out.println(CLOSE_CONNECTION_COMMAND);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -71,6 +76,7 @@ public class ConnectionHandler implements Runnable {
 
     public void closeConnection() {
 
+        isConnectionActive = false;
         try {
             is.close();
         } catch (IOException e) {

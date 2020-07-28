@@ -15,30 +15,49 @@ import java.util.*;
 
 public class Controller implements Initializable {
 
+    public static String DOWNLOAD_COMMAND = "./download";
+    public static String CLOSE_CONNECTION_COMMAND = "./closeconnection";
+
     public Button send;
     public ListView<String> listView;
     public TextField text;
     private List<File> clientFileList;
-    public static Socket socket;
+    private Socket socket;
     private DataInputStream is;
-    private static DataOutputStream os;
+    private DataOutputStream os;
     private File clientDir;
 
     public void downloadFileAction(ActionEvent actionEvent) {
-        String fileName = text.getCharacters().toString();
-        downLoadFile(fileName);
+        String command = text.getCharacters().toString();
+        if (command.startsWith(DOWNLOAD_COMMAND)){
+            downLoadFile(command);
+        }
+        if (command.startsWith(CLOSE_CONNECTION_COMMAND)){
+            sendCommand(CLOSE_CONNECTION_COMMAND);
+        }
     }
 
-    public void downLoadFile(String fileName){
+    private void sendCommand(String command){
         try {
-            os.writeUTF("./download");
-            os.writeUTF(fileName);
+            os.writeUTF(command);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void downLoadFile(String commandToDownloadFile){
+        try {
+            String[] commands = commandToDownloadFile.split(" ");
+            String downloadCommand = commands[0];
+            String downloadedFileName = commands[1];
+            os.writeUTF(downloadCommand);
+            os.writeUTF(downloadedFileName);
             String response = is.readUTF();
             if (response.equals("./take")){
-                String downloadedFileName = clientDir + "/" + is.readUTF();
-                System.out.println(downloadedFileName);
+                String downloadedFileFullName = clientDir + "/" + is.readUTF();
+                System.out.println(downloadedFileFullName);
                 long downloadedFileSize = is.readLong();
-                File downloadedFile = new File(downloadedFileName);
+                File downloadedFile = new File(downloadedFileFullName);
                 if (!downloadedFile.exists()) {
                     if (!downloadedFile.createNewFile());
                 }
@@ -118,4 +137,15 @@ public class Controller implements Initializable {
         return null;
     }
 
+    public Socket getSocket() {
+        return socket;
+    }
+
+    public DataInputStream getIs() {
+        return is;
+    }
+
+    public DataOutputStream getOs() {
+        return os;
+    }
 }

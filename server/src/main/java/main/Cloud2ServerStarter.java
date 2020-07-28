@@ -13,7 +13,4 @@ public class Cloud2ServerStarter {
         server.waitConnection();
     }
 
-    public static void setStorageRootDir(String storageRootDir) {
-        Cloud2ServerStarter.storageRootDir = storageRootDir;
-    }
 }
