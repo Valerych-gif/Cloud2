@@ -100,9 +100,8 @@ public class TestCloud2Server {
     @DisplayName("Закрытие соединения со стороны сервера")
     public void testCloseConnectionByCommandFromClient() {
 
-        client.sendCommand("./close");
+        client.sendCommand("./closeconnection");
         connectionHandler.run();
-        System.out.println(connectionHandler.getDataInputStream());
         Exception socketException = assertThrows(SocketException.class, () ->connectionHandler.getDataInputStream().readUTF());
         Assertions.assertEquals("socket closed", socketException.getMessage());
     }

@@ -51,7 +51,6 @@ public class ConnectionHandler implements Runnable {
                     sendFileToClient();
                 } else if (command.equals(CLOSE_CONNECTION_COMMAND)){
                     closeConnection();
-                    System.out.println(CLOSE_CONNECTION_COMMAND);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

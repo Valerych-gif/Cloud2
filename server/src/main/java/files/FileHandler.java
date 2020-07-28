@@ -50,7 +50,6 @@ public class FileHandler {
             String fileName = file.getName();
             long fileLength = file.length();
             try {
-                System.out.println("Отправка файла");
                 os.writeUTF("./take");
                 os.writeUTF(fileName);
                 os.writeLong(file.length());
