@@ -1,11 +1,11 @@
-package main;
+package main.iotests;
 
-import fakeantities.FakeClient;
-import fakeantities.FakeServer;
+import fakeentities.FakeClient;
+import fakeentities.FakeIOServer;
 import files.CloudFile;
 import files.FileHandler;
+import io.ConnectionHandler;
 import main.Cloud2Server;
-import main.ConnectionHandler;
 import org.junit.jupiter.api.*;
 import utils.Utils;
 
@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 
 @DisplayName("Тесты класса управления файлами")
-public class TestFileHandler {
+public class TestIOFileHandler {
 
     private Cloud2Server testServer;
     private ConnectionHandler connectionHandler;
@@ -27,7 +27,7 @@ public class TestFileHandler {
 
     @BeforeEach
     public void setUpTest(){
-        testServer = FakeServer.getInstance();
+        testServer = FakeIOServer.getInstance();
         client = new FakeClient();
         client.connect();
         testServer.waitConnection();
@@ -52,10 +52,8 @@ public class TestFileHandler {
         client.sendFiles();
         connectionHandler.run();
         String file1Path = testServer.getStorage().toString() + "/testFile1.txt";
-        System.out.println(file1Path);
         File file1 = new File(file1Path);
         String file2Path = testServer.getStorage().toString() + "/testFile2.txt";
-        System.out.println(file2Path);
         File file2 = new File(file2Path);
         Assertions.assertTrue(file1.exists());
         Assertions.assertTrue(file2.exists());

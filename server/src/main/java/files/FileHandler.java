@@ -1,7 +1,7 @@
 package files;
 
 import main.Cloud2ServerStarter;
-import main.ConnectionHandler;
+import io.ConnectionHandler;
 
 import java.io.*;
 

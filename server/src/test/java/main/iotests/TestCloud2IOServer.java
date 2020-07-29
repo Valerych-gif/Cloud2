@@ -1,8 +1,8 @@
-package main;
+package main.iotests;
 
-import fakeantities.FakeClient;
-import fakeantities.FakeServer;
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import fakeentities.FakeIOServer;
+import io.ConnectionHandler;
+import fakeentities.FakeClient;
 import main.Cloud2Server;
 import org.junit.jupiter.api.*;
 import utils.Utils;
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("Общие тесты для всего сервера")
-public class TestCloud2Server {
+public class TestCloud2IOServer {
 
     private Cloud2Server testServer;
     private File testStorage;
@@ -27,7 +27,7 @@ public class TestCloud2Server {
 
     @BeforeEach
     public void setUp() {
-        testServer = FakeServer.getInstance();
+        testServer = FakeIOServer.getInstance();
         testServer.init();
         testStorage = testServer.getStorage();
         client = new FakeClient();
@@ -38,7 +38,7 @@ public class TestCloud2Server {
 
     @AfterEach
     public void tearDownTest() {
-        ((FakeServer)testServer).closeConnection();
+        ((FakeIOServer)testServer).closeConnection();
     }
 
     @Test

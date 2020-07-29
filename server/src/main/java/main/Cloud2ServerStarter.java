@@ -1,5 +1,7 @@
 package main;
 
+import io.Cloud2IOServer;
+
 public class Cloud2ServerStarter {
 
     public static String storageRootDir = "server/src/main/resources/storage";

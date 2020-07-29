@@ -1,5 +1,6 @@
 package main;
 
+import io.ConnectionHandler;
 import exceptions.CantToCreateStorageException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,7 +9,6 @@ import java.io.File;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public abstract class Cloud2Server {
 
@@ -16,7 +16,7 @@ public abstract class Cloud2Server {
     protected ExecutorService executor;
     protected Socket socket;
     protected File storage;
-    private Logger logger = LogManager.getLogger(Cloud2Server.class);
+    protected Logger logger = LogManager.getLogger(Cloud2Server.class);
 
     public  Cloud2Server() {
         storage = new File(Cloud2ServerStarter.storageRootDir);
@@ -25,21 +25,6 @@ public abstract class Cloud2Server {
     public void init() {
         try {
             setUpMainStorage();
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    public void waitConnection() {
-        try {
-            serverSocket = new ServerSocket(Cloud2ServerStarter.PORT);
-            executor = Executors.newCachedThreadPool();
-            logger.info("Server started.");
-            while (true) {
-                socket = serverSocket.accept();
-                executor.execute(new ConnectionHandler(this, socket));
-                logger.info("Client connected");
-            }
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -66,4 +51,5 @@ public abstract class Cloud2Server {
         return null;
     }
 
+    public abstract void waitConnection();
 }

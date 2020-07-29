@@ -1,4 +1,4 @@
-package fakeantities;
+package fakeentities;
 
 import java.io.*;
 import java.net.Socket;
@@ -44,7 +44,7 @@ public class FakeClient {
             sendFile(currentFile2);
             try {
                 Thread.sleep(1000);
-                os.writeUTF("./close");
+                os.writeUTF("./closeconnection");
             } catch (Exception e) {
                 e.printStackTrace();
             }
