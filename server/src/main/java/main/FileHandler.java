@@ -1,5 +1,6 @@
-package files;
+package main;
 
+import files.CloudFile;
 import main.Cloud2ServerStarter;
 import main.ConnectionHandler;
 

@@ -105,9 +105,9 @@ public class Controller implements Initializable {
                     File currentFile = findFileByName(fileName);
                     if (currentFile != null) {
                         try {
-                            os.writeUTF("./upload");
-                            os.writeUTF(fileName);
-                            os.writeLong(currentFile.length());
+                            os.writeBytes("./upload");
+                            os.writeBytes(fileName);
+                            os.writeBytes(String.valueOf(currentFile.length()));
                             FileInputStream fis = new FileInputStream(currentFile);
                             byte [] buffer = new byte[1024];
                             while (fis.available() > 0) {

@@ -1,8 +1,10 @@
-package files;
+package nio;
 
+import files.CloudFile;
+import main.FileHandler;
 import main.ConnectionHandler;
 
-public class NIOFileHandler extends FileHandler{
+public class NIOFileHandler extends FileHandler {
 
     public NIOFileHandler(ConnectionHandler connectionHandler) {
         super(connectionHandler);

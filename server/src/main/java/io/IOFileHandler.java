@@ -1,6 +1,7 @@
-package files;
+package io;
 
-import io.IOConnectionHandler;
+import files.CloudFile;
+import main.FileHandler;
 import main.ConnectionHandler;
 
 import java.io.*;

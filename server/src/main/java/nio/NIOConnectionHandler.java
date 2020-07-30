@@ -1,20 +1,15 @@
 package nio;
 
 import files.CloudFile;
-import files.FileHandler;
-import files.IOFileHandler;
-import files.NIOFileHandler;
-import io.IOConnectionHandler;
 import main.Cloud2Server;
 import main.Cloud2ServerStarter;
 import main.ConnectionHandler;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Arrays;
 
 public class NIOConnectionHandler extends ConnectionHandler {
 
@@ -37,22 +32,36 @@ public class NIOConnectionHandler extends ConnectionHandler {
 
         while (isConnectionActive) {
             try {
-                socketChannel.read(buffer);
-                String command = buffer.toString();
-                if (command.equals(UPLOAD_COMMAND)) {
-                    receiveFileFromClient();
-                } else if (command.equals(DOWNLOAD_COMMAND)){
-                    sendFileToClient();
-                } else if (command.equals(CLOSE_CONNECTION_COMMAND)){
-                    closeConnection();
-                }
+                command = getCommand();
+                super.run();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-
+    public String getCommand() throws IOException {
+        int bytesRead = socketChannel.read(buffer);
+        System.out.println("up");
+        StringBuilder c = new StringBuilder();
+        boolean commandIsNotEnd = true;
+        while (bytesRead != -1&&commandIsNotEnd) {
+            buffer.flip();
+            while(buffer.hasRemaining()){
+                char ch = (char) buffer.get();
+                if ((int)ch!=0) {
+                    System.out.println(ch + " " + (int)ch);
+                    c.append(ch);
+                } else {
+                    commandIsNotEnd = false;
+                    break;
+                }
+            }
+            buffer.clear();
+            if (commandIsNotEnd) bytesRead = socketChannel.read(buffer);
+        }
+        return c.toString();
+    }
 
     public void sendFileToClient() throws IOException {
         socketChannel.read(buffer);
@@ -62,12 +71,13 @@ public class NIOConnectionHandler extends ConnectionHandler {
     }
 
     public void receiveFileFromClient() throws IOException {
-        socketChannel.read(buffer);
-        String[] command = buffer.toString().split(" ");
-        String fileName = command[0];
-        long fileLength = Long.getLong(command[1]);
+        String fileName = getCommand();
+        System.out.println(fileName);
+        long fileLength = Long.getLong(getCommand());
+        System.out.println(fileLength);
         CloudFile file = new CloudFile(storage + "/" + fileName, fileLength);
-        fileHandler.loadFileToStorage(file);
+        System.out.println(file.getAbsolutePath());
+        //fileHandler.loadFileToStorage(file);
     }
 
     public void closeConnection() {
