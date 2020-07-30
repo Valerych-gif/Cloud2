@@ -1,7 +1,7 @@
 package main.iotests;
 
 import fakeentities.FakeIOServer;
-import io.ConnectionHandler;
+import io.IOConnectionHandler;
 import fakeentities.FakeClient;
 import main.Cloud2Server;
 import org.junit.jupiter.api.*;
@@ -21,7 +21,7 @@ public class TestCloud2IOServer {
     private Cloud2Server testServer;
     private File testStorage;
     private FakeClient client;
-    private ConnectionHandler connectionHandler;
+    private IOConnectionHandler connectionHandler;
     private DataInputStream is;
 
 

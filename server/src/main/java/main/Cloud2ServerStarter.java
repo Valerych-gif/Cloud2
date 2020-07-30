@@ -1,6 +1,7 @@
 package main;
 
 import io.Cloud2IOServer;
+import nio.Cloud2NIOServer;
 
 public class Cloud2ServerStarter {
 
@@ -10,7 +11,7 @@ public class Cloud2ServerStarter {
     public final static int BUFFER_SIZE = 1024;
 
     public static void main(String[] args) {
-        Cloud2Server server = Cloud2IOServer.getInstance();
+        Cloud2Server server = Cloud2NIOServer.getInstance();
         server.init();
         server.waitConnection();
     }

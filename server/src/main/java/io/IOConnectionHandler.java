@@ -1,74 +1,59 @@
 package io;
 
+import files.IOFileHandler;
 import main.Cloud2Server;
 
 import files.CloudFile;
 import files.FileHandler;
 import lombok.Getter;
+import main.ConnectionHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.Socket;
 
-@Getter
-public class ConnectionHandler implements Runnable {
+public class IOConnectionHandler extends ConnectionHandler{
 
-    public static String DOWNLOAD_COMMAND = "./download";
-    public static String UPLOAD_COMMAND = "./upload";
-    public static String CLOSE_CONNECTION_COMMAND = "./closeconnection";
-
-    private Logger logger = LogManager.getLogger(ConnectionHandler.class);
-
-    private Cloud2Server server;
     private Socket socket;
     private DataInputStream is;
     private DataOutputStream os;
-    private FileHandler fileHandler;
-    private File storage;
-    private boolean isConnectionActive;
 
-    public ConnectionHandler(Cloud2Server server, Socket socket) throws IOException{
-        logger.info("Connection accepted");
-        isConnectionActive = true;
-        this.server = server;
+    public IOConnectionHandler(Cloud2Server server, Socket socket) throws IOException{
+        super(server);
         this.socket = socket;
         this.is = new DataInputStream(socket.getInputStream());
         this.os = new DataOutputStream(socket.getOutputStream());
-        this.storage = server.getStorage();
     }
 
-
-
     @Override
-    public void run() {
-
-        fileHandler = new FileHandler(this);
+    public void run(){
         while (isConnectionActive) {
-            try {
-                String command = is.readUTF();
-                if (command.equals(UPLOAD_COMMAND)) {
-                    receiveFileFromClient();
-                } else if (command.equals(DOWNLOAD_COMMAND)){
-                    sendFileToClient();
-                } else if (command.equals(CLOSE_CONNECTION_COMMAND)){
-                    closeConnection();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            fileHandler = new IOFileHandler(this);
+            command = getCommandFromClient(); // Block
+            super.run();
         }
     }
 
+    public String getCommandFromClient(){
+        String command = null;
+        try {
+            command = is.readUTF();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return command;
+    }
 
 
-    private void sendFileToClient() throws IOException {
+
+    public void sendFileToClient() throws IOException {
         String fileName = is.readUTF();
         CloudFile file = new CloudFile(storage + "/" + fileName);
         fileHandler.getFileFromStorage(file);
     }
 
-    private void receiveFileFromClient() throws IOException {
+    public void receiveFileFromClient() throws IOException {
         String fileName = is.readUTF();
         long fileLength = is.readLong();
         CloudFile file = new CloudFile(storage + "/" + fileName, fileLength);

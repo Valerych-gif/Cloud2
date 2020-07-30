@@ -1,6 +1,6 @@
 package main;
 
-import io.ConnectionHandler;
+import io.IOConnectionHandler;
 import exceptions.CantToCreateStorageException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,7 +47,7 @@ public abstract class Cloud2Server {
         return storage;
     }
 
-    public ConnectionHandler getConnectionHandler(){
+    public IOConnectionHandler getConnectionHandler(){
         return null;
     }
 

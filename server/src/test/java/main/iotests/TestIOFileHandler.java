@@ -4,7 +4,9 @@ import fakeentities.FakeClient;
 import fakeentities.FakeIOServer;
 import files.CloudFile;
 import files.FileHandler;
-import io.ConnectionHandler;
+import files.IOFileHandler;
+import io.IOConnectionHandler;
+import main.ConnectionHandler;
 import main.Cloud2Server;
 import org.junit.jupiter.api.*;
 import utils.Utils;
@@ -32,7 +34,7 @@ public class TestIOFileHandler {
         client.connect();
         testServer.waitConnection();
         connectionHandler = testServer.getConnectionHandler();
-        fileHandler = new FileHandler(connectionHandler);
+        fileHandler = new IOFileHandler(connectionHandler);
 
         file1 = new File(client.getFile1().getAbsolutePath());
         file2 = new File(client.getFile2().getAbsolutePath());
@@ -42,7 +44,7 @@ public class TestIOFileHandler {
 
     @AfterEach
     public void tearsDownTest(){
-        connectionHandler.closeConnection();
+        ((IOConnectionHandler)connectionHandler).closeConnection();
     }
 
     @Test
