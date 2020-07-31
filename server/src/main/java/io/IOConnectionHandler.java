@@ -3,6 +3,7 @@ package io;
 import main.Cloud2Server;
 
 import files.CloudFile;
+import main.Commands;
 import main.ConnectionHandler;
 
 import java.io.*;
@@ -10,6 +11,7 @@ import java.net.Socket;
 
 public class IOConnectionHandler extends ConnectionHandler{
 
+    private static final int MAX_COMMAND_LENGTH = 100;
     private Socket socket;
     private DataInputStream is;
     private DataOutputStream os;
@@ -31,15 +33,31 @@ public class IOConnectionHandler extends ConnectionHandler{
     }
 
     public String getCommandFromClient(){
-        String command = null;
+
+        StringBuilder command = new StringBuilder();
         try {
-            command = is.readUTF();
+            for (int i = 0; i < MAX_COMMAND_LENGTH; i++) {
+                byte b = is.readByte();
+                command.append((char)b);
+                if (checkCommand(command.toString())){
+                    break;
+                }
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return command;
+        System.out.println(command);
+        return command.toString();
     }
 
+    private boolean checkCommand(String command) {
+        Commands[] commands = Commands.values();
+        for (Commands c : commands) {
+            if (command.equals(c.getCommandStr())) return true;
+        }
+        return false;
+    }
 
 
     public void sendFileToClient() throws IOException {

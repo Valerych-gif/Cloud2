@@ -11,7 +11,7 @@ public class Cloud2ServerStarter {
     public final static int BUFFER_SIZE = 1024;
 
     public static void main(String[] args) {
-        Cloud2Server server = Cloud2NIOServer.getInstance();
+        Cloud2Server server = Cloud2IOServer.getInstance();
         server.init();
         server.waitConnection();
     }

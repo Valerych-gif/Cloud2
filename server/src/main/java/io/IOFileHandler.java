@@ -17,8 +17,8 @@ public class IOFileHandler extends FileHandler {
 
     @Override
     public void init() {
-        this.is = ((IOConnectionHandler) connectionHandler).getDataInputStream();
-        this.os = ((IOConnectionHandler) connectionHandler).getDataOutputStream();
+        this.is = connectionHandler.getDataInputStream();
+        this.os = connectionHandler.getDataOutputStream();
     }
 
     public boolean loadFileToStorage(CloudFile clientFile){

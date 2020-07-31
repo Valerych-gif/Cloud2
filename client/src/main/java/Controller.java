@@ -55,8 +55,8 @@ public class Controller implements Initializable {
             String[] commands = commandToDownloadFile.split(" ");
             String downloadCommand = commands[0];
             String downloadedFileName = commands[1];
-            os.writeUTF(downloadCommand);
-            os.writeUTF(downloadedFileName);
+            os.writeBytes(downloadCommand);
+            os.writeBytes(downloadedFileName);
             String response = is.readUTF();
             if (response.equals("./take")){
                 String downloadedFileFullName = clientDir + "/" + is.readUTF();
@@ -110,40 +110,41 @@ public class Controller implements Initializable {
                     File currentFile = findFileByName(fileName);
                     if (currentFile != null) {
                         try {
-                            os.writeUTF("./upload");
-                            os.writeUTF(fileName);
-                            os.writeLong(currentFile.length());
-                            SocketChannel bos = SocketChannel.open(new InetSocketAddress("localhost", 8190));
-
-                            RandomAccessFile aFile = new RandomAccessFile(currentFile.getAbsolutePath(), "r");
-                            FileChannel inChannel = aFile.getChannel();
-                            ByteBuffer buf = ByteBuffer.allocate(1024);
-                            int bytesRead = inChannel.read(buf);
-                            while (bytesRead != -1) {
-                                buf.flip();
+                            os.writeBytes("./upload");
+                            os.writeBytes(fileName);
+                            String fileLength = String.valueOf(currentFile.length());
+                            os.writeBytes(fileLength);
+//                            SocketChannel bos = SocketChannel.open(new InetSocketAddress("localhost", 8190));
+//
+//                            RandomAccessFile aFile = new RandomAccessFile(currentFile.getAbsolutePath(), "r");
+//                            FileChannel inChannel = aFile.getChannel();
+//                            ByteBuffer buf = ByteBuffer.allocate(1024);
+//                            int bytesRead = inChannel.read(buf);
+//                            while (bytesRead != -1) {
+//                                buf.flip();
 //                                while(buf.hasRemaining()){
 //                                    //System.out.print((char) buf.get());
 //                                    byte b = buf.get();
 //                                }
-                                bos.write(buf);
-                                buf.clear();
-
-                                bytesRead = inChannel.read(buf);
-                            }
-                            aFile.close();
-
-
-//                            FileInputStream fis = new FileInputStream(currentFile);
-
-//                            byte [] buffer = new byte[1024];
-//                            while (fis.available() > 0) {
-//                                int bytesRead = fis.read(buffer);
-//                                os.write(buffer, 0, bytesRead);
+//                                bos.write(buf);
+//                                buf.clear();
+//
+//                                bytesRead = inChannel.read(buf);
 //                            }
-//                            os.flush();
-//                            byte[] response = new byte[1024];
-//                            is.read(response);
-//                            System.out.println(response);
+//                            aFile.close();
+
+
+                            FileInputStream fis = new FileInputStream(currentFile);
+
+                            byte [] buffer = new byte[1024];
+                            while (fis.available() > 0) {
+                                int bytesRead = fis.read(buffer);
+                                os.write(buffer, 0, bytesRead);
+                            }
+                            os.flush();
+                            byte[] response = new byte[1024];
+                            is.read(response);
+                            System.out.println(response);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
