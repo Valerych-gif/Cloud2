@@ -20,6 +20,7 @@ import java.util.*;
 
 public class Controller implements Initializable {
 
+    private static final int MAX_RESPONSE_LENGTH = 100;
     public static String DOWNLOAD_COMMAND = "./download";
     public static String CLOSE_CONNECTION_COMMAND = "./closeconnection";
 
@@ -44,7 +45,7 @@ public class Controller implements Initializable {
 
     private void sendCommand(String command){
         try {
-            os.writeUTF(command);
+            os.writeBytes(command);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -111,9 +112,18 @@ public class Controller implements Initializable {
                     if (currentFile != null) {
                         try {
                             os.writeBytes("./upload");
-                            os.writeBytes(fileName);
-                            String fileLength = String.valueOf(currentFile.length());
-                            os.writeBytes(fileLength);
+                            if (getResponse()) {
+                                os.writeBytes(fileName);
+                            }
+                            if (getResponse()) {
+                                long fileLength = currentFile.length();
+                                os.writeLong(fileLength);
+                            }
+
+                            if (getResponse()) {
+                                sendFile(currentFile);
+                            }
+
 //                            SocketChannel bos = SocketChannel.open(new InetSocketAddress("localhost", 8190));
 //
 //                            RandomAccessFile aFile = new RandomAccessFile(currentFile.getAbsolutePath(), "r");
@@ -133,18 +143,6 @@ public class Controller implements Initializable {
 //                            }
 //                            aFile.close();
 
-
-                            FileInputStream fis = new FileInputStream(currentFile);
-
-                            byte [] buffer = new byte[1024];
-                            while (fis.available() > 0) {
-                                int bytesRead = fis.read(buffer);
-                                os.write(buffer, 0, bytesRead);
-                            }
-                            os.flush();
-                            byte[] response = new byte[1024];
-                            is.read(response);
-                            System.out.println(response);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -154,6 +152,36 @@ public class Controller implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void sendFile(File currentFile) throws IOException {
+        FileInputStream fis = new FileInputStream(currentFile);
+
+        byte [] buffer = new byte[1024];
+        while (fis.available() > 0) {
+            int bytesRead = fis.read(buffer);
+            os.write(buffer, 0, bytesRead);
+        }
+        os.flush();
+    }
+
+    private boolean getResponse() {
+        StringBuilder command = new StringBuilder();
+        try {
+            for (int i = 0; i < MAX_RESPONSE_LENGTH; i++) {
+                byte b = is.readByte();
+                command.append((char)b);
+                if (command.toString().equals("./ok")){
+                    return true;
+                }
+                if (command.toString().equals("./fail")){
+                    return false;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private File findFileByName(String fileName) {

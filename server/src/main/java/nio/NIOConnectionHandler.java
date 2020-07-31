@@ -4,6 +4,7 @@ import files.CloudFile;
 import io.IOFileHandler;
 import main.Cloud2Server;
 import main.Cloud2ServerStarter;
+import main.Commands;
 import main.ConnectionHandler;
 
 import java.io.DataInputStream;
@@ -36,14 +37,19 @@ public class NIOConnectionHandler extends ConnectionHandler {
         }
     }
 
-    public String getCommandFromClient(){
+    @Override
+    protected void sendResponse(String responseStr) {
+
+    }
+
+    public Commands getCommandFromClient(){
         String command = null;
         try {
             command = is.readUTF();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return command;
+        return null;
     }
 
 

@@ -19,7 +19,7 @@ public abstract class ConnectionHandler implements Runnable {
     protected FileHandler fileHandler;
     protected File storage;
     protected boolean isConnectionActive;
-    protected String command;
+    protected Commands command;
 
     public ConnectionHandler(Cloud2Server server) {
         logger.info("Connection accepted");
@@ -32,17 +32,20 @@ public abstract class ConnectionHandler implements Runnable {
     public void run() {
 
         try {
-            if (command.equals(UPLOAD_COMMAND)) {
+            if (command.equals(Commands.UPLOAD)) {
+                sendResponse(Responses.OK.responseStr);
                 receiveFileFromClient();
-            } else if (command.equals(DOWNLOAD_COMMAND)) {
+            } else if (command.equals(Commands.DOWNLOAD)) {
                 sendFileToClient();
-            } else if (command.equals(CLOSE_CONNECTION_COMMAND)) {
+            } else if (command.equals(Commands.CLOSE_CONNECTION)) {
                 closeConnection();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    protected abstract void sendResponse(String responseStr);
 
     protected abstract void closeConnection();
 

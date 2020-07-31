@@ -25,7 +25,7 @@ public class Main extends Application {
         primaryStage.show();
         primaryStage.setOnCloseRequest(event -> {
             try {
-                os.writeUTF("./closeconnection");
+                os.writeBytes("./closeconnection");
             } catch (IOException e) {
                 e.printStackTrace();
             };

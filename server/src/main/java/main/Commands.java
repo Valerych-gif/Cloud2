@@ -1,7 +1,7 @@
 package main;
 
 public enum Commands {
-    UPLOAD ("./upload"), DOWNLOAD ("./download");
+    UPLOAD ("./upload"), DOWNLOAD ("./download"), CLOSE_CONNECTION("./closeconnection");
 
     String commandStr;
 
