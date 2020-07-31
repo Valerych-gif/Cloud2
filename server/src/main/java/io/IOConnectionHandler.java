@@ -23,8 +23,8 @@ public class IOConnectionHandler extends ConnectionHandler{
 
     @Override
     public void run(){
+        fileHandler = new IOFileHandler(this);
         while (isConnectionActive) {
-            fileHandler = new IOFileHandler(this);
             command = getCommandFromClient(); // Block
             super.run();
         }

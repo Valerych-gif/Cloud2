@@ -9,8 +9,13 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.SocketChannel;
 import java.util.*;
 
 public class Controller implements Initializable {
@@ -105,18 +110,40 @@ public class Controller implements Initializable {
                     File currentFile = findFileByName(fileName);
                     if (currentFile != null) {
                         try {
-                            os.writeBytes("./upload");
-                            os.writeBytes(fileName);
-                            os.writeBytes(String.valueOf(currentFile.length()));
-                            FileInputStream fis = new FileInputStream(currentFile);
-                            byte [] buffer = new byte[1024];
-                            while (fis.available() > 0) {
-                                int bytesRead = fis.read(buffer);
-                                os.write(buffer, 0, bytesRead);
+                            os.writeUTF("./upload");
+                            os.writeUTF(fileName);
+                            os.writeLong(currentFile.length());
+                            SocketChannel bos = SocketChannel.open(new InetSocketAddress("localhost", 8190));
+
+                            RandomAccessFile aFile = new RandomAccessFile(currentFile.getAbsolutePath(), "r");
+                            FileChannel inChannel = aFile.getChannel();
+                            ByteBuffer buf = ByteBuffer.allocate(1024);
+                            int bytesRead = inChannel.read(buf);
+                            while (bytesRead != -1) {
+                                buf.flip();
+//                                while(buf.hasRemaining()){
+//                                    //System.out.print((char) buf.get());
+//                                    byte b = buf.get();
+//                                }
+                                bos.write(buf);
+                                buf.clear();
+
+                                bytesRead = inChannel.read(buf);
                             }
-                            os.flush();
-                            String response = is.readUTF();
-                            System.out.println(response);
+                            aFile.close();
+
+
+//                            FileInputStream fis = new FileInputStream(currentFile);
+
+//                            byte [] buffer = new byte[1024];
+//                            while (fis.available() > 0) {
+//                                int bytesRead = fis.read(buffer);
+//                                os.write(buffer, 0, bytesRead);
+//                            }
+//                            os.flush();
+//                            byte[] response = new byte[1024];
+//                            is.read(response);
+//                            System.out.println(response);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
