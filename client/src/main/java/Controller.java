@@ -31,7 +31,7 @@ public class Controller implements Initializable {
             downLoadFile(command);
         }
         if (command.startsWith(CLOSE_CONNECTION_COMMAND)){
-            sendCommand(CLOSE_CONNECTION_COMMAND);
+            sendCommand(CLOSE_CONNECTION_COMMAND+'|');
         }
     }
 
@@ -48,9 +48,9 @@ public class Controller implements Initializable {
             String[] commands = commandToDownloadFile.split(" ");
             String downloadCommand = commands[0];
             String downloadedFileName = commands[1];
-            os.writeBytes(downloadCommand);
+            os.writeBytes(downloadCommand+'|');
             if (isResponseOk()) {
-                os.writeBytes(downloadedFileName);
+                os.writeBytes(downloadedFileName+'|');
 
                 if (isResponseOk()) {
                     String downloadedFileFullName = clientDir + "/" + downloadedFileName;
@@ -83,16 +83,22 @@ public class Controller implements Initializable {
     }
 
     private String getStringFromServer() {
-        String stringFromServer = null;
-        char[] b = new char[1024];
+        StringBuilder stringFromServer= new StringBuilder();
+        char b = 0;
         try {
-            Reader in = new InputStreamReader(is, StandardCharsets.UTF_8);
-            int readInt = in.read(b, 0, b.length);
-            stringFromServer = String.copyValueOf(b, 0, readInt);
-        } catch (IOException e) {
+            while (true) {
+                b = (char) is.readByte();
+                if (b != '|') {
+                    stringFromServer.append(b);
+                } else {
+                    return stringFromServer.toString();
+                }
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return stringFromServer;
+        return stringFromServer.toString();
     }
 
     @Override
@@ -119,14 +125,17 @@ public class Controller implements Initializable {
                     File currentFile = findFileByName(fileName);
                     if (currentFile != null) {
                         try {
-                            os.writeBytes("./upload");
+                            os.writeBytes("./upload|");
+                            os.flush();
                             if (isResponseOk()) {
-                                os.writeBytes(fileName);
+                                os.writeBytes(fileName+'|');
+                                os.flush();
                             }
                             if (isResponseOk()) {
                                 long fileLength = currentFile.length();
                                 String fileLengthStr = String.valueOf(fileLength);
-                                os.writeBytes(fileLengthStr);
+                                os.writeBytes(fileLengthStr+'|');
+                                os.flush();
                             }
 
                             if (isResponseOk()) {
@@ -175,18 +184,20 @@ public class Controller implements Initializable {
     }
 
     private boolean isResponseOk() {
-        StringBuilder command = new StringBuilder();
-        try {
-            for (int i = 0; i < MAX_RESPONSE_LENGTH; i++) {
-                byte b = is.readByte();
-                command.append((char)b);
-                if (command.toString().equals("./ok")){
-                    return true;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String response = getStringFromServer();
+        if (response.equals("./ok")) return true;
+//        StringBuilder command = new StringBuilder();
+//        try {
+//            for (int i = 0; i < MAX_RESPONSE_LENGTH; i++) {
+//                byte b = is.readByte();
+//                command.append((char)b);
+//                if (command.toString().equals("./ok")){
+//                    return true;
+//                }
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         return false;
     }
 

@@ -10,6 +10,6 @@ public enum Responses {
     }
 
     public String getString() {
-        return responseStr;
+        return responseStr + Cloud2ServerStarter.END_COMMAND_CHAR;
     }
 }

@@ -6,7 +6,6 @@ import files.CloudFile;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 public class IOConnectionHandler extends ConnectionHandler {
 
@@ -33,17 +32,23 @@ public class IOConnectionHandler extends ConnectionHandler {
     }
 
     private String getStringFromClient() {
-        String stringFromClient = null;
-        char[] b = new char[Cloud2ServerStarter.BUFFER_SIZE];
+        StringBuilder stringFromClient = new StringBuilder();
+        char b = 0;
         try {
-            Reader in = new InputStreamReader(is, StandardCharsets.UTF_8);
-            int readInt = in.read(b, 0, b.length);
-            stringFromClient = String.copyValueOf(b, 0, readInt);
-        } catch (IOException e) {
+            while (true) {
+                b = (char) is.readByte();
+                if (b != '|') {
+                    stringFromClient.append(b);
+                } else {
+                    return stringFromClient.toString();
+                }
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
             logger.error(e);
         }
-        return stringFromClient;
+        return stringFromClient.toString();
     }
 
     private Commands checkCommand(String command) {
@@ -56,9 +61,7 @@ public class IOConnectionHandler extends ConnectionHandler {
 
     public void sendResponse(String responseStr) {
         try {
-            Thread.sleep(100); // todo Костыль, надо избавиться. Без задержки строки от клиента приходят не полностью
             os.writeBytes(responseStr);
-            Thread.sleep(100);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e);
@@ -71,7 +74,7 @@ public class IOConnectionHandler extends ConnectionHandler {
         if (fileName != null && file.exists()) {
             sendResponse(Responses.OK.getString());
             fileHandler.getFileFromStorage(file);
-        }else {
+        } else {
             // todo Обработчик ошибки
             System.out.println("Неправильное имя файла");
         }

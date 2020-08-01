@@ -43,6 +43,7 @@ public abstract class ConnectionHandler implements Runnable {
                 }
 
             } catch (Exception e) {
+                closeConnection();
                 e.printStackTrace();
                 logger.error(e);
             }

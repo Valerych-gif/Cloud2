@@ -1,6 +1,7 @@
 package io;
 
 import files.CloudFile;
+import main.Cloud2ServerStarter;
 import main.FileHandler;
 import main.ConnectionHandler;
 import main.Responses;
@@ -50,7 +51,7 @@ public class IOFileHandler extends FileHandler {
         if (file.exists()){
             long fileLength = file.length();
             try {
-                os.writeBytes(String.valueOf(file.length()));
+                os.writeBytes(String.valueOf(file.length())+ Cloud2ServerStarter.END_COMMAND_CHAR);
                 FileInputStream fis = new FileInputStream(file);
                 byte[] bytes = new byte[bufferSize];
                 for (long i = 0; i < (fileLength / bufferSize == 0 ? 1 : fileLength / bufferSize); i++) {

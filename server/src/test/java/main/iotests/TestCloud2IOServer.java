@@ -4,6 +4,7 @@ import fakeentities.FakeIOServer;
 import io.IOConnectionHandler;
 import fakeentities.FakeClient;
 import main.Cloud2Server;
+import main.Cloud2ServerStarter;
 import org.junit.jupiter.api.*;
 import utils.Utils;
 
@@ -90,7 +91,7 @@ public class TestCloud2IOServer {
     @DisplayName("Закрытие соединения со стороны сервера")
     public void testCloseConnectionByCommandFromClient() {
 
-        client.sendCommand("./closeconnection");
+        client.sendCommand("./closeconnection" + Cloud2ServerStarter.END_COMMAND_CHAR);
         connectionHandler.run();
         Exception socketException = assertThrows(SocketException.class, () ->connectionHandler.getDataInputStream().readUTF());
         Assertions.assertEquals("socket closed", socketException.getMessage());
