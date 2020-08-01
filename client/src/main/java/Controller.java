@@ -117,7 +117,8 @@ public class Controller implements Initializable {
                             }
                             if (getResponse()) {
                                 long fileLength = currentFile.length();
-                                os.writeLong(fileLength);
+                                String fileLengthStr = String.valueOf(fileLength);
+                                os.writeBytes(fileLengthStr);
                             }
 
                             if (getResponse()) {

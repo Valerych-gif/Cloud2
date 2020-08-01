@@ -9,9 +9,6 @@ import java.io.File;
 import java.io.IOException;
 
 public abstract class ConnectionHandler implements Runnable {
-    public static String DOWNLOAD_COMMAND = "./download";
-    public static String UPLOAD_COMMAND = "./upload";
-    public static String CLOSE_CONNECTION_COMMAND = "./closeconnection";
 
     protected Logger logger = LogManager.getLogger(ConnectionHandler.class);
 
@@ -31,19 +28,28 @@ public abstract class ConnectionHandler implements Runnable {
     @Override
     public void run() {
 
-        try {
-            if (command.equals(Commands.UPLOAD)) {
-                sendResponse(Responses.OK.responseStr);
-                receiveFileFromClient();
-            } else if (command.equals(Commands.DOWNLOAD)) {
-                sendFileToClient();
-            } else if (command.equals(Commands.CLOSE_CONNECTION)) {
-                closeConnection();
+        while (isConnectionActive) {
+            command = getCommandFromClient(); // Block
+            try {
+                if (command.equals(Commands.UPLOAD)) {
+                    sendResponse(Responses.OK.getString());
+                    receiveFileFromClient(); // Block
+                } else if (command.equals(Commands.DOWNLOAD)) {
+                    sendResponse(Responses.OK.getString());
+                    sendFileToClient();
+                } else if (command.equals(Commands.CLOSE_CONNECTION)) {
+                    sendResponse(Responses.OK.getString());
+                    closeConnection();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error(e);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
+
+    protected abstract Commands getCommandFromClient();
 
     protected abstract void sendResponse(String responseStr);
 

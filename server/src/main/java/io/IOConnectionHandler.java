@@ -1,20 +1,15 @@
 package io;
 
-import main.Cloud2Server;
+import main.*;
 
 import files.CloudFile;
-import main.Cloud2ServerStarter;
-import main.Commands;
-import main.ConnectionHandler;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Arrays;
+import java.nio.charset.StandardCharsets;
 
 public class IOConnectionHandler extends ConnectionHandler {
 
-    private static final int MAX_COMMAND_LENGTH = 100;
-    private static final int MAX_FILE_NAME_LENGTH = 100;
     private Socket socket;
     private DataInputStream is;
     private DataOutputStream os;
@@ -29,44 +24,43 @@ public class IOConnectionHandler extends ConnectionHandler {
     @Override
     public void run() {
         fileHandler = new IOFileHandler(this);
-        while (isConnectionActive) {
-            command = getCommandFromClient(); // Block
-            super.run();
-        }
+        super.run();
     }
 
     public Commands getCommandFromClient() {
+        String command = getStringFromClient();
+        return checkCommand(command);
+    }
 
-        StringBuilder command = new StringBuilder();
+    private String getStringFromClient() {
+        String stringFromClient = null;
+        char[] b = new char[Cloud2ServerStarter.BUFFER_SIZE];
         try {
-            for (int i = 0; i < MAX_COMMAND_LENGTH; i++) {
-                byte b = is.readByte();
-                command.append((char) b);
-                Commands checkedCommand = checkCommand(command.toString());
-                if (checkedCommand != null) {
-                    return checkedCommand;
-                }
-            }
-
+            Reader in = new InputStreamReader(is, StandardCharsets.UTF_8);
+            int readInt = in.read(b, 0, b.length);
+            stringFromClient = String.copyValueOf(b, 0, readInt);
         } catch (IOException e) {
             e.printStackTrace();
+            logger.error(e);
         }
-
-        return null;
+        return stringFromClient;
     }
 
     private Commands checkCommand(String command) {
         Commands[] commands = Commands.values();
         for (Commands c : commands) {
-            if (command.equals(c.getCommandStr())) return c;
+            if (command.equals(c.getString())) return c;
         }
         return null;
     }
 
     public void sendResponse(String responseStr) {
         try {
+            Thread.sleep(100); // todo Костыль, надо избавиться. Без задержки строки от клиента приходят не полностью
             os.writeBytes(responseStr);
-        } catch (IOException e) {
+            Thread.sleep(100);
+        } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
         }
     }
@@ -78,31 +72,34 @@ public class IOConnectionHandler extends ConnectionHandler {
     }
 
     public void receiveFileFromClient() throws IOException {
-        String fileName = getFileNameFromClient();//is.readUTF();
-        long fileLength = is.readLong();
+
+        String fileName = getFileNameFromClient();
+        if (fileName!=null&&fileName.length()>0){
+            sendResponse(Responses.OK.getString());
+        }else{
+            // todo Обработчик ошибки
+            System.out.println("Неправильное имя файла");
+        }
+
+        long fileLength = getFileLengthFromClient();
+        if (fileLength>0){
+            sendResponse(Responses.OK.getString());
+        }else{
+            // todo Обработчик ошибки
+            System.out.println("Неправильный размер");
+        }
+
         CloudFile file = new CloudFile(storage + "/" + fileName, fileLength);
         fileHandler.loadFileToStorage(file);
     }
 
+    private long getFileLengthFromClient() {
+        String fileLengthStr = getStringFromClient();
+        return Long.parseLong(fileLengthStr);
+    }
+
     private String getFileNameFromClient() {
-//        String fileName=null;
-//        try {
-//            byte[] b = new byte[Cloud2ServerStarter.BUFFER_SIZE];
-//            int intRead = is.read(b);
-//            fileName = new String(b);
-//            //System.out.println(Arrays.toString(b));
-//
-////                if (b<0){
-////                    System.out.println(fileName.toString());
-////                    return fileName.toString();
-////                }
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        System.out.println(fileName);
-//        return fileName;
-        return null;
+        return getStringFromClient();
     }
 
     public void closeConnection() {
@@ -112,16 +109,19 @@ public class IOConnectionHandler extends ConnectionHandler {
             is.close();
         } catch (IOException e) {
             e.printStackTrace();
+            logger.error(e);
         }
         try {
             os.close();
         } catch (IOException e) {
             e.printStackTrace();
+            logger.error(e);
         }
         try {
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
+            logger.error(e);
         }
         logger.info("Client disconnected");
     }

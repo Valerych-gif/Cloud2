@@ -52,28 +52,62 @@ public class FakeClient {
     }
 
     public void sendFile(File currentFile) {
-        try {
-            Thread.sleep(500);
-            os.writeUTF("./upload");
-            os.writeUTF(currentFile.getName());
-            os.writeLong(currentFile.length());
-            FileInputStream fis = new FileInputStream(currentFile);
-            byte[] buffer = new byte[1024];
-            while (fis.available() > 0) {
-                int bytesRead = fis.read(buffer);
-                os.write(buffer, 0, bytesRead);
+
+        if (currentFile != null) {
+            try {
+                Thread.sleep(500);
+                os.writeBytes("./upload");
+                if (getResponse()) {
+                    os.writeBytes(currentFile.getName());
+                }
+                if (getResponse()) {
+                    long fileLength = currentFile.length();
+                    os.writeLong(fileLength);
+                }
+
+                if (getResponse()) {
+                    sendFile(currentFile);
+                }
+
+                FileInputStream fis = new FileInputStream(currentFile);
+
+                byte [] buffer = new byte[1024];
+                while (fis.available() > 0) {
+                    int bytesRead = fis.read(buffer);
+                    os.write(buffer, 0, bytesRead);
+                }
+                os.flush();
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            os.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
-    public void sendCommand(String command){
-        new Thread(()->{
+    private boolean getResponse() {
+        StringBuilder command = new StringBuilder();
+        try {
+            for (int i = 0; i < 100; i++) {
+                byte b = is.readByte();
+                command.append((char)b);
+                if (command.toString().equals("./ok")){
+                    return true;
+                }
+                if (command.toString().equals("./fail")){
+                    return false;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void sendCommand(String command) {
+        new Thread(() -> {
             try {
                 Thread.sleep(500);
-                os.writeUTF(command);
+                os.writeBytes(command);
             } catch (Exception e) {
                 e.printStackTrace();
             }

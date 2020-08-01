@@ -87,16 +87,6 @@ public class TestCloud2IOServer {
     }
 
     @Test
-    @DisplayName("Проверка полученения команды от клиента")
-    public void testClientCommandReceive() throws IOException {
-        String command = "./somecommand";
-        client.sendCommand(command);
-        is = connectionHandler.getDataInputStream();
-        String commandText = is.readUTF();
-        assertEquals(command, commandText);
-    }
-
-    @Test
     @DisplayName("Закрытие соединения со стороны сервера")
     public void testCloseConnectionByCommandFromClient() {
 
