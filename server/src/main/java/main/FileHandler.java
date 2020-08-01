@@ -1,10 +1,6 @@
 package main;
 
 import files.CloudFile;
-import main.Cloud2ServerStarter;
-import main.ConnectionHandler;
-
-import java.io.IOException;
 
 public abstract class FileHandler {
 
@@ -17,8 +13,8 @@ public abstract class FileHandler {
 
     public FileHandler(ConnectionHandler connectionHandler) {
         this.connectionHandler = connectionHandler;
-        this.buffer = new byte[Cloud2ServerStarter.BUFFER_SIZE];
         this.bufferSize = Cloud2ServerStarter.BUFFER_SIZE;
+        this.buffer = new byte[bufferSize];
         this.storageRootDirPath = connectionHandler.getStorage().getAbsolutePath();
         init();
     }

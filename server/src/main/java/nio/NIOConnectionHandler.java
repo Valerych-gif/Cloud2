@@ -38,7 +38,7 @@ public class NIOConnectionHandler extends ConnectionHandler {
     }
 
     @Override
-    protected void sendResponse(String responseStr) {
+    public void sendResponse(String responseStr) {
 
     }
 

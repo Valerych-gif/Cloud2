@@ -1,21 +1,12 @@
-import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 
 import java.io.*;
-import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.SocketChannel;
 import java.util.*;
 
 public class Controller implements Initializable {
@@ -112,16 +103,16 @@ public class Controller implements Initializable {
                     if (currentFile != null) {
                         try {
                             os.writeBytes("./upload");
-                            if (getResponse()) {
+                            if (isResponseOk()) {
                                 os.writeBytes(fileName);
                             }
-                            if (getResponse()) {
+                            if (isResponseOk()) {
                                 long fileLength = currentFile.length();
                                 String fileLengthStr = String.valueOf(fileLength);
                                 os.writeBytes(fileLengthStr);
                             }
 
-                            if (getResponse()) {
+                            if (isResponseOk()) {
                                 sendFile(currentFile);
                             }
 
@@ -166,7 +157,7 @@ public class Controller implements Initializable {
         os.flush();
     }
 
-    private boolean getResponse() {
+    private boolean isResponseOk() {
         StringBuilder command = new StringBuilder();
         try {
             for (int i = 0; i < MAX_RESPONSE_LENGTH; i++) {
@@ -174,9 +165,6 @@ public class Controller implements Initializable {
                 command.append((char)b);
                 if (command.toString().equals("./ok")){
                     return true;
-                }
-                if (command.toString().equals("./fail")){
-                    return false;
                 }
             }
         } catch (IOException e) {

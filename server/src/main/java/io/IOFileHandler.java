@@ -3,6 +3,7 @@ package io;
 import files.CloudFile;
 import main.FileHandler;
 import main.ConnectionHandler;
+import main.Responses;
 
 import java.io.*;
 
@@ -37,7 +38,7 @@ public class IOFileHandler extends FileHandler {
                 int bytesRead = is.read(buffer);
                 fos.write(buffer, 0, bytesRead);
             }
-            os.writeUTF("Ok");
+            connectionHandler.sendResponse(Responses.OK.getString());
         } catch (Exception e){
             e.printStackTrace();
             return false;

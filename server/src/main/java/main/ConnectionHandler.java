@@ -51,7 +51,7 @@ public abstract class ConnectionHandler implements Runnable {
 
     protected abstract Commands getCommandFromClient();
 
-    protected abstract void sendResponse(String responseStr);
+    public abstract void sendResponse(String responseStr);
 
     protected abstract void closeConnection();
 
@@ -64,4 +64,5 @@ public abstract class ConnectionHandler implements Runnable {
     public abstract DataInputStream getDataInputStream();
 
     public abstract DataOutputStream getDataOutputStream();
+
 }
