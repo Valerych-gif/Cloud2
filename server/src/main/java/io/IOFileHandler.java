@@ -48,12 +48,9 @@ public class IOFileHandler extends FileHandler {
 
     public boolean getFileFromStorage(CloudFile file) {
         if (file.exists()){
-            String fileName = file.getName();
             long fileLength = file.length();
             try {
-                os.writeUTF("./take");
-                os.writeUTF(fileName);
-                os.writeLong(file.length());
+                os.writeBytes(String.valueOf(file.length()));
                 FileInputStream fis = new FileInputStream(file);
                 byte[] bytes = new byte[bufferSize];
                 for (long i = 0; i < (fileLength / bufferSize == 0 ? 1 : fileLength / bufferSize); i++) {

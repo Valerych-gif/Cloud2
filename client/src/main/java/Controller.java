@@ -7,6 +7,7 @@ import javafx.scene.control.TextField;
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class Controller implements Initializable {
@@ -48,34 +49,50 @@ public class Controller implements Initializable {
             String downloadCommand = commands[0];
             String downloadedFileName = commands[1];
             os.writeBytes(downloadCommand);
-            os.writeBytes(downloadedFileName);
-            String response = is.readUTF();
-            if (response.equals("./take")){
-                String downloadedFileFullName = clientDir + "/" + is.readUTF();
-                System.out.println(downloadedFileFullName);
-                long downloadedFileSize = is.readLong();
-                File downloadedFile = new File(downloadedFileFullName);
-                if (!downloadedFile.exists()) {
-                    if (!downloadedFile.createNewFile());
-                }
-                int bufferSize = 1024;
-                byte[] buffer = new byte[bufferSize];
-                try {
-                    System.out.println("Получение файла");
-                    FileOutputStream fos = new FileOutputStream(downloadedFile);
-                    for (long i = 0; i < (downloadedFileSize / bufferSize == 0 ? 1 : downloadedFileSize / bufferSize); i++) {
-                        int bytesRead = is.read(buffer);
-                        fos.write(buffer, 0, bytesRead);
-                        fos.flush();
+            if (isResponseOk()) {
+                os.writeBytes(downloadedFileName);
+
+                if (isResponseOk()) {
+                    String downloadedFileFullName = clientDir + "/" + downloadedFileName;
+
+                    String fileLengthStr = getStringFromServer();
+                    long downloadedFileSize = Long.parseLong(fileLengthStr);
+                    File downloadedFile = new File(downloadedFileFullName);
+                    if (!downloadedFile.exists()) {
+                        downloadedFile.createNewFile();
                     }
-                    os.writeUTF("Ok");
-                } catch (Exception e){
-                    e.printStackTrace();
+                    int bufferSize = 1024;
+                    byte[] buffer = new byte[bufferSize];
+                    try {
+                        System.out.println("Получение файла");
+                        FileOutputStream fos = new FileOutputStream(downloadedFile);
+                        for (long i = 0; i < (downloadedFileSize / bufferSize == 0 ? 1 : downloadedFileSize / bufferSize); i++) {
+                            int bytesRead = is.read(buffer);
+                            fos.write(buffer, 0, bytesRead);
+                            fos.flush();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+    }
+
+    private String getStringFromServer() {
+        String stringFromServer = null;
+        char[] b = new char[1024];
+        try {
+            Reader in = new InputStreamReader(is, StandardCharsets.UTF_8);
+            int readInt = in.read(b, 0, b.length);
+            stringFromServer = String.copyValueOf(b, 0, readInt);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return stringFromServer;
     }
 
     @Override

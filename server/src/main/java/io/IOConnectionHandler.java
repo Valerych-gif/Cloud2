@@ -65,32 +65,43 @@ public class IOConnectionHandler extends ConnectionHandler {
         }
     }
 
-    public void sendFileToClient() throws IOException {
-        String fileName = is.readUTF();
+    public void sendFileToClient() {
+        String fileName = getStringFromClient();
         CloudFile file = new CloudFile(storage + "/" + fileName);
-        fileHandler.getFileFromStorage(file);
-    }
-
-    public void receiveFileFromClient() throws IOException {
-
-        String fileName = getFileNameFromClient();
-        if (fileName!=null&&fileName.length()>0){
+        if (fileName != null && file.exists()) {
             sendResponse(Responses.OK.getString());
-        }else{
+            fileHandler.getFileFromStorage(file);
+        }else {
             // todo Обработчик ошибки
             System.out.println("Неправильное имя файла");
         }
+    }
 
-        long fileLength = getFileLengthFromClient();
-        if (fileLength>0){
+    public void receiveFileFromClient() {
+
+        boolean isOk = true;
+        String fileName = getFileNameFromClient();
+        if (fileName != null && fileName.length() > 0) {
             sendResponse(Responses.OK.getString());
-        }else{
+        } else {
             // todo Обработчик ошибки
-            System.out.println("Неправильный размер");
+            System.out.println("Неправильное имя файла");
+            isOk = false;
         }
 
-        CloudFile file = new CloudFile(storage + "/" + fileName, fileLength);
-        fileHandler.loadFileToStorage(file);
+        long fileLength = getFileLengthFromClient();
+        if (fileLength > 0) {
+            sendResponse(Responses.OK.getString());
+        } else {
+            // todo Обработчик ошибки
+            System.out.println("Неправильный размер");
+            isOk = false;
+        }
+
+        if (isOk) {
+            CloudFile file = new CloudFile(storage + "/" + fileName, fileLength);
+            fileHandler.loadFileToStorage(file);
+        }
     }
 
     private long getFileLengthFromClient() {
