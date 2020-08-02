@@ -19,8 +19,8 @@ public class IOFileHandler extends FileHandler {
 
     @Override
     public void init() {
-        this.is = connectionHandler.getDataInputStream();
-        this.os = connectionHandler.getDataOutputStream();
+        this.is = ((IOConnectionHandler)connectionHandler).getDataInputStream();
+        this.os = ((IOConnectionHandler)connectionHandler).getDataOutputStream();
     }
 
     public boolean loadFileToStorage(CloudFile clientFile){
@@ -39,6 +39,7 @@ public class IOFileHandler extends FileHandler {
                 int bytesRead = is.read(buffer);
                 fos.write(buffer, 0, bytesRead);
             }
+            fos.close();
             connectionHandler.sendResponse(Responses.OK.getString());
         } catch (Exception e){
             e.printStackTrace();

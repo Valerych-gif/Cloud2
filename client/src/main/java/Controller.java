@@ -12,7 +12,6 @@ import java.util.*;
 
 public class Controller implements Initializable {
 
-    private static final int MAX_RESPONSE_LENGTH = 100;
     public static String DOWNLOAD_COMMAND = "./download";
     public static String CLOSE_CONNECTION_COMMAND = "./closeconnection";
 
@@ -71,6 +70,7 @@ public class Controller implements Initializable {
                             fos.write(buffer, 0, bytesRead);
                             fos.flush();
                         }
+                        fos.close();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

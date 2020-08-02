@@ -62,8 +62,4 @@ public abstract class ConnectionHandler implements Runnable {
 
     public abstract File getStorage();
 
-    public abstract DataInputStream getDataInputStream();
-
-    public abstract DataOutputStream getDataOutputStream();
-
 }

@@ -13,19 +13,27 @@ import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
 public class NIOConnectionHandler extends ConnectionHandler {
 
-    private Socket socket;
-    private DataInputStream is;
-    private DataOutputStream os;
+    private SocketChannel socketChannel;
+    private Selector selector;
+    private ByteBuffer buffer;
+    private SelectionKey key;
 
-    public NIOConnectionHandler(Cloud2Server server, Socket socket) throws IOException{
+    public NIOConnectionHandler(Cloud2Server server, SocketChannel socketChannel){
         super(server);
-        this.socket = socket;
-        this.is = new DataInputStream(socket.getInputStream());
-        this.os = new DataOutputStream(socket.getOutputStream());
+        this.socketChannel = socketChannel;
+        try {
+            selector = Selector.open();
+            key = socketChannel.register(selector, SelectionKey.OP_ACCEPT);
+        } catch (IOException e) {
+            logger.error(e);
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -43,60 +51,32 @@ public class NIOConnectionHandler extends ConnectionHandler {
     }
 
     public Commands getCommandFromClient(){
-        String command = null;
-        try {
-            command = is.readUTF();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
         return null;
     }
 
 
 
     public void sendFileToClient() throws IOException {
-        String fileName = is.readUTF();
-        CloudFile file = new CloudFile(storage + "/" + fileName);
-        fileHandler.getFileFromStorage(file);
+
     }
 
     public void receiveFileFromClient() throws IOException {
-        String fileName = is.readUTF();
-        long fileLength = is.readLong();
-        CloudFile file = new CloudFile(storage + "/" + fileName, fileLength);
-        fileHandler.loadFileToStorage(file);
+
     }
 
     public void closeConnection() {
 
         isConnectionActive = false;
         try {
-            is.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            os.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            socket.close();
+            socketChannel.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public DataInputStream getDataInputStream() {
-        return is;
-    }
-
-    public DataOutputStream getDataOutputStream() {
-        return os;
-    }
-
-    public Socket getSocket() {
-        return socket;
+    public SocketChannel getSocketChannel() {
+        return socketChannel;
     }
 
     public File getStorage() {
