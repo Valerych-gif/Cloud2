@@ -1,5 +1,7 @@
 public enum Responses {
-    OK ("./ok"), FAIL ("./fail");
+    OK ("./ok"),
+    FAIL ("./fail"),
+    END_OF_DIR_CONTENT("./endofdircontent");
 
     private String responseStr;
 

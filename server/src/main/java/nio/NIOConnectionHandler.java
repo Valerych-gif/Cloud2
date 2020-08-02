@@ -46,6 +46,11 @@ public class NIOConnectionHandler extends ConnectionHandler {
     }
 
     @Override
+    protected void sendDirContent() {
+
+    }
+
+    @Override
     public void sendResponse(String responseStr) {
 
     }
@@ -81,5 +86,10 @@ public class NIOConnectionHandler extends ConnectionHandler {
 
     public File getStorage() {
         return storage;
+    }
+
+    @Override
+    public String getStringFromClient() {
+        return null;
     }
 }

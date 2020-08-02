@@ -3,20 +3,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class FileHandler {
+public class ClientFileHandler {
 
     private Controller controller;
     private InputStream is;
     private OutputStream os;
     private List<File> clientFileList;
+    private List<File> currentStorageDirFileList;
     private String clientDirPath;
+    private String currentStorageDir;
     private File clientDir;
 
-    public FileHandler(Controller controller) {
+    public ClientFileHandler(Controller controller) {
         this.controller = controller;
         this.is = controller.getIs();
         this.os = controller.getOs();
         this.clientDirPath = Main.CLIENT_DIR_PATH;
+        this.currentStorageDir ="/";
+        currentStorageDirFileList = new ArrayList<>();
         clientFileList = getClientFileList();
     }
 
@@ -89,6 +93,8 @@ public class FileHandler {
                     sendFile(currentFile);
                 }
 
+
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -106,14 +112,31 @@ public class FileHandler {
 
     public void sendFile(File currentFile) throws IOException {
         FileInputStream fis = new FileInputStream(currentFile);
-
+        int bytesRead=0;
         byte[] buffer = new byte[Main.BUFFER_SIZE];
         while (fis.available() > 0) {
-            int bytesRead = fis.read(buffer);
+            bytesRead = fis.read(buffer);
             os.write(buffer, 0, bytesRead);
+            os.flush();
         }
-        os.flush();
         fis.close();
         System.out.println("File sent");
+    }
+
+    public List<File> getStorageDirContent() {
+
+        controller.sendCommand(Commands.GET_DIR_CONTENT.getString());
+        if (controller.isResponseOk()){
+            controller.sendCommand(currentStorageDir);
+        }
+
+        currentStorageDirFileList.clear();
+        while (true){
+            String fileName = controller.getStringFromServer();
+            if (fileName.equals("./endofdircontent")) break;
+            File file = new File(fileName);
+            currentStorageDirFileList.add(file);
+        }
+        return currentStorageDirFileList;
     }
 }

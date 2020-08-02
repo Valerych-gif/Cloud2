@@ -31,7 +31,7 @@ public class IOConnectionHandler extends ConnectionHandler {
         return checkCommand(command);
     }
 
-    private String getStringFromClient() {
+    public String getStringFromClient() {
         StringBuilder stringFromClient = new StringBuilder();
         char b = 0;
         try {
@@ -40,7 +40,7 @@ public class IOConnectionHandler extends ConnectionHandler {
                 if (b != '|') {
                     stringFromClient.append(b);
                 } else {
-                    System.out.println(stringFromClient.toString());
+                    System.out.println("<-" + stringFromClient.toString());
                     return stringFromClient.toString();
                 }
             }
@@ -62,7 +62,7 @@ public class IOConnectionHandler extends ConnectionHandler {
 
     public void sendResponse(String responseStr) {
         try {
-            System.out.println(responseStr);
+            System.out.println("->" + responseStr);
             os.writeBytes(responseStr+Cloud2ServerStarter.END_COMMAND_CHAR);
         } catch (Exception e) {
             e.printStackTrace();
@@ -116,6 +116,10 @@ public class IOConnectionHandler extends ConnectionHandler {
 
     private String getFileNameFromClient() {
         return getStringFromClient();
+    }
+
+    public void sendDirContent(){
+        fileHandler.sendDirContentToClient();
     }
 
     public void closeConnection() {

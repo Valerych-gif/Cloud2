@@ -60,4 +60,9 @@ public class NIOFileHandler extends FileHandler {
         }
         return false;
     }
+
+    @Override
+    public void sendDirContentToClient() {
+
+    }
 }

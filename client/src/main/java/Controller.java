@@ -1,4 +1,5 @@
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
@@ -7,19 +8,27 @@ import javafx.scene.control.TextField;
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class Controller implements Initializable {
 
+    @FXML
     public Button send;
-    public ListView<String> listView;
+
+    @FXML
+    public ListView<String> localFileListView;
+
+    @FXML
+    public ListView<String> storageFileListView;
+
+    @FXML
     public TextField text;
+
     private Socket socket;
     private DataInputStream is;
     private DataOutputStream os;
 
-    private FileHandler fileHandler;
+    private ClientFileHandler fileHandler;
 
     public Controller() {
         try {
@@ -33,19 +42,31 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        fileHandler = new FileHandler(this);
+        fileHandler = new ClientFileHandler(this);
         try{
             for (File file : fileHandler.getClientFileList()) {
-                listView.getItems().add(file.getName());
+                localFileListView.getItems().add(file.getName());
             }
-            listView.setOnMouseClicked(a -> {
+            getStorageDirContent();
+
+            localFileListView.setOnMouseClicked(a -> {
                 if (a.getClickCount() == 2) {
-                    String fileName = listView.getSelectionModel().getSelectedItem();
+                    String fileName = localFileListView.getSelectionModel().getSelectedItem();
                     fileHandler.uploadFile(fileName);
+                    if (isResponseOk())
+                    getStorageDirContent();
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void getStorageDirContent() {
+        List<File> storageDirContent = fileHandler.getStorageDirContent();
+        storageFileListView.getItems().clear();
+        for (File file : storageDirContent) {
+            storageFileListView.getItems().add(file.getName());
         }
     }
 

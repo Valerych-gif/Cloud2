@@ -35,15 +35,23 @@ public abstract class ConnectionHandler implements Runnable {
                 command = getCommandFromClient(); // Block
             }
             try {
-                if (command.equals(Commands.UPLOAD)) {
-                    sendResponse(Responses.OK.getString());
-                    receiveFileFromClient(); // Block
-                } else if (command.equals(Commands.DOWNLOAD)) {
-                    sendResponse(Responses.OK.getString());
-                    sendFileToClient();
-                } else if (command.equals(Commands.CLOSE_CONNECTION)) {
-                    sendResponse(Responses.OK.getString());
-                    closeConnection();
+                switch (command) {
+                    case UPLOAD:
+                        sendResponse(Responses.OK.getString());
+                        receiveFileFromClient(); // Block
+                        break;
+                    case DOWNLOAD:
+                        sendResponse(Responses.OK.getString());
+                        sendFileToClient();
+                        break;
+                    case GET_DIR_CONTENT:
+                        sendResponse(Responses.OK.getString());
+                        sendDirContent();
+                        break;
+                    case CLOSE_CONNECTION:
+                        sendResponse(Responses.OK.getString());
+                        closeConnection();
+                        break;
                 }
 
             } catch (Exception e) {
@@ -53,6 +61,8 @@ public abstract class ConnectionHandler implements Runnable {
             }
         }
     }
+
+    protected abstract void sendDirContent();
 
     protected abstract Commands getCommandFromClient();
 
@@ -64,6 +74,7 @@ public abstract class ConnectionHandler implements Runnable {
 
     protected abstract void receiveFileFromClient() throws IOException;
 
-    public abstract File getStorage();
+    protected abstract File getStorage();
 
+    public abstract String getStringFromClient();
 }

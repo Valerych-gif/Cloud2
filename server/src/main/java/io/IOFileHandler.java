@@ -7,6 +7,7 @@ import main.ConnectionHandler;
 import main.Responses;
 
 import java.io.*;
+import java.util.Objects;
 
 public class IOFileHandler extends FileHandler {
     private DataInputStream is;
@@ -23,6 +24,18 @@ public class IOFileHandler extends FileHandler {
         this.os = ((IOConnectionHandler)connectionHandler).getDataOutputStream();
     }
 
+    public void sendDirContentToClient(){
+        String currentDir = connectionHandler.getStringFromClient();
+        currentDir = Cloud2ServerStarter.STORAGE_ROOT_DIR + currentDir;
+        File file = new File(currentDir);
+
+        for (File f : Objects.requireNonNull(file.listFiles())) {
+            connectionHandler.sendResponse(f.getName());
+        }
+
+        connectionHandler.sendResponse(Responses.END_OF_DIR_CONTENT.getString());
+    }
+
     public boolean loadFileToStorage(CloudFile clientFile){
         File cloudFile = new File( storageRootDirPath + "/" + clientFile.getName());
         if (!cloudFile.exists()) {
@@ -36,7 +49,8 @@ public class IOFileHandler extends FileHandler {
         try {
             System.out.println("Uploading...");
             FileOutputStream fos = new FileOutputStream(cloudFile);
-            for (long i = 0; i < (fileLength / bufferSize == 0 ? 1 : fileLength / bufferSize); i++) {
+            long numberOfSends = fileLength / bufferSize + 1;
+            for (long i = 0; i < numberOfSends; i++) {
                 int bytesRead = is.read(buffer);
                 fos.write(buffer, 0, bytesRead);
             }

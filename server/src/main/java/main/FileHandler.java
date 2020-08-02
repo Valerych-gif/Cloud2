@@ -24,4 +24,6 @@ public abstract class FileHandler {
     public abstract boolean getFileFromStorage(CloudFile file);
 
     public abstract boolean loadFileToStorage(CloudFile file);
+
+    public abstract void sendDirContentToClient();
 }
