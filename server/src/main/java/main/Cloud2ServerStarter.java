@@ -5,7 +5,7 @@ import nio.Cloud2NIOServer;
 
 public class Cloud2ServerStarter {
 
-    public static String storageRootDir = "server/src/main/resources/storage";
+    public final static String STORAGE_ROOT_DIR = "server/src/main/resources/storage";
     public final static int PORT = 8189;
 
     public final static int BUFFER_SIZE = 1024;

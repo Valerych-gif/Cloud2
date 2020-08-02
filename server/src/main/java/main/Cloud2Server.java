@@ -19,7 +19,7 @@ public abstract class Cloud2Server {
     protected Logger logger = LogManager.getLogger(Cloud2Server.class);
 
     public  Cloud2Server() {
-        storage = new File(Cloud2ServerStarter.storageRootDir);
+        storage = new File(Cloud2ServerStarter.STORAGE_ROOT_DIR);
     }
 
     public void init() {

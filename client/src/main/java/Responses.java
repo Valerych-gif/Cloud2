@@ -1,5 +1,3 @@
-package main;
-
 public enum Responses {
     OK ("./ok"), FAIL ("./fail");
 

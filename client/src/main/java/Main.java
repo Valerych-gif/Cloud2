@@ -13,6 +13,12 @@ import java.io.IOException;
 
 public class Main extends Application {
 
+    public static String storageRootDir = "server/src/main/resources/storage";
+    public final static int PORT = 8189;
+
+    public final static int BUFFER_SIZE = 1024;
+    public final static char END_COMMAND_CHAR = '|';
+
     @Override
     public void start(Stage primaryStage) throws Exception{
 
@@ -25,7 +31,7 @@ public class Main extends Application {
         primaryStage.show();
         primaryStage.setOnCloseRequest(event -> {
             try {
-                os.writeBytes("./closeconnection|");
+                os.writeBytes(Commands.CLOSE_CONNECTION.getString() + END_COMMAND_CHAR);
             } catch (IOException e) {
                 e.printStackTrace();
             };

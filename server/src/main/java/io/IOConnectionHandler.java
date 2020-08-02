@@ -61,7 +61,7 @@ public class IOConnectionHandler extends ConnectionHandler {
 
     public void sendResponse(String responseStr) {
         try {
-            os.writeBytes(responseStr);
+            os.writeBytes(responseStr+Cloud2ServerStarter.END_COMMAND_CHAR);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e);
