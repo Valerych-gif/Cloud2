@@ -34,6 +34,7 @@ public class IOFileHandler extends FileHandler {
         }
         long fileLength = clientFile.getFileLength();
         try {
+            System.out.println("Uploading...");
             FileOutputStream fos = new FileOutputStream(cloudFile);
             for (long i = 0; i < (fileLength / bufferSize == 0 ? 1 : fileLength / bufferSize); i++) {
                 int bytesRead = is.read(buffer);
@@ -41,6 +42,7 @@ public class IOFileHandler extends FileHandler {
             }
             fos.close();
             connectionHandler.sendResponse(Responses.OK.getString());
+            System.out.println("File uploaded");
         } catch (Exception e){
             e.printStackTrace();
             return false;

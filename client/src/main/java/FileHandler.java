@@ -1,20 +1,35 @@
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class FileHandler {
 
     private Controller controller;
     private InputStream is;
     private OutputStream os;
-    private String clientDir;
     private List<File> clientFileList;
+    private String clientDirPath;
+    private File clientDir;
 
     public FileHandler(Controller controller) {
         this.controller = controller;
         this.is = controller.getIs();
         this.os = controller.getOs();
-        this.clientDir = Main.storageRootDir;
-        clientFileList = controller.getClientFileList();
+        this.clientDirPath = Main.CLIENT_DIR_PATH;
+        clientFileList = getClientFileList();
+    }
+
+    public List<File> getClientFileList() {
+        clientFileList = new ArrayList<>();
+        clientDir = new File(clientDirPath);
+        if (!clientDir.exists()) {
+            throw new RuntimeException("directory resource not exists on client");
+        }
+        for (File file : Objects.requireNonNull(clientDir.listFiles())) {
+            clientFileList.add(file);
+        }
+        return clientFileList;
     }
 
     public void downLoadFile(String commandToDownloadFile) {
@@ -35,7 +50,7 @@ public class FileHandler {
                     if (!downloadedFile.exists()) {
                         downloadedFile.createNewFile();
                     }
-                    int bufferSize = 1024;
+                    int bufferSize = Main.BUFFER_SIZE;
                     byte[] buffer = new byte[bufferSize];
                     try {
                         System.out.println("Получение файла");
@@ -54,23 +69,20 @@ public class FileHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-
-    }public void uploadFile(String fileName) {
+    public void uploadFile(String fileName) {
         File currentFile = findFileByName(fileName);
         if (currentFile != null) {
             try {
                 controller.sendCommand(Commands.UPLOAD.getString());
-                os.flush();
                 if (controller.isResponseOk()) {
                     controller.sendCommand(fileName);
-                    os.flush();
                 }
                 if (controller.isResponseOk()) {
                     long fileLength = currentFile.length();
                     String fileLengthStr = String.valueOf(fileLength);
                     controller.sendCommand(fileLengthStr);
-                    os.flush();
                 }
 
                 if (controller.isResponseOk()) {
@@ -85,8 +97,7 @@ public class FileHandler {
 
     private File findFileByName(String fileName) {
         for (File file : clientFileList) {
-            System.out.println(file.getName());
-            if (file.getName().equals(fileName)){
+            if (file.getName().equals(fileName)) {
                 return file;
             }
         }
@@ -96,11 +107,13 @@ public class FileHandler {
     public void sendFile(File currentFile) throws IOException {
         FileInputStream fis = new FileInputStream(currentFile);
 
-        byte [] buffer = new byte[1024];
+        byte[] buffer = new byte[Main.BUFFER_SIZE];
         while (fis.available() > 0) {
             int bytesRead = fis.read(buffer);
             os.write(buffer, 0, bytesRead);
         }
         os.flush();
+        fis.close();
+        System.out.println("File sent");
     }
 }

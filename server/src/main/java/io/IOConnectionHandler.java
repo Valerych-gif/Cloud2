@@ -40,6 +40,7 @@ public class IOConnectionHandler extends ConnectionHandler {
                 if (b != '|') {
                     stringFromClient.append(b);
                 } else {
+                    System.out.println(stringFromClient.toString());
                     return stringFromClient.toString();
                 }
             }
@@ -61,6 +62,7 @@ public class IOConnectionHandler extends ConnectionHandler {
 
     public void sendResponse(String responseStr) {
         try {
+            System.out.println(responseStr);
             os.writeBytes(responseStr+Cloud2ServerStarter.END_COMMAND_CHAR);
         } catch (Exception e) {
             e.printStackTrace();
@@ -71,7 +73,7 @@ public class IOConnectionHandler extends ConnectionHandler {
     public void sendFileToClient() {
         String fileName = getStringFromClient();
         CloudFile file = new CloudFile(storage + "/" + fileName);
-        if (fileName != null && file.exists()) {
+        if (file.exists()) {
             sendResponse(Responses.OK.getString());
             fileHandler.getFileFromStorage(file);
         } else {
@@ -84,7 +86,7 @@ public class IOConnectionHandler extends ConnectionHandler {
 
         boolean isOk = true;
         String fileName = getFileNameFromClient();
-        if (fileName != null && fileName.length() > 0) {
+        if (fileName.length() > 0) {
             sendResponse(Responses.OK.getString());
         } else {
             // todo Обработчик ошибки

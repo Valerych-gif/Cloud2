@@ -13,7 +13,7 @@ import java.io.IOException;
 
 public class Main extends Application {
 
-    public static String storageRootDir = "server/src/main/resources/storage";
+    public final static String CLIENT_DIR_PATH = "./client/src/main/resources/";
     public final static int PORT = 8189;
 
     public final static int BUFFER_SIZE = 1024;

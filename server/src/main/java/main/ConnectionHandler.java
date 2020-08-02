@@ -20,16 +20,20 @@ public abstract class ConnectionHandler implements Runnable {
 
     public ConnectionHandler(Cloud2Server server) {
         logger.info("Connection accepted");
-        isConnectionActive = true;
+        this.isConnectionActive = true;
         this.server = server;
         this.storage = server.getStorage();
+        this.command=null;
     }
 
     @Override
     public void run() {
 
         while (isConnectionActive) {
-            command = getCommandFromClient(); // Block
+            command=null;
+            while (command==null) {
+                command = getCommandFromClient(); // Block
+            }
             try {
                 if (command.equals(Commands.UPLOAD)) {
                     sendResponse(Responses.OK.getString());

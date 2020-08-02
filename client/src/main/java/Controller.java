@@ -15,11 +15,9 @@ public class Controller implements Initializable {
     public Button send;
     public ListView<String> listView;
     public TextField text;
-    private List<File> clientFileList;
     private Socket socket;
     private DataInputStream is;
     private DataOutputStream os;
-    private File clientDir;
 
     private FileHandler fileHandler;
 
@@ -28,7 +26,24 @@ public class Controller implements Initializable {
             socket = new Socket("localhost", 8189);
             is = new DataInputStream(socket.getInputStream());
             os = new DataOutputStream(socket.getOutputStream());
-            Thread.sleep(1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        fileHandler = new FileHandler(this);
+        try{
+            for (File file : fileHandler.getClientFileList()) {
+                listView.getItems().add(file.getName());
+            }
+            listView.setOnMouseClicked(a -> {
+                if (a.getClickCount() == 2) {
+                    String fileName = listView.getSelectionModel().getSelectedItem();
+                    fileHandler.uploadFile(fileName);
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -46,7 +61,9 @@ public class Controller implements Initializable {
 
     public void sendCommand(String command){
         try {
+            System.out.println(command);
             os.writeBytes(command+Main.END_COMMAND_CHAR);
+            os.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -61,6 +78,7 @@ public class Controller implements Initializable {
                 if (b != '|') {
                     stringFromServer.append(b);
                 } else {
+                    System.out.println(stringFromServer);
                     return stringFromServer.toString();
                 }
             }
@@ -70,38 +88,9 @@ public class Controller implements Initializable {
         return stringFromServer.toString();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        try{
-            clientFileList = new ArrayList<>();
-            String clientPath = "./client/src/main/resources/";
-            clientDir = new File(clientPath);
-            if (!clientDir.exists()) {
-                throw new RuntimeException("directory resource not exists on client");
-            }
-            for (File file : Objects.requireNonNull(clientDir.listFiles())) {
-                clientFileList.add(file);
-                listView.getItems().add(file.getName());
-            }
-            listView.setOnMouseClicked(a -> {
-                if (a.getClickCount() == 2) {
-                    String fileName = listView.getSelectionModel().getSelectedItem();
-                    fileHandler.uploadFile(fileName);
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        fileHandler = new FileHandler(this);
-    }
-
     public boolean isResponseOk() {
         String response = getStringFromServer();
         return response.equals(Responses.OK.getString());
-    }
-
-    public List<File> getClientFileList() {
-        return clientFileList;
     }
 
     public Socket getSocket() {
