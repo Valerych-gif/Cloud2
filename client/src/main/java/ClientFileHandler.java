@@ -5,8 +5,9 @@ import java.util.Objects;
 
 public class ClientFileHandler {
 
-    private static final String DIR_MARK = "./D";
-    private static final String FILE_MARK = "./F";
+    public static final String DIR_MARK = "./D";
+    public static final String FILE_MARK = "./F";
+    public static final String PARENT_DIR_MARK = "..";
 
     private Controller controller;
     private InputStream is;
@@ -15,25 +16,28 @@ public class ClientFileHandler {
     private List<CloudFile> currentStorageDirFileList;
     private String clientDirPath;
     private String currentStorageDir;
-    private File clientDir;
+    private CloudFile currentClientDir;
+    private CloudFile rootClientDir;
 
     public ClientFileHandler(Controller controller) {
         this.controller = controller;
         this.is = controller.getIs();
         this.os = controller.getOs();
         this.clientDirPath = Main.CLIENT_DIR_PATH;
-        this.currentStorageDir ="/";
+        this.rootClientDir = new CloudFile(clientDirPath);
+        this.currentStorageDir = "/";
         currentStorageDirFileList = new ArrayList<>();
+        this.currentClientDir = new CloudFile(clientDirPath);
         clientFileList = getClientFileList();
+
+        if (!rootClientDir.exists()) {
+            throw new RuntimeException("directory resource not exists on client");
+        }
     }
 
     public List<CloudFile> getClientFileList() {
         clientFileList = new ArrayList<>();
-        clientDir = new File(clientDirPath);
-        if (!clientDir.exists()) {
-            throw new RuntimeException("directory resource not exists on client");
-        }
-        for (File file : Objects.requireNonNull(clientDir.listFiles())) {
+        for (File file : Objects.requireNonNull(currentClientDir.listFiles())) {
             CloudFile cloudFile = new CloudFile(file.getAbsolutePath(), file.isDirectory());
             clientFileList.add(cloudFile);
         }
@@ -75,7 +79,7 @@ public class ClientFileHandler {
                 controller.sendCommand(downloadedFileName);
 
                 if (controller.isResponseOk()) {
-                    String downloadedFileFullName = clientDir + "/" + downloadedFileName;
+                    String downloadedFileFullName = rootClientDir + "/" + downloadedFileName;
 
                     String fileLengthStr = controller.getStringFromServer();
                     long downloadedFileSize = Long.parseLong(fileLengthStr);
@@ -155,4 +159,23 @@ public class ClientFileHandler {
         System.out.println("File sent");
     }
 
+    public void openDir(String fileName) {
+        CloudFile f;
+        if (fileName.equals(PARENT_DIR_MARK)){
+            f = new CloudFile(currentClientDir.getParent(), true);
+        } else {
+            f = findFileByName(fileName);
+        }
+        if (f!=null&&f.isDirectory()){
+            currentClientDir = new CloudFile(f.getAbsolutePath());
+        }
+    }
+
+    public CloudFile getCurrentClientDir() {
+        return currentClientDir;
+    }
+
+    public CloudFile getRootClientDir() {
+        return rootClientDir;
+    }
 }

@@ -66,14 +66,15 @@ public class Controller implements Initializable {
             refreshStorageDirContent();
 
             localFileListView.setOnMouseClicked(a -> {
-                activeFile = localFileListView.getSelectionModel().getSelectedItem();
-                activePanel = LOCAL_PANEL;
-//                if (a.getClickCount() == 2) {
-//                    String fileName = localFileListView.getSelectionModel().getSelectedItem();
-//                    fileHandler.uploadFile(fileName);
-//                    if (isResponseOk())
-//                        refreshStorageDirContent();
-//                }
+
+                if (a.getClickCount() == 2) {
+                    String fileName = localFileListView.getSelectionModel().getSelectedItem();
+                    fileHandler.openDir(fileName);
+                    refreshClientDirContent();
+                } else {
+                    activeFile = localFileListView.getSelectionModel().getSelectedItem();
+                    activePanel = LOCAL_PANEL;
+                }
             });
 
             storageFileListView.setOnMouseClicked(a -> {
@@ -131,12 +132,11 @@ public class Controller implements Initializable {
     public void refreshClientDirContent() {
         List<CloudFile> clientDirContent = fileHandler.getClientFileList();
         localFileListView.getItems().clear();
-        String mark = "";
+        if (!fileHandler.getCurrentClientDir().getAbsolutePath().equals(fileHandler.getRootClientDir().getAbsolutePath()))
+            localFileListView.getItems().add(ClientFileHandler.PARENT_DIR_MARK);
+
         for (CloudFile file : clientDirContent) {
-            if (file.isDirectory()){
-                 mark = "\tDIR";
-            }
-            localFileListView.getItems().add(file.getName() + mark);
+            localFileListView.getItems().add(file.getName());
         }
     }
 
