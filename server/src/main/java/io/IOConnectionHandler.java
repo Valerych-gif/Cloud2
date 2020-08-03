@@ -40,7 +40,7 @@ public class IOConnectionHandler extends ConnectionHandler {
                 if (b != '|') {
                     stringFromClient.append(b);
                 } else {
-                    System.out.println("<-" + stringFromClient.toString());
+                    System.out.println("<-\t" + stringFromClient.toString());
                     return stringFromClient.toString();
                 }
             }
@@ -62,7 +62,7 @@ public class IOConnectionHandler extends ConnectionHandler {
 
     public void sendResponse(String responseStr) {
         try {
-            System.out.println("->" + responseStr);
+            System.out.println("->\t" + responseStr);
             os.writeBytes(responseStr+Cloud2ServerStarter.END_COMMAND_CHAR);
         } catch (Exception e) {
             e.printStackTrace();

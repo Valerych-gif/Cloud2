@@ -5,11 +5,14 @@ import java.util.Objects;
 
 public class ClientFileHandler {
 
+    private static final String DIR_MARK = "./D";
+    private static final String FILE_MARK = "./F";
+
     private Controller controller;
     private InputStream is;
     private OutputStream os;
-    private List<File> clientFileList;
-    private List<File> currentStorageDirFileList;
+    private List<CloudFile> clientFileList;
+    private List<CloudFile> currentStorageDirFileList;
     private String clientDirPath;
     private String currentStorageDir;
     private File clientDir;
@@ -24,24 +27,50 @@ public class ClientFileHandler {
         clientFileList = getClientFileList();
     }
 
-    public List<File> getClientFileList() {
+    public List<CloudFile> getClientFileList() {
         clientFileList = new ArrayList<>();
         clientDir = new File(clientDirPath);
         if (!clientDir.exists()) {
             throw new RuntimeException("directory resource not exists on client");
         }
         for (File file : Objects.requireNonNull(clientDir.listFiles())) {
-            clientFileList.add(file);
+            CloudFile cloudFile = new CloudFile(file.getAbsolutePath(), file.isDirectory());
+            clientFileList.add(cloudFile);
         }
         return clientFileList;
     }
 
-    public void downLoadFile(String commandToDownloadFile) {
+    public List<CloudFile> getStorageDirContent() {
+
+        controller.sendCommand(Commands.GET_DIR_CONTENT.getString());
+        if (controller.isResponseOk()){
+            controller.sendCommand(currentStorageDir);
+        }
+
+        currentStorageDirFileList.clear();
+        while (true){
+            String f = controller.getStringFromServer();
+            String fileName = "";
+            CloudFile cloudFile;
+            if (f.equals("./endofdircontent")) break;
+            if (f.startsWith(DIR_MARK)){
+                fileName=f.substring(DIR_MARK.length());
+                cloudFile = new CloudFile(fileName, true);
+            } else if(f.startsWith(FILE_MARK)) {
+                fileName=f.substring(FILE_MARK.length());
+                cloudFile = new CloudFile(fileName, false);
+            } else {
+                cloudFile = new CloudFile(fileName);
+            }
+            currentStorageDirFileList.add(cloudFile);
+        }
+        return currentStorageDirFileList;
+    }
+
+    public void downLoadFile(String downloadedFileName) {
         try {
-            String[] commands = commandToDownloadFile.split(" ");
-            String downloadCommand = commands[0];
-            String downloadedFileName = commands[1];
-            controller.sendCommand(downloadCommand);
+
+            controller.sendCommand(Commands.DOWNLOAD.getString());
             if (controller.isResponseOk()) {
                 controller.sendCommand(downloadedFileName);
 
@@ -57,14 +86,17 @@ public class ClientFileHandler {
                     int bufferSize = Main.BUFFER_SIZE;
                     byte[] buffer = new byte[bufferSize];
                     try {
-                        System.out.println("Получение файла");
+                        System.out.println("Downloading...");
                         FileOutputStream fos = new FileOutputStream(downloadedFile);
-                        for (long i = 0; i < (downloadedFileSize / bufferSize == 0 ? 1 : downloadedFileSize / bufferSize); i++) {
+                        long numberOfSends = downloadedFileSize / bufferSize;
+                        for (long i = 0; i <= numberOfSends; i++) {
+                            System.out.print("\r" + i + "/" + numberOfSends);
                             int bytesRead = is.read(buffer);
                             fos.write(buffer, 0, bytesRead);
                             fos.flush();
                         }
                         fos.close();
+                        System.out.println("\nFile downloaded");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -76,7 +108,7 @@ public class ClientFileHandler {
     }
 
     public void uploadFile(String fileName) {
-        File currentFile = findFileByName(fileName);
+        CloudFile currentFile = findFileByName(fileName);
         if (currentFile != null) {
             try {
                 controller.sendCommand(Commands.UPLOAD.getString());
@@ -101,8 +133,8 @@ public class ClientFileHandler {
         }
     }
 
-    private File findFileByName(String fileName) {
-        for (File file : clientFileList) {
+    private CloudFile findFileByName(String fileName) {
+        for (CloudFile file : clientFileList) {
             if (file.getName().equals(fileName)) {
                 return file;
             }
@@ -110,7 +142,7 @@ public class ClientFileHandler {
         return null;
     }
 
-    public void sendFile(File currentFile) throws IOException {
+    public void sendFile(CloudFile currentFile) throws IOException {
         FileInputStream fis = new FileInputStream(currentFile);
         int bytesRead=0;
         byte[] buffer = new byte[Main.BUFFER_SIZE];
@@ -123,20 +155,4 @@ public class ClientFileHandler {
         System.out.println("File sent");
     }
 
-    public List<File> getStorageDirContent() {
-
-        controller.sendCommand(Commands.GET_DIR_CONTENT.getString());
-        if (controller.isResponseOk()){
-            controller.sendCommand(currentStorageDir);
-        }
-
-        currentStorageDirFileList.clear();
-        while (true){
-            String fileName = controller.getStringFromServer();
-            if (fileName.equals("./endofdircontent")) break;
-            File file = new File(fileName);
-            currentStorageDirFileList.add(file);
-        }
-        return currentStorageDirFileList;
-    }
 }

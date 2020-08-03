@@ -24,17 +24,35 @@ public class Controller implements Initializable {
     @FXML
     public TextField text;
 
+    @FXML
+    public Button refreshListsButton;
+
+    @FXML
+    public Button copyFileButton;
+
+    @FXML
+    public Button moveFileButton;
+
+    @FXML
+    public Button deleteFileButton;
+
     private Socket socket;
     private DataInputStream is;
     private DataOutputStream os;
 
     private ClientFileHandler fileHandler;
+    private String activeFile;
+    private final String STORAGE_PANEL = "storage_panel";
+    private final String LOCAL_PANEL = "local_panel";
+    private String activePanel;
 
     public Controller() {
         try {
             socket = new Socket("localhost", 8189);
             is = new DataInputStream(socket.getInputStream());
             os = new DataOutputStream(socket.getOutputStream());
+            activeFile=null;
+            activePanel=STORAGE_PANEL;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -44,45 +62,96 @@ public class Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         fileHandler = new ClientFileHandler(this);
         try{
-            for (File file : fileHandler.getClientFileList()) {
-                localFileListView.getItems().add(file.getName());
-            }
-            getStorageDirContent();
+            refreshClientDirContent();
+            refreshStorageDirContent();
 
             localFileListView.setOnMouseClicked(a -> {
-                if (a.getClickCount() == 2) {
-                    String fileName = localFileListView.getSelectionModel().getSelectedItem();
-                    fileHandler.uploadFile(fileName);
-                    if (isResponseOk())
-                    getStorageDirContent();
-                }
+                activeFile = localFileListView.getSelectionModel().getSelectedItem();
+                activePanel = LOCAL_PANEL;
+//                if (a.getClickCount() == 2) {
+//                    String fileName = localFileListView.getSelectionModel().getSelectedItem();
+//                    fileHandler.uploadFile(fileName);
+//                    if (isResponseOk())
+//                        refreshStorageDirContent();
+//                }
             });
+
+            storageFileListView.setOnMouseClicked(a -> {
+                activeFile = storageFileListView.getSelectionModel().getSelectedItem();
+                activePanel = STORAGE_PANEL;
+//                if (a.getClickCount() == 2) {
+//                    String fileName = storageFileListView.getSelectionModel().getSelectedItem();
+//                    fileHandler.downLoadFile(fileName);
+//                    if (isResponseOk()){
+//                        refreshClientDirContent();
+//                    }
+//                }
+            });
+
+            refreshListsButton.setOnAction(a->{
+                refreshStorageDirContent();
+                refreshClientDirContent();
+            });
+
+            copyFileButton.setOnAction(a->{
+                String fileName="";
+                if (activeFile != null) {
+                    fileName = activeFile;
+                    if (activePanel.equals(STORAGE_PANEL)){
+                        fileHandler.downLoadFile(fileName);
+                        if (isResponseOk())
+                            refreshClientDirContent();
+                    } else if (activePanel.equals(LOCAL_PANEL)){
+                        fileHandler.uploadFile(fileName);
+                        if (isResponseOk())
+                            refreshStorageDirContent();
+                    }
+                }
+                System.out.println(fileName);
+            });
+
+            moveFileButton.setOnAction(a->{
+                System.out.println("move");
+            });
+
+            deleteFileButton.setOnAction(a->{
+                System.out.println("delete");
+            });
+
+            send.setOnAction(a->{
+                String command = text.getCharacters().toString();
+                sendCommand(command);
+            });
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void getStorageDirContent() {
-        List<File> storageDirContent = fileHandler.getStorageDirContent();
+    public void refreshClientDirContent() {
+        List<CloudFile> clientDirContent = fileHandler.getClientFileList();
+        localFileListView.getItems().clear();
+        String mark = "";
+        for (CloudFile file : clientDirContent) {
+            if (file.isDirectory()){
+                 mark = "\tDIR";
+            }
+            localFileListView.getItems().add(file.getName() + mark);
+        }
+    }
+
+    public void refreshStorageDirContent() {
+        List<CloudFile> storageDirContent = fileHandler.getStorageDirContent();
         storageFileListView.getItems().clear();
-        for (File file : storageDirContent) {
+        for (CloudFile file : storageDirContent) {
             storageFileListView.getItems().add(file.getName());
         }
     }
 
-    public void handleCommandAction(ActionEvent actionEvent) {
-        String command = text.getCharacters().toString();
-        if (command.startsWith(Commands.DOWNLOAD.getString())){
-            fileHandler.downLoadFile(command);
-        }
-        if (command.startsWith(Commands.CLOSE_CONNECTION.getString())){
-            sendCommand(Commands.CLOSE_CONNECTION.getString());
-        }
-    }
 
     public void sendCommand(String command){
         try {
-            System.out.println(command);
+            System.out.println("->\t" + command);
             os.writeBytes(command+Main.END_COMMAND_CHAR);
             os.flush();
         } catch (IOException e) {
@@ -99,7 +168,7 @@ public class Controller implements Initializable {
                 if (b != '|') {
                     stringFromServer.append(b);
                 } else {
-                    System.out.println(stringFromServer);
+                    System.out.println("<-\t" + stringFromServer);
                     return stringFromServer.toString();
                 }
             }

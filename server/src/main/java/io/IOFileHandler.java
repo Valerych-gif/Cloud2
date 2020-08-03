@@ -10,6 +10,8 @@ import java.io.*;
 import java.util.Objects;
 
 public class IOFileHandler extends FileHandler {
+    private static final String DIR_MARK = "./D";
+    private static final String FILE_MARK = "./F";
     private DataInputStream is;
     private DataOutputStream os;
 
@@ -30,7 +32,12 @@ public class IOFileHandler extends FileHandler {
         File file = new File(currentDir);
 
         for (File f : Objects.requireNonNull(file.listFiles())) {
-            connectionHandler.sendResponse(f.getName());
+            String fileName = f.getName();
+            if (f.isDirectory()) {
+                connectionHandler.sendResponse(DIR_MARK+fileName);
+            } else {
+                connectionHandler.sendResponse(FILE_MARK+fileName);
+            }
         }
 
         connectionHandler.sendResponse(Responses.END_OF_DIR_CONTENT.getString());
@@ -49,14 +56,16 @@ public class IOFileHandler extends FileHandler {
         try {
             System.out.println("Uploading...");
             FileOutputStream fos = new FileOutputStream(cloudFile);
-            long numberOfSends = fileLength / bufferSize + 1;
-            for (long i = 0; i < numberOfSends; i++) {
+            long numberOfSends = fileLength / bufferSize;
+            for (long i = 0; i <= numberOfSends; i++) {
                 int bytesRead = is.read(buffer);
+                System.out.print("\r" + i + "/" + numberOfSends);
                 fos.write(buffer, 0, bytesRead);
             }
+            fos.flush();
             fos.close();
+            System.out.println("\nFile uploaded");
             connectionHandler.sendResponse(Responses.OK.getString());
-            System.out.println("File uploaded");
         } catch (Exception e){
             e.printStackTrace();
             return false;
@@ -68,13 +77,18 @@ public class IOFileHandler extends FileHandler {
         if (file.exists()){
             long fileLength = file.length();
             try {
-                os.writeBytes(String.valueOf(file.length())+ Cloud2ServerStarter.END_COMMAND_CHAR);
+                connectionHandler.sendResponse(String.valueOf(file.length()));
                 FileInputStream fis = new FileInputStream(file);
-                byte[] bytes = new byte[bufferSize];
-                for (long i = 0; i < (fileLength / bufferSize == 0 ? 1 : fileLength / bufferSize); i++) {
+                long numberOfSends = fileLength / bufferSize;
+                for (long i = 0; i <= numberOfSends; i++) {
                     int byteRead = fis.read(buffer);
                     os.write(buffer, 0, byteRead);
+                    os.flush();
                 }
+                System.out.println("File sent");
+                fis.close();
+                Thread.sleep(50); // todo Костыль. Надо найти другое решение. Без этого в передачу файла попадает ответ сервера
+                connectionHandler.sendResponse(Responses.OK.getString());
             } catch (Exception e){
                 e.printStackTrace();
                 return false;
