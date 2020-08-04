@@ -30,7 +30,7 @@ public abstract class FileHandler {
 
     public abstract void init();
 
-    public abstract boolean getFileFromStorage(CloudFile file);
+    public abstract boolean getFileFromStorage(String file);
 
     public abstract boolean loadFileToStorage(CloudFile file);
 

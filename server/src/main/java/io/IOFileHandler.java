@@ -28,8 +28,6 @@ public class IOFileHandler extends FileHandler {
         setCurrentStorageDir(requestedDirFromClient);
 
         if (currentStorageDir.getAbsolutePath().length()>rootStorageDir.getAbsolutePath().length()) {
-            System.out.println(currentStorageDir.getAbsolutePath());
-            System.out.println(rootStorageDir.getAbsolutePath());
             connectionHandler.sendResponse(DIR_PREFIX + PARENT_DIR_MARK);
         }
         for (File f : Objects.requireNonNull(currentStorageDir.listFiles())) {
@@ -62,7 +60,7 @@ public class IOFileHandler extends FileHandler {
     }
 
     public boolean loadFileToStorage(CloudFile clientFile) {
-        File cloudFile = new File(storageRootDirPath + "/" + clientFile.getName());
+        File cloudFile = new File(currentStorageDir.getAbsolutePath() + "/" + clientFile.getName());
         if (!cloudFile.exists()) {
             try {
                 if (!cloudFile.createNewFile()) return false;
@@ -91,8 +89,11 @@ public class IOFileHandler extends FileHandler {
         return true;
     }
 
-    public boolean getFileFromStorage(CloudFile file) {
+    public boolean getFileFromStorage(String fileName) {
+        CloudFile file = new CloudFile(currentStorageDir.getAbsolutePath() + "/" + fileName);
+        System.out.println(file.length());
         if (file.exists()) {
+            connectionHandler.sendResponse(Responses.OK.getString());
             long fileLength = file.length();
             try {
                 connectionHandler.sendResponse(String.valueOf(file.length()));
@@ -111,6 +112,9 @@ public class IOFileHandler extends FileHandler {
                 e.printStackTrace();
                 return false;
             }
+        } else {
+            // todo Обработчик ошибки
+            System.out.println("Неправильное имя файла");
         }
         return false;
     }

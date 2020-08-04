@@ -107,7 +107,6 @@ public class Controller implements Initializable {
                             refreshStorageDirContent();
                     }
                 }
-                System.out.println(fileName);
             });
 
             moveFileButton.setOnAction(a->{

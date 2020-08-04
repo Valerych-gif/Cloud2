@@ -36,7 +36,7 @@ public class NIOFileHandler extends FileHandler {
     }
 
     @Override
-    public boolean getFileFromStorage(CloudFile file) {
+    public boolean getFileFromStorage(String file) {
         return false;
     }
 

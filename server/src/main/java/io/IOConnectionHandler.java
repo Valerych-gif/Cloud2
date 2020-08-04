@@ -72,14 +72,7 @@ public class IOConnectionHandler extends ConnectionHandler {
 
     public void sendFileToClient() {
         String fileName = getStringFromClient();
-        CloudFile file = new CloudFile(storage + "/" + fileName);
-        if (file.exists()) {
-            sendResponse(Responses.OK.getString());
-            fileHandler.getFileFromStorage(file);
-        } else {
-            // todo Обработчик ошибки
-            System.out.println("Неправильное имя файла");
-        }
+        fileHandler.getFileFromStorage(fileName);
     }
 
     public void receiveFileFromClient() {

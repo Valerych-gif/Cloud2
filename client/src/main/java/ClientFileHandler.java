@@ -1,7 +1,5 @@
-import javafx.animation.PathTransition;
 
 import java.io.*;
-import java.nio.file.FileSystem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -82,7 +80,7 @@ public class ClientFileHandler {
                 controller.sendCommand(downloadedFileName);
 
                 if (controller.isResponseOk()) {
-                    String downloadedFileFullName = rootClientDir + "/" + downloadedFileName;
+                    String downloadedFileFullName = currentClientDir + "/" + downloadedFileName;
 
                     String fileLengthStr = controller.getStringFromServer();
                     long downloadedFileSize = Long.parseLong(fileLengthStr);
@@ -175,13 +173,6 @@ public class ClientFileHandler {
     }
 
     public void openStorageDir(String fileName) {
-//        CloudFile f;
-//        if (fileName.equals(PARENT_DIR_MARK)){
-//            currentStorageDir = new CloudFile(currentStorageDir.getParent(), true);
-//        } else {
-//            String newFileName = currentStorageDir.getPath()+"/"+fileName ;
-//            currentStorageDir = new CloudFile(newFileName);
-//        }
         currentStorageDirName = fileName;
     }
 
