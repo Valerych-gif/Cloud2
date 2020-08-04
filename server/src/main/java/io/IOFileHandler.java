@@ -10,8 +10,6 @@ import java.io.*;
 import java.util.Objects;
 
 public class IOFileHandler extends FileHandler {
-    private static final String DIR_MARK = "./D";
-    private static final String FILE_MARK = "./F";
     private DataInputStream is;
     private DataOutputStream os;
 
@@ -22,29 +20,47 @@ public class IOFileHandler extends FileHandler {
 
     @Override
     public void init() {
-        this.is = ((IOConnectionHandler)connectionHandler).getDataInputStream();
-        this.os = ((IOConnectionHandler)connectionHandler).getDataOutputStream();
+        this.is = ((IOConnectionHandler) connectionHandler).getDataInputStream();
+        this.os = ((IOConnectionHandler) connectionHandler).getDataOutputStream();
     }
 
-    public void sendDirContentToClient(){
-        String currentDir = connectionHandler.getStringFromClient();
-        currentDir = Cloud2ServerStarter.STORAGE_ROOT_DIR + currentDir;
-        File file = new File(currentDir);
+    public void sendDirContentToClient() {
+        String requestedDirFromClient = connectionHandler.getStringFromClient();
+        setCurrentStorageDir(requestedDirFromClient);
 
+        File file = new File(currentStorageDir.getAbsolutePath());
+        if (!file.getAbsolutePath().equals(rootStorageDir.getAbsolutePath())) {
+            connectionHandler.sendResponse(DIR_MARK + PARENT_DIR_MARK);
+        }
         for (File f : Objects.requireNonNull(file.listFiles())) {
             String fileName = f.getName();
             if (f.isDirectory()) {
-                connectionHandler.sendResponse(DIR_MARK+fileName);
+                connectionHandler.sendResponse(DIR_MARK + fileName);
             } else {
-                connectionHandler.sendResponse(FILE_MARK+fileName);
+                connectionHandler.sendResponse(FILE_MARK + fileName);
             }
         }
 
         connectionHandler.sendResponse(Responses.END_OF_DIR_CONTENT.getString());
     }
 
-    public boolean loadFileToStorage(CloudFile clientFile){
-        File cloudFile = new File( storageRootDirPath + "/" + clientFile.getName());
+    public void setCurrentStorageDir(String fileName) {
+        String newFileName;
+        CloudFile file;
+        if (fileName.equals(PARENT_DIR_MARK)) {
+            file = new CloudFile(currentStorageDir.getParent());
+        } else {
+            newFileName = currentStorageDir.getAbsolutePath() + "/" + fileName;
+            file = new CloudFile(newFileName);
+        }
+
+        if (file.exists() && file.isDirectory()) {
+            currentStorageDir = file;
+        }
+    }
+
+    public boolean loadFileToStorage(CloudFile clientFile) {
+        File cloudFile = new File(storageRootDirPath + "/" + clientFile.getName());
         if (!cloudFile.exists()) {
             try {
                 if (!cloudFile.createNewFile()) return false;
@@ -66,7 +82,7 @@ public class IOFileHandler extends FileHandler {
             fos.close();
             System.out.println("\nFile uploaded");
             connectionHandler.sendResponse(Responses.OK.getString());
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
@@ -74,7 +90,7 @@ public class IOFileHandler extends FileHandler {
     }
 
     public boolean getFileFromStorage(CloudFile file) {
-        if (file.exists()){
+        if (file.exists()) {
             long fileLength = file.length();
             try {
                 connectionHandler.sendResponse(String.valueOf(file.length()));
@@ -89,7 +105,7 @@ public class IOFileHandler extends FileHandler {
                 fis.close();
                 Thread.sleep(50); // todo Костыль. Надо найти другое решение. Без этого в передачу файла попадает ответ сервера
                 connectionHandler.sendResponse(Responses.OK.getString());
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 return false;
             }

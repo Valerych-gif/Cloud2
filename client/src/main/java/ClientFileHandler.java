@@ -1,4 +1,7 @@
+import javafx.animation.PathTransition;
+
 import java.io.*;
+import java.nio.file.FileSystem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -15,7 +18,7 @@ public class ClientFileHandler {
     private List<CloudFile> clientFileList;
     private List<CloudFile> currentStorageDirFileList;
     private String clientDirPath;
-    private String currentStorageDir;
+    private String currentStorageDirName;
     private CloudFile currentClientDir;
     private CloudFile rootClientDir;
 
@@ -25,7 +28,7 @@ public class ClientFileHandler {
         this.os = controller.getOs();
         this.clientDirPath = Main.CLIENT_DIR_PATH;
         this.rootClientDir = new CloudFile(clientDirPath);
-        this.currentStorageDir = "/";
+        this.currentStorageDirName = "";
         currentStorageDirFileList = new ArrayList<>();
         this.currentClientDir = new CloudFile(clientDirPath);
         clientFileList = getClientFileList();
@@ -48,7 +51,7 @@ public class ClientFileHandler {
 
         controller.sendCommand(Commands.GET_DIR_CONTENT.getString());
         if (controller.isResponseOk()){
-            controller.sendCommand(currentStorageDir);
+            controller.sendCommand(currentStorageDirName);
         }
 
         currentStorageDirFileList.clear();
@@ -159,7 +162,7 @@ public class ClientFileHandler {
         System.out.println("File sent");
     }
 
-    public void openDir(String fileName) {
+    public void openLocalDir(String fileName) {
         CloudFile f;
         if (fileName.equals(PARENT_DIR_MARK)){
             f = new CloudFile(currentClientDir.getParent(), true);
@@ -171,11 +174,26 @@ public class ClientFileHandler {
         }
     }
 
+    public void openStorageDir(String fileName) {
+//        CloudFile f;
+//        if (fileName.equals(PARENT_DIR_MARK)){
+//            currentStorageDir = new CloudFile(currentStorageDir.getParent(), true);
+//        } else {
+//            String newFileName = currentStorageDir.getPath()+"/"+fileName ;
+//            currentStorageDir = new CloudFile(newFileName);
+//        }
+        currentStorageDirName = fileName;
+    }
+
     public CloudFile getCurrentClientDir() {
         return currentClientDir;
     }
 
     public CloudFile getRootClientDir() {
         return rootClientDir;
+    }
+
+    public String getCurrentStorageDirName() {
+        return currentStorageDirName;
     }
 }

@@ -1,4 +1,3 @@
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -69,7 +68,7 @@ public class Controller implements Initializable {
 
                 if (a.getClickCount() == 2) {
                     String fileName = localFileListView.getSelectionModel().getSelectedItem();
-                    fileHandler.openDir(fileName);
+                    fileHandler.openLocalDir(fileName);
                     refreshClientDirContent();
                 } else {
                     activeFile = localFileListView.getSelectionModel().getSelectedItem();
@@ -78,15 +77,15 @@ public class Controller implements Initializable {
             });
 
             storageFileListView.setOnMouseClicked(a -> {
-                activeFile = storageFileListView.getSelectionModel().getSelectedItem();
-                activePanel = STORAGE_PANEL;
-//                if (a.getClickCount() == 2) {
-//                    String fileName = storageFileListView.getSelectionModel().getSelectedItem();
-//                    fileHandler.downLoadFile(fileName);
-//                    if (isResponseOk()){
-//                        refreshClientDirContent();
-//                    }
-//                }
+                if (a.getClickCount() == 2) {
+                    String fileName = storageFileListView.getSelectionModel().getSelectedItem();
+                    fileHandler.openStorageDir(fileName);
+                    refreshStorageDirContent();
+
+                }else{
+                    activeFile = storageFileListView.getSelectionModel().getSelectedItem();
+                    activePanel = STORAGE_PANEL;
+                }
             });
 
             refreshListsButton.setOnAction(a->{
@@ -143,6 +142,8 @@ public class Controller implements Initializable {
     public void refreshStorageDirContent() {
         List<CloudFile> storageDirContent = fileHandler.getStorageDirContent();
         storageFileListView.getItems().clear();
+//        if (!fileHandler.getCurrentStorageDirName().equals(fileHandler.getRootStorageDir().getName()))
+//            storageFileListView.getItems().add(ClientFileHandler.PARENT_DIR_MARK);
         for (CloudFile file : storageDirContent) {
             storageFileListView.getItems().add(file.getName());
         }
