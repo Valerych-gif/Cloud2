@@ -142,8 +142,6 @@ public class Controller implements Initializable {
     public void refreshStorageDirContent() {
         List<CloudFile> storageDirContent = fileHandler.getStorageDirContent();
         storageFileListView.getItems().clear();
-//        if (!fileHandler.getCurrentStorageDirName().equals(fileHandler.getRootStorageDir().getName()))
-//            storageFileListView.getItems().add(ClientFileHandler.PARENT_DIR_MARK);
         for (CloudFile file : storageDirContent) {
             storageFileListView.getItems().add(file.getName());
         }

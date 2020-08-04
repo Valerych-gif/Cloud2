@@ -1,7 +1,6 @@
 package io;
 
 import files.CloudFile;
-import main.Cloud2ServerStarter;
 import main.FileHandler;
 import main.ConnectionHandler;
 import main.Responses;
@@ -28,19 +27,19 @@ public class IOFileHandler extends FileHandler {
         String requestedDirFromClient = connectionHandler.getStringFromClient();
         setCurrentStorageDir(requestedDirFromClient);
 
-        File file = new File(currentStorageDir.getAbsolutePath());
-        if (!file.getAbsolutePath().equals(rootStorageDir.getAbsolutePath())) {
-            connectionHandler.sendResponse(DIR_MARK + PARENT_DIR_MARK);
+        if (currentStorageDir.getAbsolutePath().length()>rootStorageDir.getAbsolutePath().length()) {
+            System.out.println(currentStorageDir.getAbsolutePath());
+            System.out.println(rootStorageDir.getAbsolutePath());
+            connectionHandler.sendResponse(DIR_PREFIX + PARENT_DIR_MARK);
         }
-        for (File f : Objects.requireNonNull(file.listFiles())) {
+        for (File f : Objects.requireNonNull(currentStorageDir.listFiles())) {
             String fileName = f.getName();
             if (f.isDirectory()) {
-                connectionHandler.sendResponse(DIR_MARK + fileName);
+                connectionHandler.sendResponse(DIR_PREFIX + fileName);
             } else {
-                connectionHandler.sendResponse(FILE_MARK + fileName);
+                connectionHandler.sendResponse(FILE_PREFIX + fileName);
             }
         }
-
         connectionHandler.sendResponse(Responses.END_OF_DIR_CONTENT.getString());
     }
 
@@ -49,6 +48,9 @@ public class IOFileHandler extends FileHandler {
         CloudFile file;
         if (fileName.equals(PARENT_DIR_MARK)) {
             file = new CloudFile(currentStorageDir.getParent());
+            if (file.getAbsolutePath().length()<=rootStorageDir.getAbsolutePath().length()){
+                file = new CloudFile(rootStorageDir.getAbsolutePath());
+            }
         } else {
             newFileName = currentStorageDir.getAbsolutePath() + "/" + fileName;
             file = new CloudFile(newFileName);

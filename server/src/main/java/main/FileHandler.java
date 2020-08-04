@@ -4,8 +4,8 @@ import files.CloudFile;
 
 public abstract class FileHandler {
 
-    public static final String DIR_MARK = "./D";
-    public static final String FILE_MARK = "./F";
+    public static final String DIR_PREFIX = "./D";
+    public static final String FILE_PREFIX = "./F";
     public static final String PARENT_DIR_MARK = "..";
 
     protected byte [] buffer;
