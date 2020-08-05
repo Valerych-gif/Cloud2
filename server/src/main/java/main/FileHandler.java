@@ -22,7 +22,7 @@ public abstract class FileHandler {
         this.connectionHandler = connectionHandler;
         this.bufferSize = Cloud2ServerStarter.BUFFER_SIZE;
         this.buffer = new byte[bufferSize];
-        this.storageRootDirPath = connectionHandler.getStorage().getAbsolutePath();
+        this.storageRootDirPath = connectionHandler.getUserStorage().getAbsolutePath();
         this.rootStorageDir = new CloudFile(storageRootDirPath);
         this.currentStorageDir = rootStorageDir;
         init();

@@ -88,7 +88,7 @@ public class IOConnectionHandler extends ConnectionHandler {
         }
 
         long fileLength = getFileLengthFromClient();
-        if (fileLength > 0) {
+        if (fileLength >= 0) {
             sendResponse(Responses.OK.getString());
         } else {
             // todo Обработчик ошибки
@@ -97,7 +97,7 @@ public class IOConnectionHandler extends ConnectionHandler {
         }
 
         if (isOk) {
-            CloudFile file = new CloudFile(storage + "/" + fileName, fileLength);
+            CloudFile file = new CloudFile(mainStorage + "/" + fileName, fileLength);
             fileHandler.loadFileToStorage(file);
         }
     }
@@ -151,7 +151,4 @@ public class IOConnectionHandler extends ConnectionHandler {
         return socket;
     }
 
-    public File getStorage() {
-        return storage;
-    }
 }

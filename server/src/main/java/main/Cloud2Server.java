@@ -1,5 +1,6 @@
 package main;
 
+import auth.AuthService;
 import io.IOConnectionHandler;
 import exceptions.CantToCreateStorageException;
 import org.apache.logging.log4j.LogManager;
@@ -52,4 +53,5 @@ public abstract class Cloud2Server {
     }
 
     public abstract void waitConnection();
+
 }

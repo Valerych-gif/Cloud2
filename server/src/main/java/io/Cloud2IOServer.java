@@ -22,6 +22,7 @@ public class Cloud2IOServer extends Cloud2Server{
 
     public void waitConnection() {
         try {
+
             serverSocket = new ServerSocket(Cloud2ServerStarter.PORT);
             executor = Executors.newCachedThreadPool();
             logger.info("Server started.");

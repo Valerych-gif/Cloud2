@@ -1,10 +1,10 @@
 package main;
 
+import auth.AuthService;
+import exceptions.CantToCreateStorageException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -14,7 +14,10 @@ public abstract class ConnectionHandler implements Runnable {
 
     protected Cloud2Server server;
     protected FileHandler fileHandler;
-    protected File storage;
+    protected AuthService authService;
+    protected String userStoragePath;
+    protected File mainStorage;
+    protected File userStorage;
     protected boolean isConnectionActive;
     protected Commands command;
 
@@ -22,8 +25,26 @@ public abstract class ConnectionHandler implements Runnable {
         logger.info("Connection accepted");
         this.isConnectionActive = true;
         this.server = server;
-        this.storage = server.getStorage();
+        this.authService = AuthService.getInstance();
+        this.userStoragePath = authService.getId();
+        this.mainStorage = server.getStorage();
+        this.userStorage = new File(mainStorage.getAbsolutePath() + "\\" + userStoragePath);
+        System.out.println(userStorage.getAbsolutePath());
+        try {
+            setUpUserStorage();
+        } catch (Exception e) {
+            logger.error(e);
+        }
         this.command=null;
+    }
+
+    public void setUpUserStorage() throws Exception {
+        if (userStorage.exists()) return;
+        if (userStorage.mkdir()) {
+            logger.info("Создана корневая папка пользователя " + authService.getLogin());
+        } else {
+            throw new CantToCreateStorageException();
+        }
     }
 
     @Override
@@ -74,7 +95,13 @@ public abstract class ConnectionHandler implements Runnable {
 
     protected abstract void receiveFileFromClient() throws IOException;
 
-    protected abstract File getStorage();
-
     public abstract String getStringFromClient();
+
+    public File getMainStorage() {
+        return mainStorage;
+    }
+
+    public File getUserStorage() {
+        return userStorage;
+    }
 }

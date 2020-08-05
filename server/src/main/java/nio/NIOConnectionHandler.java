@@ -1,17 +1,11 @@
 package nio;
 
-import files.CloudFile;
-import io.IOFileHandler;
 import main.Cloud2Server;
-import main.Cloud2ServerStarter;
 import main.Commands;
 import main.ConnectionHandler;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -84,8 +78,8 @@ public class NIOConnectionHandler extends ConnectionHandler {
         return socketChannel;
     }
 
-    public File getStorage() {
-        return storage;
+    public File getMainStorage() {
+        return mainStorage;
     }
 
     @Override

@@ -27,7 +27,7 @@ public class IOFileHandler extends FileHandler {
         String requestedDirFromClient = connectionHandler.getStringFromClient();
         setCurrentStorageDir(requestedDirFromClient);
 
-        if (currentStorageDir.getAbsolutePath().length()>rootStorageDir.getAbsolutePath().length()) {
+        if (currentStorageDir.getAbsolutePath().length() > rootStorageDir.getAbsolutePath().length()) {
             connectionHandler.sendResponse(DIR_PREFIX + PARENT_DIR_MARK);
         }
         for (File f : Objects.requireNonNull(currentStorageDir.listFiles())) {
@@ -46,7 +46,7 @@ public class IOFileHandler extends FileHandler {
         CloudFile file;
         if (fileName.equals(PARENT_DIR_MARK)) {
             file = new CloudFile(currentStorageDir.getParent());
-            if (file.getAbsolutePath().length()<=rootStorageDir.getAbsolutePath().length()){
+            if (file.getAbsolutePath().length() <= rootStorageDir.getAbsolutePath().length()) {
                 file = new CloudFile(rootStorageDir.getAbsolutePath());
             }
         } else {
@@ -71,14 +71,17 @@ public class IOFileHandler extends FileHandler {
         long fileLength = clientFile.getFileLength();
         try {
             System.out.println("Uploading...");
+
             FileOutputStream fos = new FileOutputStream(cloudFile);
-            long numberOfSends = fileLength / bufferSize;
-            for (long i = 0; i <= numberOfSends; i++) {
-                int bytesRead = is.read(buffer);
-                System.out.print("\r" + i + "/" + numberOfSends);
-                fos.write(buffer, 0, bytesRead);
+            if (fileLength > 0) {
+                long numberOfSends = fileLength / bufferSize;
+                for (long i = 0; i <= numberOfSends; i++) {
+                    int bytesRead = is.read(buffer);
+                    System.out.print("\r" + i + "/" + numberOfSends);
+                    fos.write(buffer, 0, bytesRead);
+                }
+                fos.flush();
             }
-            fos.flush();
             fos.close();
             System.out.println("\nFile uploaded");
             connectionHandler.sendResponse(Responses.OK.getString());
