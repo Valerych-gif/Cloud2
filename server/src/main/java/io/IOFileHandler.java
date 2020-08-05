@@ -100,15 +100,17 @@ public class IOFileHandler extends FileHandler {
             long fileLength = file.length();
             try {
                 connectionHandler.sendResponse(String.valueOf(file.length()));
-                FileInputStream fis = new FileInputStream(file);
-                long numberOfSends = fileLength / bufferSize;
-                for (long i = 0; i <= numberOfSends; i++) {
-                    int byteRead = fis.read(buffer);
-                    os.write(buffer, 0, byteRead);
-                    os.flush();
+                if (fileLength>0) {
+                    FileInputStream fis = new FileInputStream(file);
+                    long numberOfSends = fileLength / bufferSize;
+                    for (long i = 0; i <= numberOfSends; i++) {
+                        int byteRead = fis.read(buffer);
+                        os.write(buffer, 0, byteRead);
+                        os.flush();
+                    }
+                    fis.close();
                 }
                 System.out.println("File sent");
-                fis.close();
                 Thread.sleep(50); // todo Костыль. Надо найти другое решение. Без этого в передачу файла попадает ответ сервера
                 connectionHandler.sendResponse(Responses.OK.getString());
             } catch (Exception e) {

@@ -93,12 +93,14 @@ public class ClientFileHandler {
                     try {
                         System.out.println("Downloading...");
                         FileOutputStream fos = new FileOutputStream(downloadedFile);
-                        long numberOfSends = downloadedFileSize / bufferSize;
-                        for (long i = 0; i <= numberOfSends; i++) {
-                            System.out.print("\r" + i + "/" + numberOfSends);
-                            int bytesRead = is.read(buffer);
-                            fos.write(buffer, 0, bytesRead);
-                            fos.flush();
+                        if (downloadedFileSize>0) {
+                            long numberOfSends = downloadedFileSize / bufferSize;
+                            for (long i = 0; i <= numberOfSends; i++) {
+                                System.out.print("\r" + i + "/" + numberOfSends);
+                                int bytesRead = is.read(buffer);
+                                fos.write(buffer, 0, bytesRead);
+                                fos.flush();
+                            }
                         }
                         fos.close();
                         System.out.println("\nFile downloaded");
