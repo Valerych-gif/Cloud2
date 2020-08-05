@@ -20,22 +20,41 @@ public abstract class ConnectionHandler implements Runnable {
     protected File userStorage;
     protected boolean isConnectionActive;
     protected Commands command;
+    protected int userId;
 
     public ConnectionHandler(Cloud2Server server) {
         logger.info("Connection accepted");
         this.isConnectionActive = true;
         this.server = server;
         this.authService = AuthService.getInstance();
-        this.userStoragePath = authService.getId();
         this.mainStorage = server.getStorage();
-        this.userStorage = new File(mainStorage.getAbsolutePath() + "\\" + userStoragePath);
-        System.out.println(userStorage.getAbsolutePath());
+        this.command = null;
+        userInit();
+    }
+
+    public void userInit() {
+        String userIdStr;
+        do {
+            userIdStr = authorization();
+        } while (userIdStr == null);
+        this.userId = Integer.parseInt(userIdStr);
+        userStoragePath = mainStorage.getAbsolutePath() + "\\" + userIdStr;
+        this.userStorage = new File(userStoragePath);
         try {
             setUpUserStorage();
         } catch (Exception e) {
             logger.error(e);
         }
-        this.command=null;
+    }
+
+    public String authorization() {
+        String userIdStr = null;
+        try {
+            userIdStr = authService.getId("other", "2345");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return userIdStr;
     }
 
     public void setUpUserStorage() throws Exception {
@@ -51,8 +70,8 @@ public abstract class ConnectionHandler implements Runnable {
     public void run() {
 
         while (isConnectionActive) {
-            command=null;
-            while (command==null) {
+            command = null;
+            while (command == null) {
                 command = getCommandFromClient(); // Block
             }
             try {
