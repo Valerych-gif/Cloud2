@@ -1,23 +1,18 @@
 package main;
 
-import auth.AuthService;
 import io.IOConnectionHandler;
 import exceptions.CantToCreateStorageException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
 
 public abstract class Cloud2Server {
 
-    protected ServerSocket serverSocket;
-    protected ExecutorService executor;
     protected Socket socket;
     protected File storage;
-    protected Logger logger = LogManager.getLogger(Cloud2Server.class);
+    protected static Logger logger = LogManager.getLogger(Cloud2Server.class);
 
     public  Cloud2Server() {
         storage = new File(Cloud2ServerStarter.STORAGE_ROOT_DIR);

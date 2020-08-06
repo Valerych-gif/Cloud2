@@ -18,12 +18,28 @@ public class IOConnectionHandler extends ConnectionHandler {
         this.socket = socket;
         this.is = new DataInputStream(socket.getInputStream());
         this.os = new DataOutputStream(socket.getOutputStream());
+        userInit();
     }
 
     @Override
     public void run() {
         fileHandler = new IOFileHandler(this);
         super.run();
+    }
+
+    public boolean getLoginAndPassFromClient() {
+        String authStrFromClient = getStringFromClient();
+        if (authStrFromClient.equals(Commands.AUTHORIZATION.getString())){
+            sendResponse(Responses.OK.getString());
+            String[] loginAndPassStr = getStringFromClient().split(" ");
+            this.login = loginAndPassStr[0];
+            this.pass = loginAndPassStr[1];
+            sendResponse(Responses.OK.getString());
+            return true;
+        } else{
+            sendResponse(Responses.FAIL.getString());
+            return false;
+        }
     }
 
     public Commands getCommandFromClient() {
@@ -63,7 +79,7 @@ public class IOConnectionHandler extends ConnectionHandler {
     public void sendResponse(String responseStr) {
         try {
             System.out.println("->\t" + responseStr);
-            os.writeBytes(responseStr+Cloud2ServerStarter.END_COMMAND_CHAR);
+            os.writeBytes(responseStr + Cloud2ServerStarter.END_COMMAND_CHAR);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e);

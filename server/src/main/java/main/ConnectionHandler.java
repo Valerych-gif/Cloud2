@@ -20,6 +20,8 @@ public abstract class ConnectionHandler implements Runnable {
     protected File userStorage;
     protected boolean isConnectionActive;
     protected Commands command;
+    protected String login;
+    protected String pass;
     protected int userId;
 
     public ConnectionHandler(Cloud2Server server) {
@@ -29,7 +31,6 @@ public abstract class ConnectionHandler implements Runnable {
         this.authService = AuthService.getInstance();
         this.mainStorage = server.getStorage();
         this.command = null;
-        userInit();
     }
 
     public void userInit() {
@@ -43,16 +44,19 @@ public abstract class ConnectionHandler implements Runnable {
         try {
             setUpUserStorage();
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
         }
     }
 
     public String authorization() {
+        if (!getLoginAndPassFromClient()) return null;
         String userIdStr = null;
         try {
-            userIdStr = authService.getId("other", "2345");
+            userIdStr = authService.getId(login, pass);
         } catch (IOException e) {
             e.printStackTrace();
+            logger.error(e);
         }
         return userIdStr;
     }
@@ -115,6 +119,8 @@ public abstract class ConnectionHandler implements Runnable {
     protected abstract void receiveFileFromClient() throws IOException;
 
     public abstract String getStringFromClient();
+
+    protected abstract boolean getLoginAndPassFromClient();
 
     public File getMainStorage() {
         return mainStorage;

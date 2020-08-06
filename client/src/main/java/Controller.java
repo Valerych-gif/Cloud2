@@ -59,6 +59,7 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        authorization();
         fileHandler = new ClientFileHandler(this);
         try{
             refreshClientDirContent();
@@ -125,6 +126,20 @@ public class Controller implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void authorization() {
+        boolean authResponse;
+        do {
+            authResponse = false;
+            sendCommand(Commands.AUTHORIZATION.getString());
+            if (isResponseOk()){
+                sendCommand("login 1234");
+            }
+            if (isResponseOk()){
+                authResponse=true;
+            }
+        } while (!authResponse);
     }
 
     public void refreshClientDirContent() {
