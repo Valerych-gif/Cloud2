@@ -2,6 +2,7 @@ package main;
 
 import auth.AuthService;
 import exceptions.CantToCreateStorageException;
+import io.IOFileHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,6 +14,7 @@ public abstract class ConnectionHandler implements Runnable {
     protected Logger logger = LogManager.getLogger(ConnectionHandler.class);
 
     protected Cloud2Server server;
+    protected ConnectionHandler connectionHandler;
     protected FileHandler fileHandler;
     protected AuthService authService;
     protected String userStoragePath;
@@ -33,32 +35,30 @@ public abstract class ConnectionHandler implements Runnable {
         this.command = null;
     }
 
-    public void userInit() {
-        String userIdStr;
-        do {
-            userIdStr = authorization();
-        } while (userIdStr == null);
-        this.userId = Integer.parseInt(userIdStr);
-        userStoragePath = mainStorage.getAbsolutePath() + "\\" + userIdStr;
-        this.userStorage = new File(userStoragePath);
-        try {
-            setUpUserStorage();
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e);
+    public void authorization() {
+        getLoginAndPassFromClient();
+        if (login!=null) {
+            try {
+                String userIdStr = authService.getId(login, pass);
+                this.userId = userIdStr != null ? Integer.parseInt(userIdStr) : -1;
+            } catch (IOException e) {
+                e.printStackTrace();
+                logger.error(e);
+            }
         }
     }
 
-    public String authorization() {
-        if (!getLoginAndPassFromClient()) return null;
-        String userIdStr = null;
-        try {
-            userIdStr = authService.getId(login, pass);
-        } catch (IOException e) {
-            e.printStackTrace();
-            logger.error(e);
+    public void userInit() {
+        if (userId!=-1) {
+            userStoragePath = mainStorage.getAbsolutePath() + "\\" + userId;
+            this.userStorage = new File(userStoragePath);
+            try {
+                setUpUserStorage();
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error(e);
+            }
         }
-        return userIdStr;
     }
 
     public void setUpUserStorage() throws Exception {
@@ -72,7 +72,6 @@ public abstract class ConnectionHandler implements Runnable {
 
     @Override
     public void run() {
-
         while (isConnectionActive) {
             command = null;
             while (command == null) {
@@ -80,24 +79,49 @@ public abstract class ConnectionHandler implements Runnable {
             }
             try {
                 switch (command) {
-                    case UPLOAD:
+                    case AUTHORIZATION:
                         sendResponse(Responses.OK.getString());
-                        receiveFileFromClient(); // Block
+                        authorization();
+                        if (userId!=-1){
+                            sendResponse(Responses.OK.getString());
+                            seUpUser();
+                        } else {
+                            sendResponse(Responses.FAIL.getString());
+                        }
+                        break;
+                    case UPLOAD:
+                        if (userId!=-1) {
+                            sendResponse(Responses.OK.getString());
+                            receiveFileFromClient(); // Block
+                        } else {
+                            sendResponse(Responses.FAIL.getString());
+                        }
                         break;
                     case DOWNLOAD:
-                        sendResponse(Responses.OK.getString());
-                        sendFileToClient();
+                        if (userId!=-1) {
+                            sendResponse(Responses.OK.getString());
+                            sendFileToClient();
+                        } else {
+                            sendResponse(Responses.FAIL.getString());
+                        }
                         break;
                     case GET_DIR_CONTENT:
-                        sendResponse(Responses.OK.getString());
-                        sendDirContent();
+                        if (userId!=-1) {
+                            sendResponse(Responses.OK.getString());
+                            sendDirContent();
+                        } else {
+                            sendResponse(Responses.FAIL.getString());
+                        }
                         break;
                     case CLOSE_CONNECTION:
-                        sendResponse(Responses.OK.getString());
-                        closeConnection();
+                        if (userId!=-1) {
+                            sendResponse(Responses.OK.getString());
+                            closeConnection();
+                        } else {
+                            sendResponse(Responses.FAIL.getString());
+                        }
                         break;
                 }
-
             } catch (Exception e) {
                 closeConnection();
                 e.printStackTrace();
@@ -105,6 +129,8 @@ public abstract class ConnectionHandler implements Runnable {
             }
         }
     }
+
+    protected abstract void seUpUser();
 
     protected abstract void sendDirContent();
 
@@ -120,7 +146,7 @@ public abstract class ConnectionHandler implements Runnable {
 
     public abstract String getStringFromClient();
 
-    protected abstract boolean getLoginAndPassFromClient();
+    protected abstract void getLoginAndPassFromClient();
 
     public File getMainStorage() {
         return mainStorage;

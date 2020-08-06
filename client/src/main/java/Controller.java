@@ -1,3 +1,4 @@
+import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -12,16 +13,22 @@ import java.util.*;
 public class Controller implements Initializable {
 
     @FXML
-    public Button send;
-
-    @FXML
     public ListView<String> localFileListView;
 
     @FXML
     public ListView<String> storageFileListView;
 
     @FXML
-    public TextField text;
+    public TextField loginField;
+
+    @FXML
+    public TextField passField;
+
+    @FXML
+    public Button regButton;
+
+    @FXML
+    public Button signInButton;
 
     @FXML
     public Button refreshListsButton;
@@ -45,13 +52,16 @@ public class Controller implements Initializable {
     private final String LOCAL_PANEL = "local_panel";
     private String activePanel;
 
+    private String login;
+    private String pass;
+
     public Controller() {
         try {
             socket = new Socket("localhost", 8189);
             is = new DataInputStream(socket.getInputStream());
             os = new DataOutputStream(socket.getOutputStream());
-            activeFile=null;
-            activePanel=STORAGE_PANEL;
+            activeFile = null;
+            activePanel = STORAGE_PANEL;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -59,11 +69,10 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        authorization();
+
         fileHandler = new ClientFileHandler(this);
-        try{
+        try {
             refreshClientDirContent();
-            refreshStorageDirContent();
 
             localFileListView.setOnMouseClicked(a -> {
 
@@ -83,26 +92,26 @@ public class Controller implements Initializable {
                     fileHandler.openStorageDir(fileName);
                     refreshStorageDirContent();
 
-                }else{
+                } else {
                     activeFile = storageFileListView.getSelectionModel().getSelectedItem();
                     activePanel = STORAGE_PANEL;
                 }
             });
 
-            refreshListsButton.setOnAction(a->{
+            refreshListsButton.setOnAction(a -> {
                 refreshStorageDirContent();
                 refreshClientDirContent();
             });
 
-            copyFileButton.setOnAction(a->{
-                String fileName="";
+            copyFileButton.setOnAction(a -> {
+                String fileName = "";
                 if (activeFile != null) {
                     fileName = activeFile;
-                    if (activePanel.equals(STORAGE_PANEL)){
+                    if (activePanel.equals(STORAGE_PANEL)) {
                         fileHandler.downLoadFile(fileName);
                         if (isResponseOk())
                             refreshClientDirContent();
-                    } else if (activePanel.equals(LOCAL_PANEL)){
+                    } else if (activePanel.equals(LOCAL_PANEL)) {
                         fileHandler.uploadFile(fileName);
                         if (isResponseOk())
                             refreshStorageDirContent();
@@ -110,17 +119,16 @@ public class Controller implements Initializable {
                 }
             });
 
-            moveFileButton.setOnAction(a->{
+            moveFileButton.setOnAction(a -> {
                 System.out.println("move");
             });
 
-            deleteFileButton.setOnAction(a->{
+            deleteFileButton.setOnAction(a -> {
                 System.out.println("delete");
             });
 
-            send.setOnAction(a->{
-                String command = text.getCharacters().toString();
-                sendCommand(command);
+            signInButton.setOnAction(a -> {
+                authorization();
             });
 
         } catch (Exception e) {
@@ -129,17 +137,16 @@ public class Controller implements Initializable {
     }
 
     public void authorization() {
-        boolean authResponse;
-        do {
-            authResponse = false;
-            sendCommand(Commands.AUTHORIZATION.getString());
-            if (isResponseOk()){
-                sendCommand("login 1234");
-            }
-            if (isResponseOk()){
-                authResponse=true;
-            }
-        } while (!authResponse);
+
+        sendCommand(Commands.AUTHORIZATION.getString());
+        if (isResponseOk()) {
+            String l = loginField.getText();
+            String p = passField.getText();
+            sendCommand(l + " " + p);
+        }
+        if (isResponseOk()) {
+            refreshStorageDirContent();
+        }
     }
 
     public void refreshClientDirContent() {
@@ -162,10 +169,10 @@ public class Controller implements Initializable {
     }
 
 
-    public void sendCommand(String command){
+    public void sendCommand(String command) {
         try {
             System.out.println("->\t" + command);
-            os.writeBytes(command+Main.END_COMMAND_CHAR);
+            os.writeBytes(command + Main.END_COMMAND_CHAR);
             os.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -173,7 +180,7 @@ public class Controller implements Initializable {
     }
 
     public String getStringFromServer() {
-        StringBuilder stringFromServer= new StringBuilder();
+        StringBuilder stringFromServer = new StringBuilder();
         char b = 0;
         try {
             while (true) {

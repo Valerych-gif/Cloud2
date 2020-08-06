@@ -18,28 +18,28 @@ public class IOConnectionHandler extends ConnectionHandler {
         this.socket = socket;
         this.is = new DataInputStream(socket.getInputStream());
         this.os = new DataOutputStream(socket.getOutputStream());
-        userInit();
+        this.connectionHandler = this;
     }
 
     @Override
     public void run() {
-        fileHandler = new IOFileHandler(this);
         super.run();
     }
 
-    public boolean getLoginAndPassFromClient() {
-        String authStrFromClient = getStringFromClient();
-        if (authStrFromClient.equals(Commands.AUTHORIZATION.getString())){
-            sendResponse(Responses.OK.getString());
-            String[] loginAndPassStr = getStringFromClient().split(" ");
-            this.login = loginAndPassStr[0];
-            this.pass = loginAndPassStr[1];
-            sendResponse(Responses.OK.getString());
-            return true;
-        } else{
-            sendResponse(Responses.FAIL.getString());
-            return false;
+    public void getLoginAndPassFromClient() {
+        String[] loginAndPassStr = getStringFromClient().split(" ");
+        if (loginAndPassStr.length>1) {
+            this.login = loginAndPassStr[0].trim();
+            this.pass = loginAndPassStr[1].trim();
+        } else {
+            this.login = null;
+            this.pass = null;
         }
+    }
+
+    public void seUpUser() {
+        userInit();
+        fileHandler = new IOFileHandler(this);
     }
 
     public Commands getCommandFromClient() {
@@ -127,7 +127,7 @@ public class IOConnectionHandler extends ConnectionHandler {
         return getStringFromClient();
     }
 
-    public void sendDirContent(){
+    public void sendDirContent() {
         fileHandler.sendDirContentToClient();
     }
 
