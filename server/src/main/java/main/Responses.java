@@ -4,7 +4,8 @@ public enum Responses {
     OK ("./ok"),
     FAIL ("./fail"),
     END_OF_DIR_CONTENT("./endofdircontent"),
-    NEED_TO_AUTH ("./needtoauth");
+    NEED_TO_AUTH ("./needtoauth"),
+    LOGIN_ALREADY_IN_USE ("./loginfail");
 
     private String responseStr;
 

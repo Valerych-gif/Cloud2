@@ -5,7 +5,8 @@ public enum Commands {
     DOWNLOAD ("./download"),
     CLOSE_CONNECTION("./closeconnection"),
     GET_DIR_CONTENT("./getdircontent"),
-    AUTHORIZATION ("./authorization");
+    AUTHORIZATION ("./authorization"),
+    REGISTRATION ("./registration");
 
     String commandStr;
 

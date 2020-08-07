@@ -33,6 +33,7 @@ public abstract class ConnectionHandler implements Runnable {
         this.authService = AuthService.getInstance();
         this.mainStorage = server.getStorage();
         this.command = null;
+        this.userId=-1;
     }
 
     public void authorization() {
@@ -42,6 +43,19 @@ public abstract class ConnectionHandler implements Runnable {
                 String userIdStr = authService.getId(login, pass);
                 this.userId = userIdStr != null ? Integer.parseInt(userIdStr) : -1;
             } catch (IOException e) {
+                e.printStackTrace();
+                logger.error(e);
+            }
+        }
+    }
+
+    public void registration(){
+        getLoginAndPassFromClient();
+        if (login!=null) {
+            try {
+                String userIdStr = authService.registration(login, pass);
+                this.userId = userIdStr != null ? Integer.parseInt(userIdStr) : -1;
+            } catch (Exception e) {
                 e.printStackTrace();
                 logger.error(e);
             }
@@ -64,7 +78,7 @@ public abstract class ConnectionHandler implements Runnable {
     public void setUpUserStorage() throws Exception {
         if (userStorage.exists()) return;
         if (userStorage.mkdir()) {
-            logger.info("Создана корневая папка пользователя " + authService.getLogin());
+            logger.info("Создана корневая папка пользователя " + login);
         } else {
             throw new CantToCreateStorageException();
         }
@@ -82,6 +96,16 @@ public abstract class ConnectionHandler implements Runnable {
                     case AUTHORIZATION:
                         sendResponse(Responses.OK.getString());
                         authorization();
+                        if (userId!=-1){
+                            sendResponse(Responses.OK.getString());
+                            seUpUser();
+                        } else {
+                            sendResponse(Responses.FAIL.getString());
+                        }
+                        break;
+                    case REGISTRATION:
+                        sendResponse(Responses.OK.getString());
+                        registration();
                         if (userId!=-1){
                             sendResponse(Responses.OK.getString());
                             seUpUser();

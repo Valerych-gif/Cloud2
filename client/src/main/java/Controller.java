@@ -131,6 +131,10 @@ public class Controller implements Initializable {
                 authorization();
             });
 
+            regButton.setOnAction(a -> {
+                registration();
+            });
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -139,6 +143,19 @@ public class Controller implements Initializable {
     public void authorization() {
 
         sendCommand(Commands.AUTHORIZATION.getString());
+        if (isResponseOk()) {
+            String l = loginField.getText();
+            String p = passField.getText();
+            sendCommand(l + " " + p);
+        }
+        if (isResponseOk()) {
+            refreshStorageDirContent();
+        }
+    }
+
+    public void registration() {
+
+        sendCommand(Commands.REGISTRATION.getString());
         if (isResponseOk()) {
             String l = loginField.getText();
             String p = passField.getText();
