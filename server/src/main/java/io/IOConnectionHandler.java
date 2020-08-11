@@ -131,6 +131,10 @@ public class IOConnectionHandler extends ConnectionHandler {
         fileHandler.sendDirContentToClient();
     }
 
+    public void sendSharedFilesToClient() {
+        fileHandler.sendSharedFilesToClient();
+    }
+
     public void closeConnection() {
 
         isConnectionActive = false;

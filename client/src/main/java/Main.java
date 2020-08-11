@@ -13,7 +13,10 @@ import java.io.IOException;
 
 public class Main extends Application {
 
-    public final static String CLIENT_DIR_PATH = "client/src/main/resources/";
+    public static final boolean DEBUG_MODE = true;
+
+    public final static String CLIENT_DIR_PATH = "C:/Users/Валерий/Cloud2Disk";
+    public final static String SERVER = "localhost";
     public final static int PORT = 8189;
 
     public final static int BUFFER_SIZE = 1024;

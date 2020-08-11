@@ -26,14 +26,17 @@ public class ClientFileHandler {
         this.os = controller.getOs();
         this.clientDirPath = Main.CLIENT_DIR_PATH;
         this.rootClientDir = new CloudFile(clientDirPath);
+        if (!rootClientDir.exists()) {
+            if (rootClientDir.mkdir()) {
+                System.out.println("Создана корневая папка пользователя ");
+            } else {
+                throw new RuntimeException("directory resource not exists on client");
+            }
+        }
         this.currentStorageDirName = "";
         currentStorageDirFileList = new ArrayList<>();
         this.currentClientDir = new CloudFile(clientDirPath);
         clientFileList = getClientFileList();
-
-        if (!rootClientDir.exists()) {
-            throw new RuntimeException("directory resource not exists on client");
-        }
     }
 
     public List<CloudFile> getClientFileList() {
@@ -51,13 +54,16 @@ public class ClientFileHandler {
         if (controller.isResponseOk()){
             controller.sendCommand(currentStorageDirName);
         }
+        return getFilesFromStorage();
+    }
 
+    private List<CloudFile> getFilesFromStorage() {
         currentStorageDirFileList.clear();
         while (true){
             String f = controller.getStringFromServer();
             String fileName = "";
             CloudFile cloudFile;
-            if (f.equals("./endofdircontent")) break;
+            if (f.equals(Responses.END_OF_DIR_CONTENT.getString())) break;
             if (f.startsWith(DIR_MARK)){
                 fileName=f.substring(DIR_MARK.length());
                 cloudFile = new CloudFile(fileName, true);
@@ -72,38 +78,46 @@ public class ClientFileHandler {
         return currentStorageDirFileList;
     }
 
-    public void downLoadFile(String downloadedFileName) {
-        try {
+    public List<CloudFile> getSharedDirContent() {
+        controller.sendCommand(Commands.GET_SHARED_DIR_CONTENT.getString());
+        if (controller.isResponseOk()){
+            return getFilesFromStorage();
+        }
+        return null;
+    }
 
+    public void downLoadFile(String downloadedFileName) {
+        String downloadedFileFullName = currentClientDir + "/" + downloadedFileName;
+        downloadFile(downloadedFileName);
+    }
+
+    private void downloadFile(String fileName) {
+        try {
             controller.sendCommand(Commands.DOWNLOAD.getString());
             if (controller.isResponseOk()) {
-                controller.sendCommand(downloadedFileName);
-
+                controller.sendCommand(fileName);
                 if (controller.isResponseOk()) {
-                    String downloadedFileFullName = currentClientDir + "/" + downloadedFileName;
-
                     String fileLengthStr = controller.getStringFromServer();
                     long downloadedFileSize = Long.parseLong(fileLengthStr);
-                    File downloadedFile = new File(downloadedFileFullName);
+                    System.out.println(fileName);
+
+                    File downloadedFile = new File(fileName);
                     if (!downloadedFile.exists()) {
                         downloadedFile.createNewFile();
                     }
                     int bufferSize = Main.BUFFER_SIZE;
                     byte[] buffer = new byte[bufferSize];
                     try {
-                        System.out.println("Downloading...");
                         FileOutputStream fos = new FileOutputStream(downloadedFile);
                         if (downloadedFileSize>0) {
                             long numberOfSends = downloadedFileSize / bufferSize;
                             for (long i = 0; i <= numberOfSends; i++) {
-                                System.out.print("\r" + i + "/" + numberOfSends);
                                 int bytesRead = is.read(buffer);
                                 fos.write(buffer, 0, bytesRead);
                                 fos.flush();
                             }
                         }
                         fos.close();
-                        System.out.println("\nFile downloaded");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -121,19 +135,19 @@ public class ClientFileHandler {
                 controller.sendCommand(Commands.UPLOAD.getString());
                 if (controller.isResponseOk()) {
                     controller.sendCommand(fileName);
+                } else {
+                    return;
                 }
                 if (controller.isResponseOk()) {
                     long fileLength = currentFile.length();
                     String fileLengthStr = String.valueOf(fileLength);
                     controller.sendCommand(fileLengthStr);
+                } else {
+                    return;
                 }
-
                 if (controller.isResponseOk()) {
                     sendFile(currentFile);
                 }
-
-
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -159,7 +173,6 @@ public class ClientFileHandler {
             os.flush();
         }
         fis.close();
-        System.out.println("File sent");
     }
 
     public void openLocalDir(String fileName) {

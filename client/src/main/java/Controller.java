@@ -34,6 +34,9 @@ public class Controller implements Initializable {
     public Button refreshListsButton;
 
     @FXML
+    public Button swapButton;
+
+    @FXML
     public Button copyFileButton;
 
     @FXML
@@ -49,6 +52,7 @@ public class Controller implements Initializable {
     private ClientFileHandler fileHandler;
     private String activeFile;
     private final String STORAGE_PANEL = "storage_panel";
+    private boolean inSharedFileMode = false;
     private final String LOCAL_PANEL = "local_panel";
     private String activePanel;
 
@@ -57,7 +61,7 @@ public class Controller implements Initializable {
 
     public Controller() {
         try {
-            socket = new Socket("localhost", 8189);
+            socket = new Socket(Main.SERVER, Main.PORT);
             is = new DataInputStream(socket.getInputStream());
             os = new DataOutputStream(socket.getOutputStream());
             activeFile = null;
@@ -103,6 +107,16 @@ public class Controller implements Initializable {
                 refreshClientDirContent();
             });
 
+            swapButton.setOnAction(a->{
+                if (inSharedFileMode){
+                    refreshStorageDirContent();
+                    inSharedFileMode = false;
+                } else {
+                    getSharedDirContent();
+                    inSharedFileMode = true;
+                }
+            });
+
             copyFileButton.setOnAction(a -> {
                 String fileName = "";
                 if (activeFile != null) {
@@ -111,7 +125,7 @@ public class Controller implements Initializable {
                         fileHandler.downLoadFile(fileName);
                         if (isResponseOk())
                             refreshClientDirContent();
-                    } else if (activePanel.equals(LOCAL_PANEL)) {
+                    } else if (activePanel.equals(LOCAL_PANEL)&&!inSharedFileMode) {
                         fileHandler.uploadFile(fileName);
                         if (isResponseOk())
                             refreshStorageDirContent();
@@ -141,29 +155,27 @@ public class Controller implements Initializable {
     }
 
     public void authorization() {
-
         sendCommand(Commands.AUTHORIZATION.getString());
+        confirmAuthorization();
+    }
+
+    private void confirmAuthorization() {
+        String l = null, p = null;
         if (isResponseOk()) {
-            String l = loginField.getText();
-            String p = passField.getText();
+            l = loginField.getText();
+            p = passField.getText();
             sendCommand(l + " " + p);
         }
         if (isResponseOk()) {
             refreshStorageDirContent();
+            this.login = l;
+            this.pass = p;
         }
     }
 
     public void registration() {
-
         sendCommand(Commands.REGISTRATION.getString());
-        if (isResponseOk()) {
-            String l = loginField.getText();
-            String p = passField.getText();
-            sendCommand(l + " " + p);
-        }
-        if (isResponseOk()) {
-            refreshStorageDirContent();
-        }
+        confirmAuthorization();
     }
 
     public void refreshClientDirContent() {
@@ -171,7 +183,6 @@ public class Controller implements Initializable {
         localFileListView.getItems().clear();
         if (!fileHandler.getCurrentClientDir().getAbsolutePath().equals(fileHandler.getRootClientDir().getAbsolutePath()))
             localFileListView.getItems().add(ClientFileHandler.PARENT_DIR_MARK);
-
         for (CloudFile file : clientDirContent) {
             localFileListView.getItems().add(file.getName());
         }
@@ -185,10 +196,17 @@ public class Controller implements Initializable {
         }
     }
 
+    private void getSharedDirContent() {
+        List<CloudFile> storageDirContent = fileHandler.getSharedDirContent();
+        storageFileListView.getItems().clear();
+        for (CloudFile file : storageDirContent) {
+            storageFileListView.getItems().add(file.getAbsolutePath());
+        }
+    }
 
     public void sendCommand(String command) {
         try {
-            System.out.println("->\t" + command);
+            if (Main.DEBUG_MODE) System.out.println("->\t" + command);
             os.writeBytes(command + Main.END_COMMAND_CHAR);
             os.flush();
         } catch (IOException e) {
@@ -202,10 +220,10 @@ public class Controller implements Initializable {
         try {
             while (true) {
                 b = (char) is.readByte();
-                if (b != '|') {
+                if (b != Main.END_COMMAND_CHAR) {
                     stringFromServer.append(b);
                 } else {
-                    System.out.println("<-\t" + stringFromServer);
+                    if (Main.DEBUG_MODE) System.out.println("<-\t" + stringFromServer);
                     return stringFromServer.toString();
                 }
             }

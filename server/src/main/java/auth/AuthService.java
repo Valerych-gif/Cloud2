@@ -3,6 +3,7 @@ package auth;
 import main.Cloud2Server;
 import main.Cloud2ServerStarter;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -14,11 +15,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class AuthService {
 
     public static String AUTH_FILE = "server/src/main/resources/sfiles/auth.db";
+    public static String SHARED_FILE = "server/src/main/resources/sfiles/sharedfiles.db";
     private static Path path;
 
     private static AuthService instance;
@@ -27,8 +32,8 @@ public class AuthService {
         path = Paths.get(AUTH_FILE);
     }
 
-    public static AuthService getInstance(){
-        if (instance==null) {
+    public static AuthService getInstance() {
+        if (instance == null) {
             instance = new AuthService();
         }
         return instance;
@@ -36,12 +41,12 @@ public class AuthService {
 
     public String getId(String login, String pass) throws IOException {
         Optional<String> lines = Files.lines(path)
-        .filter((str)->{
-            String[] line = str.split(" ");
-            return login.equals(line[1]) && pass.equals(line[2]);
-        })
-        .findFirst();
-        String userIdStr=null;
+                .filter((str) -> {
+                    String[] line = str.split(" ");
+                    return login.equals(line[1]) && pass.equals(line[2]);
+                })
+                .findFirst();
+        String userIdStr = null;
         if (lines.isPresent()) {
             userIdStr = (lines.get().split(" "))[0];
         }
@@ -50,9 +55,9 @@ public class AuthService {
 
     public String registration(String login, String pass) throws Exception {
         String userIdStr = getId(login, pass);
-        if (userIdStr==null) {
+        if (userIdStr == null) {
             userIdStr = getNewUserId();
-            if (isLoginFree(login)){
+            if (isLoginFree(login)) {
                 writeNewUserIntoDB(userIdStr, login, pass);
             } else {
                 return null;
@@ -63,7 +68,7 @@ public class AuthService {
 
     synchronized private boolean isLoginFree(String login) throws IOException {
         Optional<String[]> lines = Files.lines(path)
-                .map((str)-> str.split(" "))
+                .map((str) -> str.split(" "))
                 .filter((strings) -> login.equals(strings[1]))
                 .findFirst();
         return !lines.isPresent();
@@ -71,7 +76,7 @@ public class AuthService {
 
     synchronized private String getNewUserId() throws IOException {
         Optional<String[]> lines = Files.lines(path)
-                .map((str)-> str.split(" "))
+                .map((str) -> str.split(" "))
                 .max(Comparator.comparingInt(str -> Integer.parseInt(str[0])));
         if (lines.isPresent()) {
             int newUserId = Integer.parseInt((lines.get())[0]) + 1;
@@ -95,5 +100,20 @@ public class AuthService {
             fileChannel.write(buffer);
         }
         fileChannel.close();
+    }
+
+    public File[] getSharedFiles(int userId) throws IOException {
+        String id = String.valueOf(userId);
+        Path sharedFilesPath = Paths.get(SHARED_FILE);
+        List<String[]> fileNames = Files.lines(sharedFilesPath)
+                .map((str) -> str.split(" "))
+                .filter(str->str[0].equals(id)||str[0].equals("-1"))
+                .collect(Collectors.toList());
+        File[] files = new File[fileNames.size()];
+        for (int i=0; i< files.length; i++) {
+            files[i] = new File(Cloud2ServerStarter.STORAGE_ROOT_DIR + "/" + fileNames.get(i)[1] + "/" + fileNames.get(i)[2]);
+            System.out.println(files[i]);
+        }
+        return files;
     }
 }

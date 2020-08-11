@@ -6,6 +6,7 @@ import main.ConnectionHandler;
 import main.Responses;
 
 import java.io.*;
+import java.util.List;
 import java.util.Objects;
 
 public class IOFileHandler extends FileHandler {
@@ -32,13 +33,34 @@ public class IOFileHandler extends FileHandler {
         }
         for (File f : Objects.requireNonNull(currentStorageDir.listFiles())) {
             String fileName = f.getName();
-            if (f.isDirectory()) {
-                connectionHandler.sendResponse(DIR_PREFIX + fileName);
-            } else {
-                connectionHandler.sendResponse(FILE_PREFIX + fileName);
-            }
+            sendFileToClient(fileName);
         }
         connectionHandler.sendResponse(Responses.END_OF_DIR_CONTENT.getString());
+    }
+
+    private void sendFileToClient(String fileName) {
+        File f = new File(fileName);
+        if (f.isDirectory()) {
+            connectionHandler.sendResponse(DIR_PREFIX + fileName);
+        } else {
+            connectionHandler.sendResponse(FILE_PREFIX + fileName);
+        }
+    }
+
+    public void sendSharedFilesToClient() {
+        try {
+            File[] files;
+            files = authService.getSharedFiles(connectionHandler.getUserId());
+            for (File f : Objects.requireNonNull(files)) {
+                String fileName = f.getAbsolutePath();
+                sendFileToClient(fileName);
+            }
+            connectionHandler.sendResponse(Responses.END_OF_DIR_CONTENT.getString());
+        } catch (IOException e) {
+            logger.error(e);
+            e.printStackTrace();
+        }
+
     }
 
     public void setCurrentStorageDir(String fileName) {
@@ -65,6 +87,7 @@ public class IOFileHandler extends FileHandler {
             try {
                 if (!cloudFile.createNewFile()) return false;
             } catch (IOException e) {
+                logger.error(e);
                 e.printStackTrace();
             }
         }
@@ -94,13 +117,17 @@ public class IOFileHandler extends FileHandler {
 
     public boolean getFileFromStorage(String fileName) {
         CloudFile file = new CloudFile(currentStorageDir.getAbsolutePath() + "/" + fileName);
-        System.out.println(file.length());
+        if (!file.exists()) file = new CloudFile(fileName);
+        return getFile(file);
+    }
+
+    private boolean getFile(CloudFile file) {
         if (file.exists()) {
             connectionHandler.sendResponse(Responses.OK.getString());
             long fileLength = file.length();
             try {
                 connectionHandler.sendResponse(String.valueOf(file.length()));
-                if (fileLength>0) {
+                if (fileLength > 0) {
                     FileInputStream fis = new FileInputStream(file);
                     long numberOfSends = fileLength / bufferSize;
                     for (long i = 0; i <= numberOfSends; i++) {
@@ -110,7 +137,6 @@ public class IOFileHandler extends FileHandler {
                     }
                     fis.close();
                 }
-                System.out.println("File sent");
                 Thread.sleep(50); // todo Костыль. Надо найти другое решение. Без этого в передачу файла попадает ответ сервера
                 connectionHandler.sendResponse(Responses.OK.getString());
             } catch (Exception e) {
@@ -119,7 +145,7 @@ public class IOFileHandler extends FileHandler {
             }
         } else {
             // todo Обработчик ошибки
-            System.out.println("Неправильное имя файла");
+            logger.error("Неправильное имя файла");
         }
         return false;
     }

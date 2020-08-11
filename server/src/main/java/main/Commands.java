@@ -5,6 +5,7 @@ public enum Commands {
     DOWNLOAD ("./download"),
     CLOSE_CONNECTION("./closeconnection"),
     GET_DIR_CONTENT("./getdircontent"),
+    GET_SHARED_DIR_CONTENT("./getshareddircontent"),
     AUTHORIZATION ("./authorization"),
     REGISTRATION ("./registration");
 
