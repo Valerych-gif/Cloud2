@@ -122,7 +122,11 @@ public class Controller implements Initializable {
                 if (activeFile != null) {
                     fileName = activeFile;
                     if (activePanel.equals(STORAGE_PANEL)) {
-                        fileHandler.downLoadFile(fileName);
+                        if (!inSharedFileMode) {
+                            fileHandler.downLoadFile(fileName);
+                        } else {
+                            fileHandler.downLoadSharedFile(fileName);
+                        }
                         if (isResponseOk())
                             refreshClientDirContent();
                     } else if (activePanel.equals(LOCAL_PANEL)&&!inSharedFileMode) {

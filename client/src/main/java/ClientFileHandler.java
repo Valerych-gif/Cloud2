@@ -88,20 +88,57 @@ public class ClientFileHandler {
 
     public void downLoadFile(String downloadedFileName) {
         String downloadedFileFullName = currentClientDir + "/" + downloadedFileName;
-        downloadFile(downloadedFileName);
-    }
-
-    private void downloadFile(String fileName) {
         try {
             controller.sendCommand(Commands.DOWNLOAD.getString());
             if (controller.isResponseOk()) {
-                controller.sendCommand(fileName);
+                controller.sendCommand(downloadedFileName);
                 if (controller.isResponseOk()) {
                     String fileLengthStr = controller.getStringFromServer();
                     long downloadedFileSize = Long.parseLong(fileLengthStr);
-                    System.out.println(fileName);
+                    System.out.println(downloadedFileName);
 
-                    File downloadedFile = new File(fileName);
+                    File downloadedFile = new File(downloadedFileFullName);
+                    if (!downloadedFile.exists()) {
+                        downloadedFile.createNewFile();
+                    }
+                    int bufferSize = Main.BUFFER_SIZE;
+                    byte[] buffer = new byte[bufferSize];
+                    try {
+                        FileOutputStream fos = new FileOutputStream(downloadedFile);
+                        if (downloadedFileSize>0) {
+                            long numberOfSends = downloadedFileSize / bufferSize;
+                            for (long i = 0; i <= numberOfSends; i++) {
+                                int bytesRead = is.read(buffer);
+                                fos.write(buffer, 0, bytesRead);
+                                fos.flush();
+                            }
+                        }
+                        fos.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void downLoadSharedFile(String fullPathFileName) {
+        String[] unixFileNameArray = fullPathFileName.split("/");
+        String[] windowsFileNameArray = unixFileNameArray[unixFileNameArray.length-1].split("\\\\");
+        String downloadedFileName = windowsFileNameArray[windowsFileNameArray.length-1];
+        String downloadedFileFullName = currentClientDir + "/" + downloadedFileName;
+        try {
+            controller.sendCommand(Commands.DOWNLOAD.getString());
+            if (controller.isResponseOk()) {
+                controller.sendCommand(fullPathFileName);
+                if (controller.isResponseOk()) {
+                    String fileLengthStr = controller.getStringFromServer();
+                    long downloadedFileSize = Long.parseLong(fileLengthStr);
+                    System.out.println(fullPathFileName);
+                    System.out.println(downloadedFileFullName);
+                    File downloadedFile = new File(downloadedFileFullName);
                     if (!downloadedFile.exists()) {
                         downloadedFile.createNewFile();
                     }
