@@ -98,7 +98,6 @@ public class IOConnectionHandler extends ConnectionHandler {
         if (fileName.length() > 0) {
             sendResponse(Responses.OK.getString());
         } else {
-            // todo Обработчик ошибки
             System.out.println("Неправильное имя файла");
             isOk = false;
         }
@@ -107,7 +106,6 @@ public class IOConnectionHandler extends ConnectionHandler {
         if (fileLength >= 0) {
             sendResponse(Responses.OK.getString());
         } else {
-            // todo Обработчик ошибки
             System.out.println("Неправильный размер");
             isOk = false;
         }
@@ -138,9 +136,12 @@ public class IOConnectionHandler extends ConnectionHandler {
     public void shareFile(){
         String nickName = getStringFromClient();
         String fileName = getStringFromClient();
+        String fileFullPathName = fileHandler.getAbsFilePathByName(fileName).getAbsolutePath();
+        String fileNameForShare = fileFullPathName.substring(fileHandler.getStorageRootDirPath().length());
         String userIdStr = String.valueOf(userId);
+        System.out.println(fileNameForShare);
         try {
-            authService.shareFile(nickName, userIdStr, fileName);
+            authService.shareFile(nickName, userIdStr, fileNameForShare);
         } catch (IOException e) {
             logger.error(e);
             e.printStackTrace();

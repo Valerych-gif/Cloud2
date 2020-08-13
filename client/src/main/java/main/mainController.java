@@ -93,6 +93,7 @@ public class mainController implements Initializable {
                 } else {
                     activeFile = localFileListView.getSelectionModel().getSelectedItem();
                     activePanel = LOCAL_PANEL;
+                    shareButton.setDisable(true);
                 }
             });
 
@@ -105,6 +106,7 @@ public class mainController implements Initializable {
                 } else {
                     activeFile = storageFileListView.getSelectionModel().getSelectedItem();
                     activePanel = STORAGE_PANEL;
+                    shareButton.setDisable(false);
                 }
             });
 
@@ -253,7 +255,7 @@ public class mainController implements Initializable {
     }
 
     public void shareFileByNickname(String nickName) {
-        if (activePanel.equals(LOCAL_PANEL)) {
+        if (activePanel.equals(STORAGE_PANEL)) {
             sendCommand(Commands.SHARE.getString());
             if (isResponseOk()) {
                 sendCommand(nickName);

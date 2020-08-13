@@ -53,11 +53,10 @@ public class IOFileHandler extends FileHandler {
             files = authService.getSharedFiles(connectionHandler.getUserId());
             for (File f : Objects.requireNonNull(files)) {
                 String fileName = f.getAbsolutePath();
-//                String[] fileNameArray = fileName.split("\\\\");
-//                sendFileNameToClient(fileNameArray[fileNameArray.length-2] + "/" + fileNameArray[fileNameArray.length-1]);
                 File storageAbsPath = new File(Cloud2ServerStarter.STORAGE_ROOT_DIR);
                 int storageAbsPathLength = storageAbsPath.getAbsolutePath().length();
                 String fileNameToSend = fileName.substring(storageAbsPathLength);
+                System.out.println(fileNameToSend);
                 sendFileNameToClient(fileNameToSend);
             }
             connectionHandler.sendResponse(Responses.END_OF_DIR_CONTENT.getString());
@@ -87,7 +86,7 @@ public class IOFileHandler extends FileHandler {
     }
 
     public boolean loadFileToStorage(CloudFile clientFile) {
-        File cloudFile = new File(currentStorageDir.getAbsolutePath() + "/" + clientFile.getName());
+        File cloudFile = getAbsFilePathByName(clientFile.getName());
         if (!cloudFile.exists()) {
             try {
                 if (!cloudFile.createNewFile()) return false;
@@ -119,10 +118,13 @@ public class IOFileHandler extends FileHandler {
         return true;
     }
 
+    public File getAbsFilePathByName(String fileName){
+        return new File(currentStorageDir.getAbsolutePath() + "/" + fileName);
+    }
+
     public boolean getFileFromStorage(String fileName) {
         CloudFile file = new CloudFile(currentStorageDir.getAbsolutePath() + "/" + fileName);
         if (!file.exists()) file = new CloudFile(Cloud2ServerStarter.STORAGE_ROOT_DIR + "/" + fileName);
-        System.out.println(file.getAbsolutePath());
         return getFile(file);
     }
 

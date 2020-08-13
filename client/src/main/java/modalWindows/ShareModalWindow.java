@@ -1,12 +1,17 @@
 package modalWindows;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Dialog;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import main.Commands;
 import main.mainController;
+
+import java.io.IOException;
 
 public class ShareModalWindow extends Application {
 

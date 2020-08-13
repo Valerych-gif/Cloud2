@@ -5,6 +5,8 @@ import files.CloudFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+
 public abstract class FileHandler {
 
     protected Logger logger = LogManager.getLogger(FileHandler.class);
@@ -37,6 +39,8 @@ public abstract class FileHandler {
 
     public abstract void init();
 
+    public abstract File getAbsFilePathByName(String fileName);
+
     public abstract boolean getFileFromStorage(String file);
 
     public abstract boolean loadFileToStorage(CloudFile file);
@@ -44,4 +48,8 @@ public abstract class FileHandler {
     public abstract void sendDirContentToClient();
 
     public abstract void sendSharedFileNamesToClient();
+
+    public String getStorageRootDirPath() {
+        return storageRootDirPath;
+    }
 }
