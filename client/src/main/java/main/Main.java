@@ -1,12 +1,11 @@
+package main;
+
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.ObjectPropertyBase;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -15,7 +14,7 @@ public class Main extends Application {
 
     public static final boolean DEBUG_MODE = true;
 
-    public final static String CLIENT_DIR_PATH = "C:/Users/Валерий/Cloud2Disk";
+    public final static String CLIENT_DIR_PATH = "client/src/main/resources/Cloud2Files";
     public final static String SERVER = "localhost";
     public final static int PORT = 8189;
 
@@ -25,9 +24,9 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("Cloud2.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../Cloud2.fxml"));
         Parent root = loader.load();
-        Controller controller = loader.getController();
+        mainController controller = loader.getController();
         DataOutputStream os = controller.getOs();
         primaryStage.setTitle("Cloud2");
         primaryStage.setScene(new Scene(root));

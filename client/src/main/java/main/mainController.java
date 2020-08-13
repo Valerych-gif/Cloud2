@@ -1,16 +1,19 @@
-import javafx.application.Application;
+package main;
+
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+import modalWindows.ShareModalWindow;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
 import java.util.*;
 
-public class Controller implements Initializable {
+public class mainController implements Initializable {
 
     @FXML
     public ListView<String> localFileListView;
@@ -45,6 +48,9 @@ public class Controller implements Initializable {
     @FXML
     public Button deleteFileButton;
 
+    @FXML
+    public Button shareButton;
+
     private Socket socket;
     private DataInputStream is;
     private DataOutputStream os;
@@ -59,7 +65,7 @@ public class Controller implements Initializable {
     private String login;
     private String pass;
 
-    public Controller() {
+    public mainController() {
         try {
             socket = new Socket(Main.SERVER, Main.PORT);
             is = new DataInputStream(socket.getInputStream());
@@ -145,6 +151,15 @@ public class Controller implements Initializable {
                 System.out.println("delete");
             });
 
+            shareButton.setOnAction(a -> {
+                ShareModalWindow shareModalWindow = new ShareModalWindow(this);
+                try {
+                    shareModalWindow.start(new Stage());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+
             signInButton.setOnAction(a -> {
                 authorization();
             });
@@ -204,7 +219,7 @@ public class Controller implements Initializable {
         List<CloudFile> storageDirContent = fileHandler.getSharedDirContent();
         storageFileListView.getItems().clear();
         for (CloudFile file : storageDirContent) {
-            storageFileListView.getItems().add(file.getAbsolutePath());
+            storageFileListView.getItems().add(file.getPath());
         }
     }
 
@@ -235,6 +250,16 @@ public class Controller implements Initializable {
             e.printStackTrace();
         }
         return stringFromServer.toString();
+    }
+
+    public void shareFileByNickname(String nickName) {
+        if (activePanel.equals(LOCAL_PANEL)) {
+            sendCommand(Commands.SHARE.getString());
+            if (isResponseOk()) {
+                sendCommand(nickName);
+                sendCommand(activeFile);
+            }
+        }
     }
 
     public boolean isResponseOk() {

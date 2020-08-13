@@ -145,13 +145,16 @@ public abstract class ConnectionHandler implements Runnable {
                             sendResponse(Responses.FAIL.getString());
                         }
                         break;
-                    case CLOSE_CONNECTION:
+                    case SHARE:
                         if (userId!=-1) {
                             sendResponse(Responses.OK.getString());
-                            closeConnection();
+                            shareFile();
                         } else {
                             sendResponse(Responses.FAIL.getString());
                         }
+                        break;
+                    case CLOSE_CONNECTION:
+                        closeConnection();
                         break;
                 }
             } catch (Exception e) {
@@ -161,6 +164,8 @@ public abstract class ConnectionHandler implements Runnable {
             }
         }
     }
+
+    protected abstract void shareFile();
 
     protected abstract void sendSharedFilesToClient();
 

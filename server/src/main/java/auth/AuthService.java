@@ -112,8 +112,38 @@ public class AuthService {
         File[] files = new File[fileNames.size()];
         for (int i=0; i< files.length; i++) {
             files[i] = new File(Cloud2ServerStarter.STORAGE_ROOT_DIR + "/" + fileNames.get(i)[1] + "/" + fileNames.get(i)[2]);
-            System.out.println(files[i]);
         }
         return files;
+    }
+
+    public void shareFile(String nickName, String userIdStr, String fileName) throws IOException {
+        String targetIdStr = getIdByNickName(nickName);
+        String shareLine = "\r\n" + targetIdStr + " " + userIdStr + " " + fileName;
+        System.out.println(shareLine);
+        RandomAccessFile authDBFile = new RandomAccessFile(SHARED_FILE, "rw");
+        FileChannel fileChannel = authDBFile.getChannel();
+        ByteBuffer buffer = ByteBuffer.allocate(Cloud2ServerStarter.BUFFER_SIZE);
+        buffer.clear();
+        buffer.put(shareLine.getBytes());
+        buffer.flip();
+        fileChannel.position(fileChannel.size());
+        while (buffer.hasRemaining()) {
+            fileChannel.write(buffer);
+        }
+        fileChannel.close();
+    }
+
+    private String getIdByNickName(String login) throws IOException {
+        Optional<String> lines = Files.lines(path)
+                .filter((str) -> {
+                    String[] line = str.split(" ");
+                    return login.equals(line[1]);
+                })
+                .findFirst();
+        String userIdStr = null;
+        if (lines.isPresent()) {
+            userIdStr = (lines.get().split(" "))[0];
+        }
+        return userIdStr;
     }
 }

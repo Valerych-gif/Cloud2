@@ -1,3 +1,4 @@
+package main;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ public class ClientFileHandler {
     public static final String FILE_MARK = "./F";
     public static final String PARENT_DIR_MARK = "..";
 
-    private Controller controller;
+    private mainController controller;
     private InputStream is;
     private OutputStream os;
     private List<CloudFile> clientFileList;
@@ -20,7 +21,7 @@ public class ClientFileHandler {
     private CloudFile currentClientDir;
     private CloudFile rootClientDir;
 
-    public ClientFileHandler(Controller controller) {
+    public ClientFileHandler(mainController controller) {
         this.controller = controller;
         this.is = controller.getIs();
         this.os = controller.getOs();
@@ -95,31 +96,33 @@ public class ClientFileHandler {
                 if (controller.isResponseOk()) {
                     String fileLengthStr = controller.getStringFromServer();
                     long downloadedFileSize = Long.parseLong(fileLengthStr);
-                    System.out.println(downloadedFileName);
-
-                    File downloadedFile = new File(downloadedFileFullName);
-                    if (!downloadedFile.exists()) {
-                        downloadedFile.createNewFile();
-                    }
-                    int bufferSize = Main.BUFFER_SIZE;
-                    byte[] buffer = new byte[bufferSize];
-                    try {
-                        FileOutputStream fos = new FileOutputStream(downloadedFile);
-                        if (downloadedFileSize>0) {
-                            long numberOfSends = downloadedFileSize / bufferSize;
-                            for (long i = 0; i <= numberOfSends; i++) {
-                                int bytesRead = is.read(buffer);
-                                fos.write(buffer, 0, bytesRead);
-                                fos.flush();
-                            }
-                        }
-                        fos.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    putFileIntoUserDir(downloadedFileFullName, downloadedFileSize);
                 }
             }
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void putFileIntoUserDir(String downloadedFileFullName, long downloadedFileSize) throws IOException {
+        File downloadedFile = new File(downloadedFileFullName);
+        if (!downloadedFile.exists()) {
+            downloadedFile.createNewFile();
+        }
+        int bufferSize = Main.BUFFER_SIZE;
+        byte[] buffer = new byte[bufferSize];
+        try {
+            FileOutputStream fos = new FileOutputStream(downloadedFile);
+            if (downloadedFileSize > 0) {
+                long numberOfSends = downloadedFileSize / bufferSize;
+                for (long i = 0; i <= numberOfSends; i++) {
+                    int bytesRead = is.read(buffer);
+                    fos.write(buffer, 0, bytesRead);
+                    fos.flush();
+                }
+            }
+            fos.close();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -136,28 +139,7 @@ public class ClientFileHandler {
                 if (controller.isResponseOk()) {
                     String fileLengthStr = controller.getStringFromServer();
                     long downloadedFileSize = Long.parseLong(fileLengthStr);
-                    System.out.println(fullPathFileName);
-                    System.out.println(downloadedFileFullName);
-                    File downloadedFile = new File(downloadedFileFullName);
-                    if (!downloadedFile.exists()) {
-                        downloadedFile.createNewFile();
-                    }
-                    int bufferSize = Main.BUFFER_SIZE;
-                    byte[] buffer = new byte[bufferSize];
-                    try {
-                        FileOutputStream fos = new FileOutputStream(downloadedFile);
-                        if (downloadedFileSize>0) {
-                            long numberOfSends = downloadedFileSize / bufferSize;
-                            for (long i = 0; i <= numberOfSends; i++) {
-                                int bytesRead = is.read(buffer);
-                                fos.write(buffer, 0, bytesRead);
-                                fos.flush();
-                            }
-                        }
-                        fos.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    putFileIntoUserDir(downloadedFileFullName, downloadedFileSize);
                 }
             }
         } catch (IOException e) {

@@ -132,7 +132,19 @@ public class IOConnectionHandler extends ConnectionHandler {
     }
 
     public void sendSharedFilesToClient() {
-        fileHandler.sendSharedFilesToClient();
+        fileHandler.sendSharedFileNamesToClient();
+    }
+
+    public void shareFile(){
+        String nickName = getStringFromClient();
+        String fileName = getStringFromClient();
+        String userIdStr = String.valueOf(userId);
+        try {
+            authService.shareFile(nickName, userIdStr, fileName);
+        } catch (IOException e) {
+            logger.error(e);
+            e.printStackTrace();
+        }
     }
 
     public void closeConnection() {

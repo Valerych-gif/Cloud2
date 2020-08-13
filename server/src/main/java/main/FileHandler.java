@@ -43,5 +43,5 @@ public abstract class FileHandler {
 
     public abstract void sendDirContentToClient();
 
-    public abstract void sendSharedFilesToClient();
+    public abstract void sendSharedFileNamesToClient();
 }

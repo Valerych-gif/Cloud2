@@ -1,12 +1,12 @@
 package io;
 
 import files.CloudFile;
+import main.Cloud2ServerStarter;
 import main.FileHandler;
 import main.ConnectionHandler;
 import main.Responses;
 
 import java.io.*;
-import java.util.List;
 import java.util.Objects;
 
 public class IOFileHandler extends FileHandler {
@@ -33,12 +33,12 @@ public class IOFileHandler extends FileHandler {
         }
         for (File f : Objects.requireNonNull(currentStorageDir.listFiles())) {
             String fileName = f.getName();
-            sendFileToClient(fileName);
+            sendFileNameToClient(fileName);
         }
         connectionHandler.sendResponse(Responses.END_OF_DIR_CONTENT.getString());
     }
 
-    private void sendFileToClient(String fileName) {
+    private void sendFileNameToClient(String fileName) {
         File f = new File(fileName);
         if (f.isDirectory()) {
             connectionHandler.sendResponse(DIR_PREFIX + fileName);
@@ -47,13 +47,18 @@ public class IOFileHandler extends FileHandler {
         }
     }
 
-    public void sendSharedFilesToClient() {
+    public void sendSharedFileNamesToClient() {
         try {
             File[] files;
             files = authService.getSharedFiles(connectionHandler.getUserId());
             for (File f : Objects.requireNonNull(files)) {
                 String fileName = f.getAbsolutePath();
-                sendFileToClient(fileName);
+//                String[] fileNameArray = fileName.split("\\\\");
+//                sendFileNameToClient(fileNameArray[fileNameArray.length-2] + "/" + fileNameArray[fileNameArray.length-1]);
+                File storageAbsPath = new File(Cloud2ServerStarter.STORAGE_ROOT_DIR);
+                int storageAbsPathLength = storageAbsPath.getAbsolutePath().length();
+                String fileNameToSend = fileName.substring(storageAbsPathLength);
+                sendFileNameToClient(fileNameToSend);
             }
             connectionHandler.sendResponse(Responses.END_OF_DIR_CONTENT.getString());
         } catch (IOException e) {
@@ -94,7 +99,6 @@ public class IOFileHandler extends FileHandler {
         long fileLength = clientFile.getFileLength();
         try {
             System.out.println("Uploading...");
-
             FileOutputStream fos = new FileOutputStream(cloudFile);
             if (fileLength > 0) {
                 long numberOfSends = fileLength / bufferSize;
@@ -117,7 +121,8 @@ public class IOFileHandler extends FileHandler {
 
     public boolean getFileFromStorage(String fileName) {
         CloudFile file = new CloudFile(currentStorageDir.getAbsolutePath() + "/" + fileName);
-        if (!file.exists()) file = new CloudFile(fileName);
+        if (!file.exists()) file = new CloudFile(Cloud2ServerStarter.STORAGE_ROOT_DIR + "/" + fileName);
+        System.out.println(file.getAbsolutePath());
         return getFile(file);
     }
 
@@ -144,7 +149,6 @@ public class IOFileHandler extends FileHandler {
                 return false;
             }
         } else {
-            // todo Обработчик ошибки
             logger.error("Неправильное имя файла");
         }
         return false;

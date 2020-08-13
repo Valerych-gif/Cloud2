@@ -1,3 +1,5 @@
+package main;
+
 public enum Commands {
     UPLOAD ("./upload"),
     DOWNLOAD ("./download"),
@@ -5,7 +7,8 @@ public enum Commands {
     GET_DIR_CONTENT("./getdircontent"),
     GET_SHARED_DIR_CONTENT("./getshareddircontent"),
     AUTHORIZATION ("./authorization"),
-    REGISTRATION ("./registration");
+    REGISTRATION ("./registration"),
+    SHARE ("./share");
 
     private String commandStr;
 
