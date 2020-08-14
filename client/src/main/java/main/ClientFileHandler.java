@@ -31,7 +31,7 @@ public class ClientFileHandler {
             if (rootClientDir.mkdir()) {
                 System.out.println("Создана корневая папка пользователя ");
             } else {
-                throw new RuntimeException("directory resource not exists on client");
+                throw new RuntimeException("Корневая папка пользователя отсутствует");
             }
         }
         this.currentStorageDirName = "";

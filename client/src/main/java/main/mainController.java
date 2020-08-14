@@ -81,6 +81,7 @@ public class mainController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
         fileHandler = new ClientFileHandler(this);
+        disableButtons();
         try {
             refreshClientDirContent();
 
@@ -147,6 +148,29 @@ public class mainController implements Initializable {
 
             moveFileButton.setOnAction(a -> {
                 System.out.println("move");
+                String fileName = "";
+                if (activeFile != null) {
+                    fileName = activeFile;
+                    if (activePanel.equals(STORAGE_PANEL)) {
+                        if (!inSharedFileMode) {
+                            fileHandler.downLoadFile(fileName);
+                            fileHandler.deleteStorageFile(fileName);
+                        } else {
+                            fileHandler.downLoadSharedFile(fileName);
+                        }
+                        if (isResponseOk()){
+                            refreshClientDirContent();
+                            refreshStorageDirContent();
+                        }
+                    } else if (activePanel.equals(LOCAL_PANEL) && !inSharedFileMode) {
+                        fileHandler.uploadFile(fileName);
+                        fileHandler.deleteLocalFile(fileName);
+                        if (isResponseOk()){
+                            refreshClientDirContent();
+                            refreshStorageDirContent();
+                        }
+                    }
+                }
             });
 
             deleteFileButton.setOnAction(a -> {
@@ -203,7 +227,29 @@ public class mainController implements Initializable {
             refreshStorageDirContent();
             this.login = l;
             this.pass = p;
+            enableButtons();
+        } else {
+            disableButtons();
         }
+
+    }
+
+    private void enableButtons() {
+        refreshListsButton.setDisable(false);
+        swapButton.setDisable(false);
+        shareButton.setDisable(false);
+        copyFileButton.setDisable(false);
+        moveFileButton.setDisable(false);
+        deleteFileButton.setDisable(false);
+    }
+
+    private void disableButtons() {
+        refreshListsButton.setDisable(true);
+        swapButton.setDisable(true);
+        shareButton.setDisable(true);
+        copyFileButton.setDisable(true);
+        moveFileButton.setDisable(true);
+        deleteFileButton.setDisable(true);
     }
 
     public void registration() {
