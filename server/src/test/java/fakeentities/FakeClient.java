@@ -2,6 +2,7 @@ package fakeentities;
 
 import main.Cloud2ServerStarter;
 import main.Commands;
+import main.Responses;
 
 import java.io.*;
 import java.net.Socket;
@@ -30,6 +31,8 @@ public class FakeClient {
                 socket = new Socket("localhost", 8189);
                 is = new DataInputStream(socket.getInputStream());
                 os = new DataOutputStream(socket.getOutputStream());
+                sendCommand(Commands.AUTHORIZATION.getString() + Cloud2ServerStarter.END_COMMAND_CHAR);
+                sendCommand("test test");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -48,7 +51,7 @@ public class FakeClient {
                 File currentFile2 = new File(fileName2);
                 sendFile(currentFile2);
                 Thread.sleep(1000);
-                os.writeBytes("./closeconnection" + Cloud2ServerStarter.END_COMMAND_CHAR);
+                sendCommand(Commands.CLOSE_CONNECTION.getString() + Cloud2ServerStarter.END_COMMAND_CHAR);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -60,17 +63,14 @@ public class FakeClient {
         if (currentFile != null) {
             try {
                 Thread.sleep(500);
-                os.writeBytes(Commands.UPLOAD.getString()+ Cloud2ServerStarter.END_COMMAND_CHAR);
-                os.flush();
+                sendCommand(Commands.UPLOAD.getString()+ Cloud2ServerStarter.END_COMMAND_CHAR);
                 if (getResponse()) {
-                    os.writeBytes(currentFile.getName()+ Cloud2ServerStarter.END_COMMAND_CHAR);
-                    os.flush();
+                    sendCommand(currentFile.getName()+ Cloud2ServerStarter.END_COMMAND_CHAR);
                 }
                 if (getResponse()) {
                     long fileLength = currentFile.length();
                     String fileLengthStr = String.valueOf(fileLength);
-                    os.writeBytes(fileLengthStr + Cloud2ServerStarter.END_COMMAND_CHAR);
-                    os.flush();
+                    sendCommand(fileLengthStr + Cloud2ServerStarter.END_COMMAND_CHAR);
                 }
 
                 if (getResponse()) {
@@ -91,12 +91,12 @@ public class FakeClient {
     }
 
     private boolean getResponse() {
-        String command = getStringFromServer();
+        String response = getStringFromServer();
         try {
-            if (command.equals("./ok")) {
+            if (response.equals(Responses.OK.getString())) {
                 return true;
             }
-            if (command.equals("./fail")) { ;
+            if (response.equals(Responses.FAIL.getString())) {
                 return false;
             }
         } catch (Exception e) {
@@ -129,6 +129,7 @@ public class FakeClient {
             try {
                 Thread.sleep(1000);
                 os.writeBytes(command);
+                os.flush();
             } catch (Exception e) {
                 e.printStackTrace();
             }
