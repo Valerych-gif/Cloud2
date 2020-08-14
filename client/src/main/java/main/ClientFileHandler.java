@@ -127,6 +127,36 @@ public class ClientFileHandler {
         }
     }
 
+    public void deleteStorageFile(String fileName) {
+        CloudFile file = findFileByName(fileName);
+        if (file!=null){
+            controller.sendCommand(Commands.DELETE.getString());
+            if (controller.isResponseOk()){
+                controller.sendCommand(fileName);
+            }
+        }
+    }
+
+    public void deleteLocalFile (String fileName){
+        CloudFile file = findFileByName(fileName);
+        if (file!=null){
+            recursiveDelete(file);
+        }
+    }
+
+    private void recursiveDelete(File file) {
+        if (!file.exists())
+            return;
+
+        if (file.isDirectory()) {
+            for (File f : Objects.requireNonNull(file.listFiles())) {
+                recursiveDelete(f);
+            }
+        }
+
+        file.delete();
+    }
+
     public void downLoadSharedFile(String fullPathFileName) {
         String[] unixFileNameArray = fullPathFileName.split("/");
         String[] windowsFileNameArray = unixFileNameArray[unixFileNameArray.length-1].split("\\\\");

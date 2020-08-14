@@ -3,6 +3,7 @@ package main;
 public enum Commands {
     UPLOAD ("./upload"),
     DOWNLOAD ("./download"),
+    DELETE ("./delete"),
     CLOSE_CONNECTION("./closeconnection"),
     GET_DIR_CONTENT("./getdircontent"),
     GET_SHARED_DIR_CONTENT("./getshareddircontent"),

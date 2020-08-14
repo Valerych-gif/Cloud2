@@ -26,9 +26,9 @@ public class IOConnectionHandler extends ConnectionHandler {
         super.run();
     }
 
-    public void getLoginAndPassFromClient() {
+    public void getLoginAndPassFromClient() throws IOException {
         String[] loginAndPassStr = getStringFromClient().split(" ");
-        if (loginAndPassStr.length>1) {
+        if (loginAndPassStr.length > 1) {
             this.login = loginAndPassStr[0].trim();
             this.pass = loginAndPassStr[1].trim();
         } else {
@@ -42,30 +42,24 @@ public class IOConnectionHandler extends ConnectionHandler {
         fileHandler = new IOFileHandler(this);
     }
 
-    public Commands getCommandFromClient() {
+    public Commands getCommandFromClient() throws IOException {
         String command = getStringFromClient();
         return checkCommand(command);
     }
 
-    public String getStringFromClient() {
+    public String getStringFromClient() throws IOException {
         StringBuilder stringFromClient = new StringBuilder();
         char b = 0;
-        try {
-            while (true) {
-                b = (char) is.readByte();
-                if (b != '|') {
-                    stringFromClient.append(b);
-                } else {
-                    System.out.println("<-\t" + stringFromClient.toString());
-                    return stringFromClient.toString();
-                }
-            }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e);
+        while (true) {
+            b = (char) is.readByte();
+            if (b != '|') {
+                stringFromClient.append(b);
+            } else {
+                System.out.println("<-\t" + stringFromClient.toString());
+                return stringFromClient.toString();
+            }
         }
-        return stringFromClient.toString();
     }
 
     private Commands checkCommand(String command) {
@@ -86,12 +80,12 @@ public class IOConnectionHandler extends ConnectionHandler {
         }
     }
 
-    public void sendFileToClient() {
+    public void sendFileToClient() throws IOException {
         String fileName = getStringFromClient();
         fileHandler.getFileFromStorage(fileName);
     }
 
-    public void receiveFileFromClient() {
+    public void receiveFileFromClient() throws IOException {
 
         boolean isOk = true;
         String fileName = getFileNameFromClient();
@@ -116,16 +110,16 @@ public class IOConnectionHandler extends ConnectionHandler {
         }
     }
 
-    private long getFileLengthFromClient() {
+    private long getFileLengthFromClient() throws IOException {
         String fileLengthStr = getStringFromClient();
         return Long.parseLong(fileLengthStr);
     }
 
-    private String getFileNameFromClient() {
+    private String getFileNameFromClient() throws IOException {
         return getStringFromClient();
     }
 
-    public void sendDirContent() {
+    public void sendDirContent() throws IOException {
         fileHandler.sendDirContentToClient();
     }
 
@@ -133,7 +127,7 @@ public class IOConnectionHandler extends ConnectionHandler {
         fileHandler.sendSharedFileNamesToClient();
     }
 
-    public void shareFile(){
+    public void shareFile() throws IOException {
         String nickName = getStringFromClient();
         String fileName = getStringFromClient();
         String fileFullPathName = fileHandler.getAbsFilePathByName(fileName).getAbsolutePath();

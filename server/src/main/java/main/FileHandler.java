@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.IOException;
 
 public abstract class FileHandler {
 
@@ -45,7 +46,7 @@ public abstract class FileHandler {
 
     public abstract boolean loadFileToStorage(CloudFile file);
 
-    public abstract void sendDirContentToClient();
+    public abstract void sendDirContentToClient() throws IOException;
 
     public abstract void sendSharedFileNamesToClient();
 

@@ -24,7 +24,7 @@ public class IOFileHandler extends FileHandler {
         this.os = ((IOConnectionHandler) connectionHandler).getDataOutputStream();
     }
 
-    public void sendDirContentToClient() {
+    public void sendDirContentToClient() throws IOException {
         String requestedDirFromClient = connectionHandler.getStringFromClient();
         setCurrentStorageDir(requestedDirFromClient);
 

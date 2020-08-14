@@ -36,7 +36,7 @@ public abstract class ConnectionHandler implements Runnable {
         this.userId=-1;
     }
 
-    public void authorization() {
+    public void authorization() throws IOException {
         getLoginAndPassFromClient();
         if (login!=null) {
             try {
@@ -49,7 +49,7 @@ public abstract class ConnectionHandler implements Runnable {
         }
     }
 
-    public void registration(){
+    public void registration() throws IOException {
         getLoginAndPassFromClient();
         if (login!=null) {
             try {
@@ -88,10 +88,10 @@ public abstract class ConnectionHandler implements Runnable {
     public void run() {
         while (isConnectionActive) {
             command = null;
-            while (command == null) {
-                command = getCommandFromClient(); // Block
-            }
             try {
+                while (command == null) {
+                    command = getCommandFromClient(); // Block
+                }
                 switch (command) {
                     case AUTHORIZATION:
                         sendResponse(Responses.OK.getString());
@@ -165,15 +165,15 @@ public abstract class ConnectionHandler implements Runnable {
         }
     }
 
-    protected abstract void shareFile();
+    protected abstract void shareFile() throws IOException;
 
     protected abstract void sendSharedFilesToClient();
 
     protected abstract void seUpUser();
 
-    protected abstract void sendDirContent();
+    protected abstract void sendDirContent() throws IOException;
 
-    protected abstract Commands getCommandFromClient();
+    protected abstract Commands getCommandFromClient() throws IOException;
 
     public abstract void sendResponse(String responseStr);
 
@@ -183,9 +183,9 @@ public abstract class ConnectionHandler implements Runnable {
 
     protected abstract void receiveFileFromClient() throws IOException;
 
-    public abstract String getStringFromClient();
+    public abstract String getStringFromClient() throws IOException;
 
-    protected abstract void getLoginAndPassFromClient();
+    protected abstract void getLoginAndPassFromClient() throws IOException;
 
     public File getMainStorage() {
         return mainStorage;

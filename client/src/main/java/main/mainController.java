@@ -115,8 +115,8 @@ public class mainController implements Initializable {
                 refreshClientDirContent();
             });
 
-            swapButton.setOnAction(a->{
-                if (inSharedFileMode){
+            swapButton.setOnAction(a -> {
+                if (inSharedFileMode) {
                     refreshStorageDirContent();
                     inSharedFileMode = false;
                 } else {
@@ -137,7 +137,7 @@ public class mainController implements Initializable {
                         }
                         if (isResponseOk())
                             refreshClientDirContent();
-                    } else if (activePanel.equals(LOCAL_PANEL)&&!inSharedFileMode) {
+                    } else if (activePanel.equals(LOCAL_PANEL) && !inSharedFileMode) {
                         fileHandler.uploadFile(fileName);
                         if (isResponseOk())
                             refreshStorageDirContent();
@@ -150,7 +150,20 @@ public class mainController implements Initializable {
             });
 
             deleteFileButton.setOnAction(a -> {
-                System.out.println("delete");
+                String fileName = "";
+                if (activeFile != null) {
+                    fileName = activeFile;
+                    if (activePanel.equals(STORAGE_PANEL)) {
+                        if (!inSharedFileMode) {
+                            fileHandler.deleteStorageFile(fileName);
+                        }
+                        if (isResponseOk())
+                            refreshStorageDirContent();
+                    } else if (activePanel.equals(LOCAL_PANEL)) {
+                        fileHandler.deleteLocalFile(fileName);
+                        refreshClientDirContent();
+                    }
+                }
             });
 
             shareButton.setOnAction(a -> {
