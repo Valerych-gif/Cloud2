@@ -157,8 +157,7 @@ public class mainController implements Initializable {
                         if (!inSharedFileMode) {
                             fileHandler.deleteStorageFile(fileName);
                         }
-                        if (isResponseOk())
-                            refreshStorageDirContent();
+                        refreshStorageDirContent();
                     } else if (activePanel.equals(LOCAL_PANEL)) {
                         fileHandler.deleteLocalFile(fileName);
                         refreshClientDirContent();

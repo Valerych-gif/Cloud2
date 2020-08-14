@@ -119,6 +119,11 @@ public class IOConnectionHandler extends ConnectionHandler {
         return getStringFromClient();
     }
 
+    public void deleteFileFromStorage() throws IOException {
+        String fileName = getStringFromClient();
+        fileHandler.deleteFileFromStorage(fileName);
+    }
+
     public void sendDirContent() throws IOException {
         fileHandler.sendDirContentToClient();
     }

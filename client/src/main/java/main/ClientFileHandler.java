@@ -52,7 +52,7 @@ public class ClientFileHandler {
     public List<CloudFile> getStorageDirContent() {
 
         controller.sendCommand(Commands.GET_DIR_CONTENT.getString());
-        if (controller.isResponseOk()){
+        if (controller.isResponseOk()) {
             controller.sendCommand(currentStorageDirName);
         }
         return getFilesFromStorage();
@@ -60,16 +60,16 @@ public class ClientFileHandler {
 
     private List<CloudFile> getFilesFromStorage() {
         currentStorageDirFileList.clear();
-        while (true){
+        while (true) {
             String f = controller.getStringFromServer();
             String fileName = "";
             CloudFile cloudFile;
             if (f.equals(Responses.END_OF_DIR_CONTENT.getString())) break;
-            if (f.startsWith(DIR_MARK)){
-                fileName=f.substring(DIR_MARK.length());
+            if (f.startsWith(DIR_MARK)) {
+                fileName = f.substring(DIR_MARK.length());
                 cloudFile = new CloudFile(fileName, true);
-            } else if(f.startsWith(FILE_MARK)) {
-                fileName=f.substring(FILE_MARK.length());
+            } else if (f.startsWith(FILE_MARK)) {
+                fileName = f.substring(FILE_MARK.length());
                 cloudFile = new CloudFile(fileName, false);
             } else {
                 cloudFile = new CloudFile(fileName);
@@ -81,7 +81,7 @@ public class ClientFileHandler {
 
     public List<CloudFile> getSharedDirContent() {
         controller.sendCommand(Commands.GET_SHARED_DIR_CONTENT.getString());
-        if (controller.isResponseOk()){
+        if (controller.isResponseOk()) {
             return getFilesFromStorage();
         }
         return null;
@@ -128,18 +128,15 @@ public class ClientFileHandler {
     }
 
     public void deleteStorageFile(String fileName) {
-        CloudFile file = findFileByName(fileName);
-        if (file!=null){
-            controller.sendCommand(Commands.DELETE.getString());
-            if (controller.isResponseOk()){
-                controller.sendCommand(fileName);
-            }
+        controller.sendCommand(Commands.DELETE.getString());
+        if (controller.isResponseOk()) {
+            controller.sendCommand(fileName);
         }
     }
 
-    public void deleteLocalFile (String fileName){
+    public void deleteLocalFile(String fileName) {
         CloudFile file = findFileByName(fileName);
-        if (file!=null){
+        if (file != null) {
             recursiveDelete(file);
         }
     }
@@ -159,8 +156,8 @@ public class ClientFileHandler {
 
     public void downLoadSharedFile(String fullPathFileName) {
         String[] unixFileNameArray = fullPathFileName.split("/");
-        String[] windowsFileNameArray = unixFileNameArray[unixFileNameArray.length-1].split("\\\\");
-        String downloadedFileName = windowsFileNameArray[windowsFileNameArray.length-1];
+        String[] windowsFileNameArray = unixFileNameArray[unixFileNameArray.length - 1].split("\\\\");
+        String downloadedFileName = windowsFileNameArray[windowsFileNameArray.length - 1];
         String downloadedFileFullName = currentClientDir + "/" + downloadedFileName;
         try {
             controller.sendCommand(Commands.DOWNLOAD.getString());
@@ -214,7 +211,7 @@ public class ClientFileHandler {
 
     public void sendFile(CloudFile currentFile) throws IOException {
         FileInputStream fis = new FileInputStream(currentFile);
-        int bytesRead=0;
+        int bytesRead = 0;
         byte[] buffer = new byte[Main.BUFFER_SIZE];
         while (fis.available() > 0) {
             bytesRead = fis.read(buffer);
@@ -226,12 +223,12 @@ public class ClientFileHandler {
 
     public void openLocalDir(String fileName) {
         CloudFile f;
-        if (fileName.equals(PARENT_DIR_MARK)){
+        if (fileName.equals(PARENT_DIR_MARK)) {
             f = new CloudFile(currentClientDir.getParent(), true);
         } else {
             f = findFileByName(fileName);
         }
-        if (f!=null&&f.isDirectory()){
+        if (f != null && f.isDirectory()) {
             currentClientDir = new CloudFile(f.getAbsolutePath());
         }
     }

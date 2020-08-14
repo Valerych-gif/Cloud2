@@ -129,6 +129,14 @@ public abstract class ConnectionHandler implements Runnable {
                             sendResponse(Responses.FAIL.getString());
                         }
                         break;
+                    case DELETE:
+                        if (userId!=-1) {
+                            sendResponse(Responses.OK.getString());
+                            deleteFileFromStorage();
+                        } else {
+                            sendResponse(Responses.FAIL.getString());
+                        }
+                        break;
                     case GET_DIR_CONTENT:
                         if (userId!=-1) {
                             sendResponse(Responses.OK.getString());
@@ -164,6 +172,8 @@ public abstract class ConnectionHandler implements Runnable {
             }
         }
     }
+
+    protected abstract void deleteFileFromStorage() throws IOException;
 
     protected abstract void shareFile() throws IOException;
 

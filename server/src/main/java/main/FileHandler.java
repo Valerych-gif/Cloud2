@@ -53,4 +53,6 @@ public abstract class FileHandler {
     public String getStorageRootDirPath() {
         return storageRootDirPath;
     }
+
+    public abstract void deleteFileFromStorage(String fileName);
 }

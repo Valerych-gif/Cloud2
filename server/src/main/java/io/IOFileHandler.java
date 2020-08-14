@@ -118,6 +118,24 @@ public class IOFileHandler extends FileHandler {
         return true;
     }
 
+    public void deleteFileFromStorage(String fileName){
+        File file = new File(currentStorageDir.getAbsolutePath() + "/" + fileName);
+        recursiveDelete(file);
+    }
+
+    private void recursiveDelete(File file) {
+        if (!file.exists())
+            return;
+
+        if (file.isDirectory()) {
+            for (File f : file.listFiles()) {
+                recursiveDelete(f);
+            }
+        }
+
+        file.delete();
+    }
+
     public File getAbsFilePathByName(String fileName){
         return new File(currentStorageDir.getAbsolutePath() + "/" + fileName);
     }
