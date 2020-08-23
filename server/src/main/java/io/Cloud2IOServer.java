@@ -16,6 +16,7 @@ public class Cloud2IOServer extends Cloud2Server{
     private static ExecutorService executor;
 
     private Cloud2IOServer() {
+        super();
     }
 
     public static Cloud2Server getInstance() {
@@ -36,7 +37,7 @@ public class Cloud2IOServer extends Cloud2Server{
         try {
             while (true) {
                 socket = serverSocket.accept();
-                executor.execute(new IOConnectionHandler(this, socket));
+                executor.execute(new IOConnectionHandler(socket));
                 logger.info("Client connected");
             }
         } catch (Exception e) {

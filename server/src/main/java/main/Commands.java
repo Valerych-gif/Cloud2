@@ -20,4 +20,9 @@ public enum Commands {
     public String getString() {
         return commandStr;
     }
+
+    @Override
+    public String toString() {
+        return commandStr;
+    }
 }

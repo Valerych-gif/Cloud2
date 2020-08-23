@@ -20,7 +20,8 @@ public class FakeIOServer extends Cloud2Server {
 
     public static Cloud2Server getInstance() {
         if (instance == null) {
-            instance = new FakeIOServer();
+            Cloud2Server.setServer(new FakeIOServer());
+            instance = Cloud2Server.getInstance();
         }
         return instance;
     }
@@ -29,16 +30,10 @@ public class FakeIOServer extends Cloud2Server {
         try {
             serverSocket = new ServerSocket(Cloud2ServerStarter.PORT);
             socket = serverSocket.accept();
-            connectionHandler = new IOConnectionHandler(this, socket);
+            connectionHandler = new IOConnectionHandler(socket);
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public void run(){
-        new Thread(()->{
-            connectionHandler.run();
-        }).start();
     }
 
     public IOConnectionHandler getConnectionHandler() {

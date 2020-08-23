@@ -39,6 +39,10 @@ public class AuthService {
         return instance;
     }
 
+    public static void setAuthFile(String authFile) {
+        AUTH_FILE = authFile;
+    }
+
     public String getId(String login, String pass) throws IOException {
         Optional<String> lines = Files.lines(path)
                 .filter((str) -> {

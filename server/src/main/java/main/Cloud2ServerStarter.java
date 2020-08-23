@@ -1,7 +1,5 @@
 package main;
 
-import io.Cloud2IOServer;
-
 public class Cloud2ServerStarter {
 
     public final static String STORAGE_ROOT_DIR = "server/src/main/resources/storage";
@@ -11,9 +9,8 @@ public class Cloud2ServerStarter {
     public final static char END_COMMAND_CHAR = '|';
 
     public static void main(String[] args) {
-        Cloud2Server server = Cloud2IOServer.getInstance();
+        Cloud2Server server = Cloud2Server.getServer("IOServer");
         server.init();
         server.waitConnection();
     }
-
 }

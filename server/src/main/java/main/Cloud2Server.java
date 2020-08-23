@@ -1,5 +1,6 @@
 package main;
 
+import io.Cloud2IOServer;
 import io.IOConnectionHandler;
 import exceptions.CantToCreateStorageException;
 import org.apache.logging.log4j.LogManager;
@@ -13,9 +14,25 @@ public abstract class Cloud2Server {
     protected Socket socket;
     protected File storage;
     protected static Logger logger = LogManager.getLogger(Cloud2Server.class);
+    private static Cloud2Server server;
 
-    public  Cloud2Server() {
+    public Cloud2Server() {
         storage = new File(Cloud2ServerStarter.STORAGE_ROOT_DIR);
+    }
+
+    public static Cloud2Server getServer(String serverType) {
+        if (serverType.equals("IOServer")){
+            Cloud2Server.server = Cloud2IOServer.getInstance();
+        }
+        return server;
+    }
+
+    public static void setServer (Cloud2Server server){
+        Cloud2Server.server = server;
+    }
+
+    public static Cloud2Server getInstance() {
+        return server;
     }
 
     public void init() {

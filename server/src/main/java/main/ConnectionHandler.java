@@ -2,7 +2,6 @@ package main;
 
 import auth.AuthService;
 import exceptions.CantToCreateStorageException;
-import io.IOFileHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,7 +25,8 @@ public abstract class ConnectionHandler implements Runnable {
     protected String pass;
     protected int userId;
 
-    public ConnectionHandler(Cloud2Server server) {
+    public ConnectionHandler() {
+        Cloud2Server server = Cloud2Server.getInstance();
         logger.info("Connection accepted");
         this.isConnectionActive = true;
         this.server = server;
@@ -98,7 +98,7 @@ public abstract class ConnectionHandler implements Runnable {
                         authorization();
                         if (userId!=-1){
                             sendResponse(Responses.OK.getString());
-                            seUpUser();
+                            setUpUser();
                         } else {
                             sendResponse(Responses.FAIL.getString());
                         }
@@ -108,7 +108,7 @@ public abstract class ConnectionHandler implements Runnable {
                         registration();
                         if (userId!=-1){
                             sendResponse(Responses.OK.getString());
-                            seUpUser();
+                            setUpUser();
                         } else {
                             sendResponse(Responses.FAIL.getString());
                         }
@@ -164,6 +164,8 @@ public abstract class ConnectionHandler implements Runnable {
                     case CLOSE_CONNECTION:
                         closeConnection();
                         break;
+                    default:
+                        break;
                 }
             } catch (Exception e) {
                 closeConnection();
@@ -179,7 +181,7 @@ public abstract class ConnectionHandler implements Runnable {
 
     protected abstract void sendSharedFilesToClient();
 
-    protected abstract void seUpUser();
+    protected abstract void setUpUser();
 
     protected abstract void sendDirContent() throws IOException;
 
@@ -187,7 +189,7 @@ public abstract class ConnectionHandler implements Runnable {
 
     public abstract void sendResponse(String responseStr);
 
-    protected abstract void closeConnection();
+    public abstract void closeConnection();
 
     protected abstract void sendFileToClient() throws IOException;
 

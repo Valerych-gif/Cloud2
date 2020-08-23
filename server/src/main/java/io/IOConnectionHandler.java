@@ -13,8 +13,8 @@ public class IOConnectionHandler extends ConnectionHandler {
     private DataInputStream is;
     private DataOutputStream os;
 
-    public IOConnectionHandler(Cloud2Server server, Socket socket) throws IOException {
-        super(server);
+    public IOConnectionHandler(Socket socket) throws IOException {
+        super();
         this.socket = socket;
         this.is = new DataInputStream(socket.getInputStream());
         this.os = new DataOutputStream(socket.getOutputStream());
@@ -37,7 +37,7 @@ public class IOConnectionHandler extends ConnectionHandler {
         }
     }
 
-    public void seUpUser() {
+    public void setUpUser() {
         userInit();
         fileHandler = new IOFileHandler(this);
     }
@@ -53,7 +53,7 @@ public class IOConnectionHandler extends ConnectionHandler {
 
         while (true) {
             b = (char) is.readByte();
-            if (b != '|') {
+            if (b != Cloud2ServerStarter.END_COMMAND_CHAR) {
                 stringFromClient.append(b);
             } else {
                 System.out.println("<-\t" + stringFromClient.toString());

@@ -1,6 +1,10 @@
 package utils;
 
+import fakeentities.FakeClient;
+import fakeentities.FakeIOServer;
 import main.Cloud2Server;
+import main.ConnectionHandler;
+import main.iotests.TestIOConnectionHandler;
 
 import java.io.File;
 
@@ -24,5 +28,30 @@ public class Utils {
         }
 
         file.delete();
+    }
+
+    public static void startServer(){
+        new Thread(()->{
+            Cloud2Server testServer = FakeIOServer.getInstance();
+            TestIOConnectionHandler.setTestServer(testServer);
+            testServer.waitConnection();
+            ConnectionHandler connectionHandler = testServer.getConnectionHandler();
+            TestIOConnectionHandler.setConnectionHandler(connectionHandler);
+            connectionHandler.run();
+        }).start();
+    }
+
+    public static void createClient() {
+        new Thread(()-> {
+            FakeClient client = new FakeClient();
+            client.connect();
+            try {
+                Thread.sleep(500);
+                client.auth();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            TestIOConnectionHandler.setClient(client);
+        }).start();
     }
 }
