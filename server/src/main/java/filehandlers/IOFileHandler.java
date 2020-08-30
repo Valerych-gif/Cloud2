@@ -1,9 +1,8 @@
-package io;
+package filehandlers;
 
-import files.CloudFile;
-import main.Cloud2ServerApp;
-import main.FileHandler;
-import main.ConnectionHandler;
+import connectionhandlers.IOConnectionHandler;
+import entities.CloudFile;
+import connectionhandlers.ConnectionHandler;
 import main.Responses;
 import settings.Cloud2ServerSettings;
 

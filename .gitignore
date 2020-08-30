@@ -3,4 +3,5 @@
 /server/target/
 /.idea/
 /Logs/
-/server/src/main/resources/storage/
+/storage/
+/sfiles/

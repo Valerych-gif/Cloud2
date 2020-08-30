@@ -1,8 +1,9 @@
-package io;
+package connectionhandlers;
 
+import filehandlers.IOFileHandler;
 import main.*;
 
-import files.CloudFile;
+import entities.CloudFile;
 import settings.Cloud2ServerSettings;
 
 import java.io.*;

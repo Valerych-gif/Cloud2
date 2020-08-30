@@ -1,6 +1,5 @@
-package auth;
+package services;
 
-import main.Cloud2ServerApp;
 import settings.Cloud2ServerSettings;
 
 import java.io.File;
@@ -11,6 +10,7 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -18,14 +18,20 @@ import java.util.stream.Collectors;
 
 public class AuthService {
 
-    public static String AUTH_FILE = "server/src/main/resources/sfiles/auth.db";
-    public static String SHARED_FILE = "server/src/main/resources/sfiles/sharedfiles.db";
-    private static Path path;
+    private static Path authFilePath;
+    private static Path sharedFilePath;
 
     private static AuthService instance;
 
     private AuthService() {
-        path = Paths.get(AUTH_FILE);
+        authFilePath = Paths.get(
+                Cloud2ServerSettings.SERVER_MAIN_FILES_DIR,
+                Cloud2ServerSettings.AUTH_FILE
+        );
+        sharedFilePath = Paths.get(
+                Cloud2ServerSettings.SERVER_MAIN_FILES_DIR,
+                Cloud2ServerSettings.AUTH_FILE
+        );
     }
 
     public static AuthService getInstance() {
@@ -35,12 +41,8 @@ public class AuthService {
         return instance;
     }
 
-    public static void setAuthFile(String authFile) {
-        AUTH_FILE = authFile;
-    }
-
     public String getId(String login, String pass) throws IOException {
-        Optional<String> lines = Files.lines(path)
+        Optional<String> lines = Files.lines(authFilePath)
                 .filter((str) -> {
                     String[] line = str.split(" ");
                     return login.equals(line[1]) && pass.equals(line[2]);
@@ -67,7 +69,7 @@ public class AuthService {
     }
 
     synchronized private boolean isLoginFree(String login) throws IOException {
-        Optional<String[]> lines = Files.lines(path)
+        Optional<String[]> lines = Files.lines(authFilePath)
                 .map((str) -> str.split(" "))
                 .filter((strings) -> login.equals(strings[1]))
                 .findFirst();
@@ -75,37 +77,25 @@ public class AuthService {
     }
 
     synchronized private String getNewUserId() throws IOException {
-        Optional<String[]> lines = Files.lines(path)
+        Optional<String[]> lines = Files.lines(authFilePath)
                 .map((str) -> str.split(" "))
                 .max(Comparator.comparingInt(str -> Integer.parseInt(str[0])));
         if (lines.isPresent()) {
             int newUserId = Integer.parseInt((lines.get())[0]) + 1;
             return String.valueOf(newUserId);
         } else {
-            return null;
+            return "0";
         }
     }
 
     synchronized public void writeNewUserIntoDB(String userIdStr, String login, String pass) throws Exception {
-        String newUserStr = "\r\n" + userIdStr + " " + login + " " + pass;
-        RandomAccessFile authDBFile = new RandomAccessFile(AUTH_FILE, "rw");
-        FileChannel fileChannel = authDBFile.getChannel();
-
-        ByteBuffer buffer = ByteBuffer.allocate(Cloud2ServerSettings.BUFFER_SIZE);
-        buffer.clear();
-        buffer.put(newUserStr.getBytes());
-        buffer.flip();
-        fileChannel.position(fileChannel.size());
-        while (buffer.hasRemaining()) {
-            fileChannel.write(buffer);
-        }
-        fileChannel.close();
+        String newUserStr = userIdStr + " " + login + " " + pass + "\r\n";
+        Files.write(authFilePath, newUserStr.getBytes(), StandardOpenOption.APPEND);
     }
 
     public File[] getSharedFiles(int userId) throws IOException {
         String id = String.valueOf(userId);
-        Path sharedFilesPath = Paths.get(SHARED_FILE);
-        List<String[]> fileNames = Files.lines(sharedFilesPath)
+        List<String[]> fileNames = Files.lines(sharedFilePath)
                 .map((str) -> str.split(" "))
                 .filter(str->str[0].equals(id)||str[0].equals("-1"))
                 .collect(Collectors.toList());
@@ -120,7 +110,7 @@ public class AuthService {
         String targetIdStr = getIdByNickName(nickName);
         String shareLine = "\r\n" + targetIdStr + " " + userIdStr + " " + fileName;
         System.out.println(shareLine);
-        RandomAccessFile authDBFile = new RandomAccessFile(SHARED_FILE, "rw");
+        RandomAccessFile authDBFile = new RandomAccessFile(String.valueOf(sharedFilePath), "rw");
         FileChannel fileChannel = authDBFile.getChannel();
         ByteBuffer buffer = ByteBuffer.allocate(Cloud2ServerSettings.BUFFER_SIZE);
         buffer.clear();
@@ -134,7 +124,7 @@ public class AuthService {
     }
 
     private String getIdByNickName(String login) throws IOException {
-        Optional<String> lines = Files.lines(path)
+        Optional<String> lines = Files.lines(authFilePath)
                 .filter((str) -> {
                     String[] line = str.split(" ");
                     return login.equals(line[1]);

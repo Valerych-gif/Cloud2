@@ -1,7 +1,11 @@
-package main;
+package connectionhandlers;
 
-import auth.AuthService;
+import services.AuthService;
 import exceptions.CantToCreateStorageException;
+import servers.Cloud2Server;
+import main.Commands;
+import filehandlers.FileHandler;
+import main.Responses;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

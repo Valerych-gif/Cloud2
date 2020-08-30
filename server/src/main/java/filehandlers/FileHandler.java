@@ -1,7 +1,8 @@
-package main;
+package filehandlers;
 
-import auth.AuthService;
-import files.CloudFile;
+import services.AuthService;
+import connectionhandlers.ConnectionHandler;
+import entities.CloudFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import settings.Cloud2ServerSettings;
