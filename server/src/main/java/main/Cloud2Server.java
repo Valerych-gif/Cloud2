@@ -5,6 +5,7 @@ import io.IOConnectionHandler;
 import exceptions.CantToCreateStorageException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import settings.Cloud2ServerSettings;
 
 import java.io.File;
 import java.net.Socket;
@@ -12,12 +13,21 @@ import java.net.Socket;
 public abstract class Cloud2Server {
 
     protected Socket socket;
-    protected File storage;
+    protected static File storage;
     protected static Logger logger = LogManager.getLogger(Cloud2Server.class);
     private static Cloud2Server server;
 
-    public Cloud2Server() {
-        storage = new File(Cloud2ServerStarter.STORAGE_ROOT_DIR);
+    protected Cloud2Server() {
+        storage = new File(Cloud2ServerSettings.STORAGE_ROOT_DIR);
+    }
+
+    public static Cloud2Server getInstance() {
+        try {
+            setUpMainStorage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return server;
     }
 
     public static Cloud2Server getServer(String serverType) {
@@ -31,19 +41,15 @@ public abstract class Cloud2Server {
         Cloud2Server.server = server;
     }
 
-    public static Cloud2Server getInstance() {
-        return server;
-    }
+//    public void init() {
+//        try {
+//            setUpMainStorage();
+//        } catch (Exception e) {
+//            logger.error(e.getMessage());
+//        }
+//    }
 
-    public void init() {
-        try {
-            setUpMainStorage();
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    public void setUpMainStorage() throws Exception {
+    public static void setUpMainStorage() throws Exception {
         if (isMainStorageExist()) return;
         if (storage.mkdir()) {
             logger.info("Создана корневая папка сетевого хранилища");
@@ -52,7 +58,7 @@ public abstract class Cloud2Server {
         }
     }
 
-    public boolean isMainStorageExist() {
+    public static boolean isMainStorageExist() {
         return storage.exists();
     }
 

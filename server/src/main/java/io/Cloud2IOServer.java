@@ -1,7 +1,8 @@
 package io;
 
 import main.Cloud2Server;
-import main.Cloud2ServerStarter;
+import main.Cloud2ServerApp;
+import settings.Cloud2ServerSettings;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -23,7 +24,7 @@ public class Cloud2IOServer extends Cloud2Server{
         if (instance == null) {
             instance = new Cloud2IOServer();
             try {
-                serverSocket = new ServerSocket(Cloud2ServerStarter.PORT);
+                serverSocket = new ServerSocket(Cloud2ServerSettings.PORT);
             } catch (IOException e) {
                 logger.error(e);
             }

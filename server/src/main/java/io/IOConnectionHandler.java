@@ -3,6 +3,7 @@ package io;
 import main.*;
 
 import files.CloudFile;
+import settings.Cloud2ServerSettings;
 
 import java.io.*;
 import java.net.Socket;
@@ -53,7 +54,7 @@ public class IOConnectionHandler extends ConnectionHandler {
 
         while (true) {
             b = (char) is.readByte();
-            if (b != Cloud2ServerStarter.END_COMMAND_CHAR) {
+            if (b != Cloud2ServerSettings.END_COMMAND_CHAR) {
                 stringFromClient.append(b);
             } else {
                 System.out.println("<-\t" + stringFromClient.toString());
@@ -73,7 +74,7 @@ public class IOConnectionHandler extends ConnectionHandler {
     public void sendResponse(String responseStr) {
         try {
             System.out.println("->\t" + responseStr);
-            os.writeBytes(responseStr + Cloud2ServerStarter.END_COMMAND_CHAR);
+            os.writeBytes(responseStr + Cloud2ServerSettings.END_COMMAND_CHAR);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e);

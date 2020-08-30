@@ -4,6 +4,7 @@ import auth.AuthService;
 import files.CloudFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import settings.Cloud2ServerSettings;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +31,7 @@ public abstract class FileHandler {
     public FileHandler(ConnectionHandler connectionHandler) {
         this.connectionHandler = connectionHandler;
         this.authService = AuthService.getInstance();
-        this.bufferSize = Cloud2ServerStarter.BUFFER_SIZE;
+        this.bufferSize = Cloud2ServerSettings.BUFFER_SIZE;
         this.buffer = new byte[bufferSize];
         this.storageRootDirPath = connectionHandler.getUserStorage().getAbsolutePath();
         this.rootStorageDir = new CloudFile(storageRootDirPath);

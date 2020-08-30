@@ -1,7 +1,7 @@
 package fakeentities;
 
 import main.Cloud2Server;
-import main.Cloud2ServerStarter;
+import main.Cloud2ServerApp;
 import io.IOConnectionHandler;
 
 import java.io.File;
@@ -28,7 +28,7 @@ public class FakeIOServer extends Cloud2Server {
 
     public void waitConnection() {
         try {
-            serverSocket = new ServerSocket(Cloud2ServerStarter.PORT);
+            serverSocket = new ServerSocket(Cloud2ServerApp.PORT);
             socket = serverSocket.accept();
             connectionHandler = new IOConnectionHandler(socket);
         } catch (Exception e) {

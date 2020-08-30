@@ -1,23 +1,19 @@
 package auth;
 
-import main.Cloud2Server;
-import main.Cloud2ServerStarter;
+import main.Cloud2ServerApp;
+import settings.Cloud2ServerSettings;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class AuthService {
@@ -95,7 +91,7 @@ public class AuthService {
         RandomAccessFile authDBFile = new RandomAccessFile(AUTH_FILE, "rw");
         FileChannel fileChannel = authDBFile.getChannel();
 
-        ByteBuffer buffer = ByteBuffer.allocate(Cloud2ServerStarter.BUFFER_SIZE);
+        ByteBuffer buffer = ByteBuffer.allocate(Cloud2ServerSettings.BUFFER_SIZE);
         buffer.clear();
         buffer.put(newUserStr.getBytes());
         buffer.flip();
@@ -115,7 +111,7 @@ public class AuthService {
                 .collect(Collectors.toList());
         File[] files = new File[fileNames.size()];
         for (int i=0; i< files.length; i++) {
-            files[i] = new File(Cloud2ServerStarter.STORAGE_ROOT_DIR + "/" + fileNames.get(i)[1] + "/" + fileNames.get(i)[2]);
+            files[i] = new File(Cloud2ServerSettings.STORAGE_ROOT_DIR + "/" + fileNames.get(i)[1] + "/" + fileNames.get(i)[2]);
         }
         return files;
     }
@@ -126,7 +122,7 @@ public class AuthService {
         System.out.println(shareLine);
         RandomAccessFile authDBFile = new RandomAccessFile(SHARED_FILE, "rw");
         FileChannel fileChannel = authDBFile.getChannel();
-        ByteBuffer buffer = ByteBuffer.allocate(Cloud2ServerStarter.BUFFER_SIZE);
+        ByteBuffer buffer = ByteBuffer.allocate(Cloud2ServerSettings.BUFFER_SIZE);
         buffer.clear();
         buffer.put(shareLine.getBytes());
         buffer.flip();

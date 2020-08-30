@@ -1,10 +1,11 @@
 package io;
 
 import files.CloudFile;
-import main.Cloud2ServerStarter;
+import main.Cloud2ServerApp;
 import main.FileHandler;
 import main.ConnectionHandler;
 import main.Responses;
+import settings.Cloud2ServerSettings;
 
 import java.io.*;
 import java.util.Objects;
@@ -53,7 +54,7 @@ public class IOFileHandler extends FileHandler {
             files = authService.getSharedFiles(connectionHandler.getUserId());
             for (File f : Objects.requireNonNull(files)) {
                 String fileName = f.getAbsolutePath();
-                File storageAbsPath = new File(Cloud2ServerStarter.STORAGE_ROOT_DIR);
+                File storageAbsPath = new File(Cloud2ServerSettings.STORAGE_ROOT_DIR);
                 int storageAbsPathLength = storageAbsPath.getAbsolutePath().length();
                 String fileNameToSend = fileName.substring(storageAbsPathLength);
                 System.out.println(fileNameToSend);
@@ -142,7 +143,7 @@ public class IOFileHandler extends FileHandler {
 
     public boolean getFileFromStorage(String fileName) {
         CloudFile file = new CloudFile(currentStorageDir.getAbsolutePath() + "/" + fileName);
-        if (!file.exists()) file = new CloudFile(Cloud2ServerStarter.STORAGE_ROOT_DIR + "/" + fileName);
+        if (!file.exists()) file = new CloudFile(Cloud2ServerSettings.STORAGE_ROOT_DIR + "/" + fileName);
         return getFile(file);
     }
 

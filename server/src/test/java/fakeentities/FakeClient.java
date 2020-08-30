@@ -1,6 +1,6 @@
 package fakeentities;
 
-import main.Cloud2ServerStarter;
+import main.Cloud2ServerApp;
 import main.Commands;
 import main.Responses;
 
@@ -106,7 +106,7 @@ public class FakeClient {
         try {
             while (true) {
                 b = (char) is.readByte();
-                if (b != Cloud2ServerStarter.END_COMMAND_CHAR) {
+                if (b != Cloud2ServerApp.END_COMMAND_CHAR) {
                     stringFromServer.append(b);
                 } else {
                     return stringFromServer.toString();
@@ -121,7 +121,7 @@ public class FakeClient {
 
     public void sendCommand(String command) {
         try {
-            os.writeBytes(command + Cloud2ServerStarter.END_COMMAND_CHAR);
+            os.writeBytes(command + Cloud2ServerApp.END_COMMAND_CHAR);
             os.flush();
         } catch (Exception e) {
             e.printStackTrace();
