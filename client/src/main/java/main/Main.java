@@ -1,5 +1,6 @@
 package main;
 
+import commands.Commands;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -33,7 +34,7 @@ public class Main extends Application {
         primaryStage.show();
         primaryStage.setOnCloseRequest(event -> {
             try {
-                os.writeBytes(Commands.CLOSE_CONNECTION.getString() + END_COMMAND_CHAR);
+                os.writeByte(Commands.CLOSE_CONNECTION.get());
             } catch (IOException e) {
                 e.printStackTrace();
             };

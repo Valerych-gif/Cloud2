@@ -1,5 +1,8 @@
 package main;
 
+import commands.Commands;
+import commands.Responses;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,9 +54,9 @@ public class ClientFileHandler {
 
     public List<CloudFile> getStorageDirContent() {
 
-        controller.sendCommand(Commands.GET_DIR_CONTENT.getString());
+        controller.sendCommand(Commands.GET_DIR_CONTENT);
         if (controller.isResponseOk()) {
-            controller.sendCommand(currentStorageDirName);
+            controller.sendString(currentStorageDirName);
         }
         return getFilesFromStorage();
     }
@@ -80,7 +83,7 @@ public class ClientFileHandler {
     }
 
     public List<CloudFile> getSharedDirContent() {
-        controller.sendCommand(Commands.GET_SHARED_DIR_CONTENT.getString());
+        controller.sendCommand(Commands.GET_SHARED_DIR_CONTENT);
         if (controller.isResponseOk()) {
             return getFilesFromStorage();
         }
@@ -90,9 +93,9 @@ public class ClientFileHandler {
     public void downLoadFile(String downloadedFileName) {
         String downloadedFileFullName = currentClientDir + "/" + downloadedFileName;
         try {
-            controller.sendCommand(Commands.DOWNLOAD.getString());
+            controller.sendCommand(Commands.DOWNLOAD);
             if (controller.isResponseOk()) {
-                controller.sendCommand(downloadedFileName);
+                controller.sendString(downloadedFileName);
                 if (controller.isResponseOk()) {
                     String fileLengthStr = controller.getStringFromServer();
                     long downloadedFileSize = Long.parseLong(fileLengthStr);
@@ -128,9 +131,9 @@ public class ClientFileHandler {
     }
 
     public void deleteStorageFile(String fileName) {
-        controller.sendCommand(Commands.DELETE.getString());
+        controller.sendCommand(Commands.DELETE);
         if (controller.isResponseOk()) {
-            controller.sendCommand(fileName);
+            controller.sendString(fileName);
         }
     }
 
@@ -160,9 +163,9 @@ public class ClientFileHandler {
         String downloadedFileName = windowsFileNameArray[windowsFileNameArray.length - 1];
         String downloadedFileFullName = currentClientDir + "/" + downloadedFileName;
         try {
-            controller.sendCommand(Commands.DOWNLOAD.getString());
+            controller.sendCommand(Commands.DOWNLOAD);
             if (controller.isResponseOk()) {
-                controller.sendCommand(fullPathFileName);
+                controller.sendString(fullPathFileName);
                 if (controller.isResponseOk()) {
                     String fileLengthStr = controller.getStringFromServer();
                     long downloadedFileSize = Long.parseLong(fileLengthStr);
@@ -178,16 +181,16 @@ public class ClientFileHandler {
         CloudFile currentFile = findFileByName(fileName);
         if (currentFile != null) {
             try {
-                controller.sendCommand(Commands.UPLOAD.getString());
+                controller.sendCommand(Commands.UPLOAD);
                 if (controller.isResponseOk()) {
-                    controller.sendCommand(fileName);
+                    controller.sendString(fileName);
                 } else {
                     return;
                 }
                 if (controller.isResponseOk()) {
                     long fileLength = currentFile.length();
                     String fileLengthStr = String.valueOf(fileLength);
-                    controller.sendCommand(fileLengthStr);
+                    controller.sendString(fileLengthStr);
                 } else {
                     return;
                 }

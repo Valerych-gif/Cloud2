@@ -1,5 +1,7 @@
 package main;
 
+import commands.Commands;
+import commands.Responses;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -212,7 +214,7 @@ public class mainController implements Initializable {
     }
 
     public void authorization() {
-        sendCommand(Commands.AUTHORIZATION.getString());
+        sendCommand(Commands.AUTHORIZATION);
         confirmAuthorization();
     }
 
@@ -221,7 +223,7 @@ public class mainController implements Initializable {
         if (isResponseOk()) {
             l = loginField.getText();
             p = passField.getText();
-            sendCommand(l + " " + p);
+            sendString(l + " " + p);
         }
         if (isResponseOk()) {
             refreshStorageDirContent();
@@ -253,7 +255,7 @@ public class mainController implements Initializable {
     }
 
     public void registration() {
-        sendCommand(Commands.REGISTRATION.getString());
+        sendCommand(Commands.REGISTRATION);
         confirmAuthorization();
     }
 
@@ -283,7 +285,17 @@ public class mainController implements Initializable {
         }
     }
 
-    public void sendCommand(String command) {
+    public void sendCommand(Commands command) {
+        try {
+            if (Main.DEBUG_MODE) System.out.println("->\t" + command);
+            os.writeByte(command.get());
+            os.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendString(String command) {
         try {
             if (Main.DEBUG_MODE) System.out.println("->\t" + command);
             os.writeBytes(command + Main.END_COMMAND_CHAR);
@@ -314,10 +326,10 @@ public class mainController implements Initializable {
 
     public void shareFileByNickname(String nickName) {
         if (activePanel.equals(STORAGE_PANEL)) {
-            sendCommand(Commands.SHARE.getString());
+            sendCommand(Commands.SHARE);
             if (isResponseOk()) {
-                sendCommand(nickName);
-                sendCommand(activeFile);
+                sendString(nickName);
+                sendString(activeFile);
             }
         }
     }

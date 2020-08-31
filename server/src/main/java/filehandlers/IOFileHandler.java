@@ -1,9 +1,9 @@
 package filehandlers;
 
+import commands.Responses;
 import connectionhandlers.IOConnectionHandler;
 import entities.CloudFile;
 import connectionhandlers.ConnectionHandler;
-import main.Responses;
 import settings.Cloud2ServerSettings;
 
 import java.io.*;

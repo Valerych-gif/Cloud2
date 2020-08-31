@@ -1,6 +1,6 @@
 package fakeentities;
 
-import main.Cloud2Server;
+import servers.Cloud2Server;
 
 import java.io.File;
 
@@ -20,7 +20,7 @@ public class FakeNIOServer extends Cloud2Server {
     }
 
     @Override
-    public void waitConnection() {
+    public void start() {
 
     }
 }

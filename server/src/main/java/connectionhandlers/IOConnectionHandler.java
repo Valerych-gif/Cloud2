@@ -1,10 +1,12 @@
 package connectionhandlers;
 
+import commands.Commands;
+import commands.Responses;
 import filehandlers.IOFileHandler;
-import main.*;
 
 import entities.CloudFile;
 import settings.Cloud2ServerSettings;
+import utils.LogUtils;
 
 import java.io.*;
 import java.net.Socket;
@@ -44,9 +46,10 @@ public class IOConnectionHandler extends ConnectionHandler {
         fileHandler = new IOFileHandler(this);
     }
 
-    public Commands getCommandFromClient() throws IOException {
-        String command = getStringFromClient();
-        return checkCommand(command);
+    public Commands getSignalByteFromClient() throws IOException {
+        byte signalByte = is.readByte();
+        LogUtils.info(String.valueOf(signalByte), logger, "<-\t");
+        return checkCommand(signalByte);
     }
 
     public String getStringFromClient() throws IOException {
@@ -64,10 +67,10 @@ public class IOConnectionHandler extends ConnectionHandler {
         }
     }
 
-    private Commands checkCommand(String command) {
+    private Commands checkCommand(byte signalByte) {
         Commands[] commands = Commands.values();
         for (Commands c : commands) {
-            if (command.equals(c.getString())) return c;
+            if (signalByte==c.get()) return c;
         }
         return null;
     }

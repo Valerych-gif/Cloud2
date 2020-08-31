@@ -1,13 +1,14 @@
 package connectionhandlers;
 
+import commands.Commands;
+import commands.Responses;
 import services.AuthService;
 import exceptions.CantToCreateStorageException;
 import servers.Cloud2Server;
-import main.Commands;
 import filehandlers.FileHandler;
-import main.Responses;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import utils.LogUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -93,8 +94,9 @@ public abstract class ConnectionHandler implements Runnable {
         while (isConnectionActive) {
             command = null;
             try {
+                LogUtils.info("Ожидаем сигнальный байт от клиента", logger);
                 while (command == null) {
-                    command = getCommandFromClient(); // Block
+                    command = getSignalByteFromClient(); // Block
                 }
                 switch (command) {
                     case AUTHORIZATION:
@@ -189,7 +191,7 @@ public abstract class ConnectionHandler implements Runnable {
 
     protected abstract void sendDirContent() throws IOException;
 
-    protected abstract Commands getCommandFromClient() throws IOException;
+    protected abstract Commands getSignalByteFromClient() throws IOException;
 
     public abstract void sendResponse(String responseStr);
 
