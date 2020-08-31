@@ -5,6 +5,9 @@ import commands.Responses;
 import filehandlers.IOFileHandler;
 
 import entities.CloudFile;
+import network.IOCommandReceiver;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import settings.Cloud2ServerSettings;
 import utils.LogUtils;
 
@@ -13,13 +16,17 @@ import java.net.Socket;
 
 public class IOConnectionHandler extends ConnectionHandler {
 
+    private Logger logger = LogManager.getLogger(IOConnectionHandler.class);
+
     private Socket socket;
+    private IOCommandReceiver commandReceiver;
     private DataInputStream is;
     private DataOutputStream os;
 
     public IOConnectionHandler(Socket socket) throws IOException {
         super();
         this.socket = socket;
+        this.commandReceiver = new IOCommandReceiver(socket);
         this.is = new DataInputStream(socket.getInputStream());
         this.os = new DataOutputStream(socket.getOutputStream());
         this.connectionHandler = this;
@@ -30,25 +37,10 @@ public class IOConnectionHandler extends ConnectionHandler {
         super.run();
     }
 
-    public void getLoginAndPassFromClient() throws IOException {
-        String[] loginAndPassStr = getStringFromClient().split(" ");
-        if (loginAndPassStr.length > 1) {
-            this.login = loginAndPassStr[0].trim();
-            this.pass = loginAndPassStr[1].trim();
-        } else {
-            this.login = null;
-            this.pass = null;
-        }
-    }
 
-    public void setUpUser() {
-        userInit();
-        fileHandler = new IOFileHandler(this);
-    }
 
-    public Commands getSignalByteFromClient() throws IOException {
-        byte signalByte = is.readByte();
-        LogUtils.info(String.valueOf(signalByte), logger, "<-\t");
+    public Commands getCommandFromClient() throws IOException {
+        byte signalByte = commandReceiver.getSignalByteFromClient();
         return checkCommand(signalByte);
     }
 
@@ -137,20 +129,20 @@ public class IOConnectionHandler extends ConnectionHandler {
         fileHandler.sendSharedFileNamesToClient();
     }
 
-    public void shareFile() throws IOException {
-        String nickName = getStringFromClient();
-        String fileName = getStringFromClient();
-        String fileFullPathName = fileHandler.getAbsFilePathByName(fileName).getAbsolutePath();
-        String fileNameForShare = fileFullPathName.substring(fileHandler.getStorageRootDirPath().length());
-        String userIdStr = String.valueOf(userId);
-        System.out.println(fileNameForShare);
-        try {
-            authService.shareFile(nickName, userIdStr, fileNameForShare);
-        } catch (IOException e) {
-            logger.error(e);
-            e.printStackTrace();
-        }
-    }
+//    public void shareFile() throws IOException {
+//        String nickName = getStringFromClient();
+//        String fileName = getStringFromClient();
+//        String fileFullPathName = fileHandler.getAbsFilePathByName(fileName).getAbsolutePath();
+//        String fileNameForShare = fileFullPathName.substring(fileHandler.getStorageRootDirPath().length());
+//        String userIdStr = String.valueOf(userId);
+//        System.out.println(fileNameForShare);
+//        try {
+//            authService.shareFile(nickName, userIdStr, fileNameForShare);
+//        } catch (IOException e) {
+//            logger.error(e);
+//            e.printStackTrace();
+//        }
+//    }
 
     public void closeConnection() {
 

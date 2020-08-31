@@ -2,8 +2,8 @@ package connectionhandlers;
 
 import commands.Commands;
 import commands.Responses;
-import services.AuthService;
-import exceptions.CantToCreateStorageException;
+import entities.User;
+import authservice.AuthService;
 import servers.Cloud2Server;
 import filehandlers.FileHandler;
 import org.apache.logging.log4j.LogManager;
@@ -15,128 +15,73 @@ import java.io.IOException;
 
 public abstract class ConnectionHandler implements Runnable {
 
-    protected Logger logger = LogManager.getLogger(ConnectionHandler.class);
+    private Logger logger = LogManager.getLogger(ConnectionHandler.class);
 
     protected Cloud2Server server;
     protected ConnectionHandler connectionHandler;
     protected FileHandler fileHandler;
     protected AuthService authService;
-    protected String userStoragePath;
     protected File mainStorage;
-    protected File userStorage;
     protected boolean isConnectionActive;
-    protected Commands command;
-    protected String login;
-    protected String pass;
-    protected int userId;
+    protected User user;
 
     public ConnectionHandler() {
         Cloud2Server server = Cloud2Server.getInstance();
-        logger.info("Connection accepted");
+        LogUtils.info("Connection accepted", logger);
         this.isConnectionActive = true;
         this.server = server;
         this.authService = AuthService.getInstance();
         this.mainStorage = server.getStorage();
-        this.command = null;
-        this.userId=-1;
-    }
-
-    public void authorization() throws IOException {
-        getLoginAndPassFromClient();
-        if (login!=null) {
-            try {
-                String userIdStr = authService.getId(login, pass);
-                this.userId = userIdStr != null ? Integer.parseInt(userIdStr) : -1;
-            } catch (IOException e) {
-                e.printStackTrace();
-                logger.error(e);
-            }
-        }
-    }
-
-    public void registration() throws IOException {
-        getLoginAndPassFromClient();
-        if (login!=null) {
-            try {
-                String userIdStr = authService.registration(login, pass);
-                this.userId = userIdStr != null ? Integer.parseInt(userIdStr) : -1;
-            } catch (Exception e) {
-                e.printStackTrace();
-                logger.error(e);
-            }
-        }
-    }
-
-    public void userInit() {
-        if (userId!=-1) {
-            userStoragePath = mainStorage.getAbsolutePath() + "\\" + userId;
-            this.userStorage = new File(userStoragePath);
-            try {
-                setUpUserStorage();
-            } catch (Exception e) {
-                e.printStackTrace();
-                logger.error(e);
-            }
-        }
-    }
-
-    public void setUpUserStorage() throws Exception {
-        if (userStorage.exists()) return;
-        if (userStorage.mkdir()) {
-            logger.info("Создана корневая папка пользователя " + login);
-        } else {
-            throw new CantToCreateStorageException();
-        }
+        this.user=null;
     }
 
     @Override
     public void run() {
         while (isConnectionActive) {
-            command = null;
+            Commands command = null;
             try {
                 LogUtils.info("Ожидаем сигнальный байт от клиента", logger);
                 while (command == null) {
-                    command = getSignalByteFromClient(); // Block
+                    command = getCommandFromClient(); // Block
                 }
                 switch (command) {
                     case AUTHORIZATION:
                         sendResponse(Responses.OK.getString());
-                        authorization();
-                        if (userId!=-1){
-                            sendResponse(Responses.OK.getString());
-                            setUpUser();
+                        this.user = authService.getUserByLoginAndPass();
+                        if (user!=null){
+                            sendResponse(Responses.OK.getString());// TODO move to Network
                         } else {
-                            sendResponse(Responses.FAIL.getString());
+                            sendResponse(Responses.FAIL.getString());// TODO move to Network
                         }
                         break;
                     case REGISTRATION:
-                        sendResponse(Responses.OK.getString());
-                        registration();
-                        if (userId!=-1){
-                            sendResponse(Responses.OK.getString());
-                            setUpUser();
+                        sendResponse(Responses.OK.getString());// TODO move to Network
+                        this.user = authService.getNewUserByLoginAndPass();
+                        if (user!=null){
+                            sendResponse(Responses.OK.getString());// TODO move to Network
+                            user.setUpNewUser();
                         } else {
-                            sendResponse(Responses.FAIL.getString());
+                            sendResponse(Responses.FAIL.getString());// TODO move to Network
                         }
                         break;
                     case UPLOAD:
-                        if (userId!=-1) {
+                        if (user!=null) {
                             sendResponse(Responses.OK.getString());
-                            receiveFileFromClient(); // Block
+                            //receiveFileFromClient(); // Block
                         } else {
                             sendResponse(Responses.FAIL.getString());
                         }
                         break;
                     case DOWNLOAD:
-                        if (userId!=-1) {
+                        if (user!=null) {
                             sendResponse(Responses.OK.getString());
-                            sendFileToClient();
+                            //sendFileToClient();
                         } else {
                             sendResponse(Responses.FAIL.getString());
                         }
                         break;
                     case DELETE:
-                        if (userId!=-1) {
+                        if (user!=null) {
                             sendResponse(Responses.OK.getString());
                             deleteFileFromStorage();
                         } else {
@@ -144,7 +89,7 @@ public abstract class ConnectionHandler implements Runnable {
                         }
                         break;
                     case GET_DIR_CONTENT:
-                        if (userId!=-1) {
+                        if (user!=null) {
                             sendResponse(Responses.OK.getString());
                             sendDirContent();
                         } else {
@@ -152,7 +97,7 @@ public abstract class ConnectionHandler implements Runnable {
                         }
                         break;
                     case GET_SHARED_DIR_CONTENT:
-                        if (userId!=-1) {
+                        if (user!=null) {
                             sendResponse(Responses.OK.getString());
                             sendSharedFilesToClient();
                         } else {
@@ -160,9 +105,9 @@ public abstract class ConnectionHandler implements Runnable {
                         }
                         break;
                     case SHARE:
-                        if (userId!=-1) {
+                        if (user!=null) {
                             sendResponse(Responses.OK.getString());
-                            shareFile();
+                            authService.shareFile();
                         } else {
                             sendResponse(Responses.FAIL.getString());
                         }
@@ -183,37 +128,14 @@ public abstract class ConnectionHandler implements Runnable {
 
     protected abstract void deleteFileFromStorage() throws IOException;
 
-    protected abstract void shareFile() throws IOException;
-
     protected abstract void sendSharedFilesToClient();
-
-    protected abstract void setUpUser();
 
     protected abstract void sendDirContent() throws IOException;
 
-    protected abstract Commands getSignalByteFromClient() throws IOException;
+    protected abstract Commands getCommandFromClient() throws IOException;
 
     public abstract void sendResponse(String responseStr);
 
     public abstract void closeConnection();
 
-    protected abstract void sendFileToClient() throws IOException;
-
-    protected abstract void receiveFileFromClient() throws IOException;
-
-    public abstract String getStringFromClient() throws IOException;
-
-    protected abstract void getLoginAndPassFromClient() throws IOException;
-
-    public File getMainStorage() {
-        return mainStorage;
-    }
-
-    public File getUserStorage() {
-        return userStorage;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
 }

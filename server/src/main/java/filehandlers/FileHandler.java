@@ -1,6 +1,6 @@
 package filehandlers;
 
-import services.AuthService;
+import authservice.AuthService;
 import connectionhandlers.ConnectionHandler;
 import entities.CloudFile;
 import org.apache.logging.log4j.LogManager;
@@ -42,19 +42,9 @@ public abstract class FileHandler {
 
     public abstract void init();
 
-    public abstract File getAbsFilePathByName(String fileName);
-
     public abstract boolean getFileFromStorage(String file);
 
     public abstract boolean loadFileToStorage(CloudFile file);
-
-    public abstract void sendDirContentToClient() throws IOException;
-
-    public abstract void sendSharedFileNamesToClient();
-
-    public String getStorageRootDirPath() {
-        return storageRootDirPath;
-    }
 
     public abstract void deleteFileFromStorage(String fileName);
 }
