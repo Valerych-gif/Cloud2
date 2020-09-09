@@ -1,27 +1,21 @@
 package filehandlers;
 
 import commands.Responses;
-import connectionhandlers.IOConnectionHandler;
 import entities.CloudFile;
-import connectionhandlers.ConnectionHandler;
+import entities.User;
+import network.Network;
 import settings.Cloud2ServerSettings;
 
 import java.io.*;
-import java.util.Objects;
+
 
 public class IOFileHandler extends FileHandler {
-    private DataInputStream is;
-    private DataOutputStream os;
-
-    public IOFileHandler(ConnectionHandler connectionHandler) {
-        super(connectionHandler);
-        init();
-    }
-
-    @Override
-    public void init() {
-        this.is = ((IOConnectionHandler) connectionHandler).getDataInputStream();
-        this.os = ((IOConnectionHandler) connectionHandler).getDataOutputStream();
+    public IOFileHandler(User user, Network network) {
+        super();
+        this.network=network;
+        this.storageRootDirPath = user.getUserStorage().getAbsolutePath();
+        this.rootStorageDir = new CloudFile(storageRootDirPath);
+        this.currentStorageDir = rootStorageDir;
     }
 
     public boolean loadFileToStorage(CloudFile clientFile) {
@@ -41,7 +35,7 @@ public class IOFileHandler extends FileHandler {
             if (fileLength > 0) {
                 long numberOfSends = fileLength / bufferSize;
                 for (long i = 0; i <= numberOfSends; i++) {
-                    int bytesRead = is.read(buffer);
+                    int bytesRead = network.readBufferFromClient(buffer);
                     System.out.print("\r" + i + "/" + numberOfSends);
                     fos.write(buffer, 0, bytesRead);
                 }
@@ -49,12 +43,30 @@ public class IOFileHandler extends FileHandler {
             }
             fos.close();
             System.out.println("\nFile uploaded");
-            connectionHandler.sendResponse(Responses.OK.getString());
+            network.sendResponse(Responses.OK.getString());
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
         return true;
+    }
+
+    public void setCurrentStorageDir(String fileName) {
+        String newFileName;
+        CloudFile file;
+        if (fileName.equals(IOFileHandler.PARENT_DIR_MARK)) {
+            file = new CloudFile(currentStorageDir.getParent());
+            if (file.getAbsolutePath().length() <= rootStorageDir.getAbsolutePath().length()) {
+                file = new CloudFile(rootStorageDir.getAbsolutePath());
+            }
+        } else {
+            newFileName = currentStorageDir.getAbsolutePath() + "/" + fileName;
+            file = new CloudFile(newFileName);
+        }
+
+        if (file.exists() && file.isDirectory()) {
+            currentStorageDir = file;
+        }
     }
 
     public void deleteFileFromStorage(String fileName){
@@ -87,22 +99,21 @@ public class IOFileHandler extends FileHandler {
 
     private boolean getFile(CloudFile file) {
         if (file.exists()) {
-            connectionHandler.sendResponse(Responses.OK.getString());
+            network.sendResponse(Responses.OK.getString());
             long fileLength = file.length();
             try {
-                connectionHandler.sendResponse(String.valueOf(file.length()));
+                network.sendResponse(String.valueOf(file.length()));
                 if (fileLength > 0) {
                     FileInputStream fis = new FileInputStream(file);
                     long numberOfSends = fileLength / bufferSize;
                     for (long i = 0; i <= numberOfSends; i++) {
                         int byteRead = fis.read(buffer);
-                        os.write(buffer, 0, byteRead);
-                        os.flush();
+                        network.sendBufferToClient(buffer, byteRead);// TODO callback.execute()
                     }
                     fis.close();
                 }
                 Thread.sleep(50); // todo Костыль. Надо найти другое решение. Без этого в передачу файла попадает ответ сервера
-                connectionHandler.sendResponse(Responses.OK.getString());
+                network.sendResponse(Responses.OK.getString());
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;

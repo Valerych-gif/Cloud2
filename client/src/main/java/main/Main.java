@@ -27,7 +27,7 @@ public class Main extends Application {
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../Cloud2.fxml"));
         Parent root = loader.load();
-        mainController controller = loader.getController();
+        MainController controller = loader.getController();
         DataOutputStream os = controller.getOs();
         primaryStage.setTitle("Cloud2");
         primaryStage.setScene(new Scene(root));

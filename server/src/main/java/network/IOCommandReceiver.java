@@ -7,29 +7,32 @@ import org.apache.logging.log4j.Logger;
 import settings.Cloud2ServerSettings;
 import utils.LogUtils;
 
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.Socket;
 
 public class IOCommandReceiver {
 
-    private DataInputStream is;
+    Network network;
 
     protected Logger logger = LogManager.getLogger(ConnectionHandler.class);
 
-    public IOCommandReceiver(Socket socket) {
-        try {
-            this.is = new DataInputStream(socket.getInputStream());
-        } catch (IOException e) {
-            LogUtils.error(e.toString(), logger);
-        }
+    public IOCommandReceiver(Network network) {
+        this.network = network;
     }
 
-    public byte getSignalByteFromClient() throws IOException {
-        byte signalByte = is.readByte();
+    public byte getSignalByteFromClient(){
+        byte signalByte = network.readByteFromClient();
         LogUtils.info(String.valueOf(signalByte), logger, "<-\t");
         return signalByte;
+    }
+
+
+    public Commands getCommandFromClient() throws IOException {
+        byte signalByte = getSignalByteFromClient();
+        Commands[] commands = Commands.values();
+        for (Commands c : commands) {
+            if (signalByte == c.get()) return c;
+        }
+        return null;
     }
 
     public String getStringFromClient() throws IOException {
@@ -37,7 +40,7 @@ public class IOCommandReceiver {
         char b = 0;
 
         while (true) {
-            b = (char) is.readByte();
+            b = (char) network.readByteFromClient();
             if (b != Cloud2ServerSettings.END_COMMAND_CHAR) {
                 stringFromClient.append(b);
             } else {

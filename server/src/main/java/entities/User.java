@@ -11,15 +11,22 @@ import java.nio.file.Paths;
 
 public class User {
 
+    private int id;
     private String login;
     private String password;
-    private int id;
 
     private File userStorage;
 
     private Logger logger = LogManager.getLogger(User.class);
 
-    public void setUpNewUser() {
+    public User( int id, String login, String password) {
+        this.id = id;
+        this.login = login;
+        this.password = password;
+        setUpUser();
+    }
+
+    public void setUpUser() {
         Path userStoragePath = Paths.get(Cloud2ServerSettings.STORAGE_ROOT_DIR, String.valueOf(id));
         userStorage = userStoragePath.toFile();
         if (!userStorage.exists()) {
@@ -41,5 +48,9 @@ public class User {
 
     public int getId() {
         return id;
+    }
+
+    public File getUserStorage() {
+        return userStorage;
     }
 }

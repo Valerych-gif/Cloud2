@@ -1,7 +1,7 @@
 package authservice;
 
-import connectionhandlers.IOConnectionHandler;
 import entities.User;
+import network.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,9 +13,15 @@ import java.util.Optional;
 
 public class RegistrationService {
 
+    Network network;
+
     private Logger logger = LogManager.getLogger(RegistrationService.class);
 
-//    public void registration() throws IOException {
+    public RegistrationService(Network network) {
+        this.network = network;
+    }
+
+    //    public void registration() throws IOException {
 //        getLoginAndPassFromClient();
 //        if (login!=null) {
 //            try {
@@ -42,7 +48,7 @@ public class RegistrationService {
 //    }
 
     synchronized private boolean isLoginFree(String login) throws IOException {
-        Optional<String[]> lines = Files.lines(AuthService.AUTH_FILE_PATH)
+        Optional<String[]> lines = Files.lines(UsersService.AUTH_FILE_PATH)
                 .map((str) -> str.split(" "))
                 .filter((strings) -> login.equals(strings[1]))
                 .findFirst();
@@ -50,7 +56,7 @@ public class RegistrationService {
     }
 
     synchronized private String getNewUserId() throws IOException {
-        Optional<String[]> lines = Files.lines(AuthService.AUTH_FILE_PATH)
+        Optional<String[]> lines = Files.lines(UsersService.AUTH_FILE_PATH)
                 .map((str) -> str.split(" "))
                 .max(Comparator.comparingInt(str -> Integer.parseInt(str[0])));
         if (lines.isPresent()) {
@@ -63,7 +69,7 @@ public class RegistrationService {
 
     synchronized public void writeNewUserIntoDB(User user) throws Exception {
         String newUserStr = user.getId() + " " + user.getLogin() + " " + user.getPassword() + "\r\n";
-        Files.write(AuthService.AUTH_FILE_PATH, newUserStr.getBytes(), StandardOpenOption.APPEND);
+        Files.write(UsersService.AUTH_FILE_PATH, newUserStr.getBytes(), StandardOpenOption.APPEND);
     }
 
     public User createNewUserByLoginAndPassFromClient() {

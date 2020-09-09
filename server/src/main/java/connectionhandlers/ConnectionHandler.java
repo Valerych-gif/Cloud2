@@ -3,7 +3,10 @@ package connectionhandlers;
 import commands.Commands;
 import commands.Responses;
 import entities.User;
-import authservice.AuthService;
+import authservice.UsersService;
+import filehandlers.IOFileHandler;
+import network.IOCommandReceiver;
+import network.Network;
 import servers.Cloud2Server;
 import filehandlers.FileHandler;
 import org.apache.logging.log4j.LogManager;
@@ -20,7 +23,9 @@ public abstract class ConnectionHandler implements Runnable {
     protected Cloud2Server server;
     protected ConnectionHandler connectionHandler;
     protected FileHandler fileHandler;
-    protected AuthService authService;
+    protected UsersService usersService;
+    protected Network network;
+    protected IOCommandReceiver commandReceiver;
     protected File mainStorage;
     protected boolean isConnectionActive;
     protected User user;
@@ -30,9 +35,8 @@ public abstract class ConnectionHandler implements Runnable {
         LogUtils.info("Connection accepted", logger);
         this.isConnectionActive = true;
         this.server = server;
-        this.authService = AuthService.getInstance();
         this.mainStorage = server.getStorage();
-        this.user=null;
+        this.user = new User(-1, "", "");
     }
 
     @Override
@@ -40,81 +44,82 @@ public abstract class ConnectionHandler implements Runnable {
         while (isConnectionActive) {
             Commands command = null;
             try {
-                LogUtils.info("Ожидаем сигнальный байт от клиента", logger);
                 while (command == null) {
-                    command = getCommandFromClient(); // Block
+                    LogUtils.info("Waiting for signal byte from client", logger);
+                    command = commandReceiver.getCommandFromClient(); // Block
                 }
                 switch (command) {
                     case AUTHORIZATION:
-                        sendResponse(Responses.OK.getString());
-                        this.user = authService.getUserByLoginAndPass();
-                        if (user!=null){
-                            sendResponse(Responses.OK.getString());// TODO move to Network
+                        network.sendResponse(Responses.OK.getString());
+                        this.user = usersService.getUserByLoginAndPass();
+                        if (user.getId() != -1) {
+                            network.sendResponse(Responses.OK.getString());
+                            this.fileHandler = new IOFileHandler(user, network);
                         } else {
-                            sendResponse(Responses.FAIL.getString());// TODO move to Network
+                            network.sendResponse(Responses.FAIL.getString());
                         }
                         break;
-                    case REGISTRATION:
-                        sendResponse(Responses.OK.getString());// TODO move to Network
-                        this.user = authService.getNewUserByLoginAndPass();
-                        if (user!=null){
-                            sendResponse(Responses.OK.getString());// TODO move to Network
-                            user.setUpNewUser();
-                        } else {
-                            sendResponse(Responses.FAIL.getString());// TODO move to Network
-                        }
-                        break;
-                    case UPLOAD:
-                        if (user!=null) {
-                            sendResponse(Responses.OK.getString());
-                            //receiveFileFromClient(); // Block
-                        } else {
-                            sendResponse(Responses.FAIL.getString());
-                        }
-                        break;
-                    case DOWNLOAD:
-                        if (user!=null) {
-                            sendResponse(Responses.OK.getString());
-                            //sendFileToClient();
-                        } else {
-                            sendResponse(Responses.FAIL.getString());
-                        }
-                        break;
-                    case DELETE:
-                        if (user!=null) {
-                            sendResponse(Responses.OK.getString());
-                            deleteFileFromStorage();
-                        } else {
-                            sendResponse(Responses.FAIL.getString());
-                        }
-                        break;
-                    case GET_DIR_CONTENT:
-                        if (user!=null) {
-                            sendResponse(Responses.OK.getString());
-                            sendDirContent();
-                        } else {
-                            sendResponse(Responses.FAIL.getString());
-                        }
-                        break;
-                    case GET_SHARED_DIR_CONTENT:
-                        if (user!=null) {
-                            sendResponse(Responses.OK.getString());
-                            sendSharedFilesToClient();
-                        } else {
-                            sendResponse(Responses.FAIL.getString());
-                        }
-                        break;
-                    case SHARE:
-                        if (user!=null) {
-                            sendResponse(Responses.OK.getString());
-                            authService.shareFile();
-                        } else {
-                            sendResponse(Responses.FAIL.getString());
-                        }
-                        break;
-                    case CLOSE_CONNECTION:
-                        closeConnection();
-                        break;
+//                    case REGISTRATION:
+//                        network.sendResponse(Responses.OK.getString());
+//                        this.user = usersService.getNewUserByLoginAndPass();
+//                        if (user != null) {
+//                            network.sendResponse(Responses.OK.getString());
+//                            user.setUpNewUser();
+//                        } else {
+//                            network.sendResponse(Responses.FAIL.getString());
+//                        }
+//                        break;
+//                    case UPLOAD:
+//                        if (user!=null) {
+//                            network.sendResponse(Responses.OK.getString());
+//                            receiveFileFromClient(); // Block
+//                        } else {
+//                            network.sendResponse(Responses.FAIL.getString());
+//                        }
+//                        break;
+//                    case DOWNLOAD:
+//                        if (user!=null) {
+//                            network.sendResponse(Responses.OK.getString());
+//                            sendFileToClient();
+//                        } else {
+//                            network.sendResponse(Responses.FAIL.getString());
+//                        }
+//                        break;
+//                    case DELETE:
+//                        if (user!=null) {
+//                            network.sendResponse(Responses.OK.getString());
+//                            deleteFileFromStorage();
+//                        } else {
+//                            network.sendResponse(Responses.FAIL.getString());
+//                        }
+//                        break;
+//                    case GET_DIR_CONTENT:
+//                        if (user!=null) {
+//                            network.sendResponse(Responses.OK.getString());
+//                            sendDirContent();
+//                        } else {
+//                            network.sendResponse(Responses.FAIL.getString());
+//                        }
+//                        break;
+//                    case GET_SHARED_DIR_CONTENT:
+//                        if (user!=null) {
+//                            network.sendResponse(Responses.OK.getString());
+//                            sendSharedFilesToClient();
+//                        } else {
+//                            network.sendResponse(Responses.FAIL.getString());
+//                        }
+//                        break;
+//                    case SHARE:
+//                        if (user!=null) {
+//                            network.sendResponse(Responses.OK.getString());
+//                            authService.shareFile();
+//                        } else {
+//                            network.sendResponse(Responses.FAIL.getString());
+//                        }
+//                        break;
+//                    case CLOSE_CONNECTION:
+//                        closeConnection();
+//                        break;
                     default:
                         break;
                 }
@@ -126,16 +131,117 @@ public abstract class ConnectionHandler implements Runnable {
         }
     }
 
-    protected abstract void deleteFileFromStorage() throws IOException;
+//    public void sendFileToClient(){
+//        String fileName = network.getStringFromClient();
+//        fileHandler.getFileFromStorage(fileName);
+//    }
 
-    protected abstract void sendSharedFilesToClient();
 
-    protected abstract void sendDirContent() throws IOException;
+//    public void sendSharedFileNamesToClient() {
+//        try {
+//            File[] files;
+//            files = authService.getSharedFiles(connectionHandler.getUserId());
+//            for (File f : Objects.requireNonNull(files)) {
+//                String fileName = f.getAbsolutePath();
+//                File storageAbsPath = new File(Cloud2ServerSettings.STORAGE_ROOT_DIR);
+//                int storageAbsPathLength = storageAbsPath.getAbsolutePath().length();
+//                String fileNameToSend = fileName.substring(storageAbsPathLength);
+//                System.out.println(fileNameToSend);
+//                sendFileNameToClient(fileNameToSend);
+//            }
+//            sendResponse(Responses.END_OF_DIR_CONTENT.getString());
+//        } catch (IOException e) {
+//            logger.error(e);
+//            e.printStackTrace();
+//        }
+//
+//    }
 
-    protected abstract Commands getCommandFromClient() throws IOException;
+    public void sendDirContent() {
+//        String requestedDirFromClient = network.getStringFromClient();
+//        fileHandler.setCurrentStorageDir(requestedDirFromClient);
+//
+//        if (currentStorageDir.getAbsolutePath().length() > rootStorageDir.getAbsolutePath().length()) {
+//            sendResponse(DIR_PREFIX + PARENT_DIR_MARK);
+//        }
+//        for (File f : Objects.requireNonNull(currentStorageDir.listFiles())) {
+//            String fileName = f.getName();
+//            sendFileNameToClient(fileName);
+//        }
+//        sendResponse(Responses.END_OF_DIR_CONTENT.getString());
+    }
 
-    public abstract void sendResponse(String responseStr);
+    private void sendFileNameToClient(String fileName) {
+        File f = new File(fileName);
+        if (f.isDirectory()) {
+            network.sendResponse(IOFileHandler.DIR_PREFIX + fileName);
+        } else {
+            network.sendResponse(IOFileHandler.FILE_PREFIX + fileName);
+        }
+    }
+//
+//    public void receiveFileFromClient(){
+//        boolean isOk = true;
+//        String fileName = getFileNameFromClient();
+//        if (fileName.length() > 0) {
+//            network.sendResponse(Responses.OK.getString());
+//        } else {
+//            System.out.println("Неправильное имя файла");
+//            isOk = false;
+//        }
+//
+//        long fileLength = getFileLengthFromClient();
+//        if (fileLength >= 0) {
+//            network.sendResponse(Responses.OK.getString());
+//        } else {
+//            System.out.println("Неправильный размер");
+//            isOk = false;
+//        }
+//
+//        if (isOk) {
+//            CloudFile file = new CloudFile(mainStorage + "/" + fileName, fileLength);
+//            fileHandler.loadFileToStorage(file);
+//        }
+//    }
 
-    public abstract void closeConnection();
+//    private long getFileLengthFromClient(){
+//        String fileLengthStr = network.getStringFromClient();
+//        return Long.parseLong(fileLengthStr);
+//    }
+//
+//    private String getFileNameFromClient(){
+//        return network.getStringFromClient();
+//    }
+//
+//    public void deleteFileFromStorage(){
+//        String fileName = network.getStringFromClient();
+//        fileHandler.deleteFileFromStorage(fileName);
+//    }
 
+    public void sendSharedFilesToClient() {
+        network.sendSharedFileNamesToClient();
+    }
+
+    //    public void shareFile(){
+//        String nickName = network.getStringFromClient();
+//        String fileName = network.getStringFromClient();
+//        String fileFullPathName = fileHandler.getAbsFilePathByName(fileName).getAbsolutePath();
+//        String fileNameForShare = fileFullPathName.substring(fileHandler.getStorageRootDirPath().length());
+//        String userIdStr = String.valueOf(userId);
+//        System.out.println(fileNameForShare);
+//        try {
+//            authService.shareFile(nickName, userIdStr, fileNameForShare);
+//        } catch (IOException e) {
+//            logger.error(e);
+//            e.printStackTrace();
+//        }
+//    }
+    public void closeConnection() {
+        isConnectionActive = false;
+        network.closeConnection();
+    }
+
+    public User getUser() {
+        return user;
+    }
 }

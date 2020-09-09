@@ -6,17 +6,17 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import main.mainController;
+import main.MainController;
 
 public class ShareModalWindow extends Application {
 
-    private static mainController controller;
+    private static MainController controller;
 
-    public ShareModalWindow (mainController controller){
+    public ShareModalWindow (MainController controller){
         ShareModalWindow.controller = controller;
     }
 
-    public static mainController getController(){
+    public static MainController getController(){
         return controller;
     }
 

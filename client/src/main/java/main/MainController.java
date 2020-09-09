@@ -15,7 +15,7 @@ import java.net.Socket;
 import java.net.URL;
 import java.util.*;
 
-public class mainController implements Initializable {
+public class MainController implements Initializable {
 
     @FXML
     public ListView<String> localFileListView;
@@ -67,7 +67,7 @@ public class mainController implements Initializable {
     private String login;
     private String pass;
 
-    public mainController() {
+    public MainController() {
         try {
             socket = new Socket(Main.SERVER, Main.PORT);
             is = new DataInputStream(socket.getInputStream());
@@ -220,10 +220,21 @@ public class mainController implements Initializable {
 
     private void confirmAuthorization() {
         String l = null, p = null;
+        int lLength = 0, pLength = 0;
         if (isResponseOk()) {
             l = loginField.getText();
             p = passField.getText();
-            sendString(l + " " + p);
+            lLength = l.length();
+            pLength = p.length();
+            try {
+                os.writeByte(lLength);
+                os.writeBytes(l);
+                os.writeByte(pLength);
+                os.writeBytes(p);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
         if (isResponseOk()) {
             refreshStorageDirContent();
@@ -298,7 +309,7 @@ public class mainController implements Initializable {
     public void sendString(String command) {
         try {
             if (Main.DEBUG_MODE) System.out.println("->\t" + command);
-            os.writeBytes(command + Main.END_COMMAND_CHAR);
+            os.writeBytes(command);
             os.flush();
         } catch (IOException e) {
             e.printStackTrace();

@@ -14,7 +14,7 @@ public class ClientFileHandler {
     public static final String FILE_MARK = "./F";
     public static final String PARENT_DIR_MARK = "..";
 
-    private mainController controller;
+    private MainController controller;
     private InputStream is;
     private OutputStream os;
     private List<CloudFile> clientFileList;
@@ -24,7 +24,7 @@ public class ClientFileHandler {
     private CloudFile currentClientDir;
     private CloudFile rootClientDir;
 
-    public ClientFileHandler(mainController controller) {
+    public ClientFileHandler(MainController controller) {
         this.controller = controller;
         this.is = controller.getIs();
         this.os = controller.getOs();

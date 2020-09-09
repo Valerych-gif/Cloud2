@@ -1,6 +1,7 @@
 package authservice;
 
 import entities.User;
+import network.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import settings.Cloud2ServerSettings;
@@ -10,7 +11,7 @@ import utils.LogUtils;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class AuthService {
+public class UsersService {
 
     public final static Path AUTH_FILE_PATH = Paths.get(
             Cloud2ServerSettings.SERVER_MAIN_FILES_DIR,
@@ -21,26 +22,26 @@ public class AuthService {
     private RegistrationService registrationService;
     private ShareService shareService;
 
-    private static AuthService instance;
+    private static UsersService instance;
 
-    private Logger logger = LogManager.getLogger(AuthService.class);
+    private Logger logger = LogManager.getLogger(UsersService.class);
 
-    private AuthService() {
-        this.authorisationService = new AuthorisationService();
-        this.registrationService = new RegistrationService();
+    private UsersService(Network network) {
+        this.authorisationService = new AuthorisationService(network);
+        this.registrationService = new RegistrationService(network);
         this.shareService = new ShareService();
-        LogUtils.info("Сервис авторизации успешно запущен", logger);
+        LogUtils.info("Authorization service started successfully", logger);
     }
 
-    public static AuthService getInstance() {
+    public static UsersService getInstance(Network network) {
         if (instance == null) {
-            instance = new AuthService();
+            instance = new UsersService(network);
         }
         return instance;
     }
 
     public User getUserByLoginAndPass() {
-        return authorisationService.getUserByLoginAndPassFromClient();
+        return authorisationService.getUserByLoginAndPasswordFromClient();
     }
 
     public User getNewUserByLoginAndPass() {
