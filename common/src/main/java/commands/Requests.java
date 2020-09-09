@@ -1,6 +1,6 @@
 package commands;
 
-public enum Commands {
+public enum Requests {
     UPLOAD ((byte)10),
     DOWNLOAD ((byte)20),
     DELETE ((byte)30),
@@ -13,7 +13,7 @@ public enum Commands {
 
     Byte signalByte;
 
-    Commands(byte signalByte) {
+    Requests(byte signalByte) {
         this.signalByte = signalByte;
     }
 

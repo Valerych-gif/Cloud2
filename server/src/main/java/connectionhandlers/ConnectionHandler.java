@@ -1,6 +1,6 @@
 package connectionhandlers;
 
-import commands.Commands;
+import commands.Requests;
 import commands.Responses;
 import entities.User;
 import authservice.UsersService;
@@ -41,7 +41,7 @@ public abstract class ConnectionHandler implements Runnable {
     @Override
     public void run() {
         while (isConnectionActive) {
-            Commands command = null;
+            Requests command = null;
             try {
                 while (command == null) {
                     LogUtils.info("Waiting for signal byte from client", logger);
@@ -49,13 +49,13 @@ public abstract class ConnectionHandler implements Runnable {
                 }
                 switch (command) {
                     case AUTHORIZATION:
-                        network.sendResponse(Responses.OK.getString());
+                        network.sendResponse(Responses.OK.get());
                         this.user = usersService.getUserByLoginAndPass();
                         if (user.getId() != -1) {
-                            network.sendResponse(Responses.OK.getString());
+                            network.sendResponse(Responses.OK.get());
                             this.fileHandler = new IOFileHandler(user, network);
                         } else {
-                            network.sendResponse(Responses.FAIL.getString());
+                            network.sendResponse(Responses.FAIL.get());
                         }
                         break;
 //                    case REGISTRATION:
@@ -156,7 +156,7 @@ public abstract class ConnectionHandler implements Runnable {
 //
 //    }
 
-    public void sendDirContent() {
+//    public void sendDirContent() {
 //        String requestedDirFromClient = network.getStringFromClient();
 //        fileHandler.setCurrentStorageDir(requestedDirFromClient);
 //
@@ -168,16 +168,16 @@ public abstract class ConnectionHandler implements Runnable {
 //            sendFileNameToClient(fileName);
 //        }
 //        sendResponse(Responses.END_OF_DIR_CONTENT.getString());
-    }
+//    }
 
-    private void sendFileNameToClient(String fileName) {
-        File f = new File(fileName);
-        if (f.isDirectory()) {
-            network.sendResponse(IOFileHandler.DIR_PREFIX + fileName);
-        } else {
-            network.sendResponse(IOFileHandler.FILE_PREFIX + fileName);
-        }
-    }
+//    private void sendFileNameToClient(String fileName) {
+//        File f = new File(fileName);
+//        if (f.isDirectory()) {
+//            network.sendResponse(IOFileHandler.DIR_PREFIX + fileName);
+//        } else {
+//            network.sendResponse(IOFileHandler.FILE_PREFIX + fileName);
+//        }
+//    }
 //
 //    public void receiveFileFromClient(){
 //        boolean isOk = true;
@@ -217,9 +217,9 @@ public abstract class ConnectionHandler implements Runnable {
 //        fileHandler.deleteFileFromStorage(fileName);
 //    }
 
-    public void sendSharedFilesToClient() {
-        network.sendSharedFileNamesToClient();
-    }
+//    public void sendSharedFilesToClient() {
+//        network.sendSharedFileNamesToClient();
+//    }
 
     //    public void shareFile(){
 //        String nickName = network.getStringFromClient();
@@ -240,7 +240,4 @@ public abstract class ConnectionHandler implements Runnable {
         network.closeConnection();
     }
 
-    public User getUser() {
-        return user;
-    }
 }

@@ -1,19 +1,18 @@
 package commands;
 
 public enum Responses {
-    OK ("./ok"),
-    FAIL ("./fail"),
-    END_OF_DIR_CONTENT("./endofdircontent"),
-    NEED_TO_AUTH ("./needtoauth"),
-    LOGIN_ALREADY_IN_USE ("./loginfail");
+    OK ((byte)100),
+    FAIL ((byte)110),
+    END_OF_DIR_CONTENT((byte)120),
+    LOGIN_ALREADY_IN_USE ((byte)130);
 
-    private String responseStr;
+    private byte signalByte;
 
-    Responses(String responseStr) {
-        this.responseStr = responseStr;
+    Responses(byte signalByte) {
+        this.signalByte = signalByte;
     }
 
-    public String getString() {
-        return responseStr;
+    public byte get() {
+        return signalByte;
     }
 }

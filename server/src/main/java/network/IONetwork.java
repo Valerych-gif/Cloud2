@@ -103,17 +103,12 @@ public class IONetwork extends Network {
     }
 
     @Override
-    public void sendResponse(String responseStr) {
+    public void sendResponse(byte response) {
         try {
-            System.out.println("->\t" + responseStr);
-            os.writeBytes(responseStr + Cloud2ServerSettings.END_COMMAND_CHAR);
+            LogUtils.info(String.valueOf(response), logger, "->\t");
+            os.writeByte(response);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e);
+            LogUtils.error("Can't to send response. " + e, logger);
         }
-    }
-
-    public Socket getSocket() {
-        return socket;
     }
 }

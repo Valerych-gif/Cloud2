@@ -1,6 +1,6 @@
 package main;
 
-import commands.Commands;
+import commands.Requests;
 import commands.Responses;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -214,7 +214,7 @@ public class MainController implements Initializable {
     }
 
     public void authorization() {
-        sendCommand(Commands.AUTHORIZATION);
+        sendCommand(Requests.AUTHORIZATION);
         confirmAuthorization();
     }
 
@@ -266,7 +266,7 @@ public class MainController implements Initializable {
     }
 
     public void registration() {
-        sendCommand(Commands.REGISTRATION);
+        sendCommand(Requests.REGISTRATION);
         confirmAuthorization();
     }
 
@@ -296,7 +296,7 @@ public class MainController implements Initializable {
         }
     }
 
-    public void sendCommand(Commands command) {
+    public void sendCommand(Requests command) {
         try {
             if (Main.DEBUG_MODE) System.out.println("->\t" + command);
             os.writeByte(command.get());
@@ -337,7 +337,7 @@ public class MainController implements Initializable {
 
     public void shareFileByNickname(String nickName) {
         if (activePanel.equals(STORAGE_PANEL)) {
-            sendCommand(Commands.SHARE);
+            sendCommand(Requests.SHARE);
             if (isResponseOk()) {
                 sendString(nickName);
                 sendString(activeFile);
@@ -346,8 +346,14 @@ public class MainController implements Initializable {
     }
 
     public boolean isResponseOk() {
-        String response = getStringFromServer();
-        return response.equals(Responses.OK.getString());
+//        String response = getStringFromServer();
+        byte response = 0;
+        try {
+            response = is.readByte();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return response==Responses.OK.get();
     }
 
     public Socket getSocket() {

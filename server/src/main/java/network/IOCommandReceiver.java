@@ -1,10 +1,9 @@
 package network;
 
-import commands.Commands;
+import commands.Requests;
 import connectionhandlers.ConnectionHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import settings.Cloud2ServerSettings;
 import utils.LogUtils;
 
 
@@ -25,10 +24,10 @@ public class IOCommandReceiver {
     }
 
 
-    public Commands getCommandFromClient(){
+    public Requests getCommandFromClient(){
         byte signalByte = getSignalByteFromClient();
-        Commands[] commands = Commands.values();
-        for (Commands c : commands) {
+        Requests[] commands = Requests.values();
+        for (Requests c : commands) {
             if (signalByte == c.get()) return c;
         }
         return null;

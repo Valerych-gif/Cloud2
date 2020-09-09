@@ -1,9 +1,7 @@
 package network;
 
-import java.net.Socket;
-
 public abstract class Network {
-    public abstract void sendResponse(String string);
+    public abstract void sendResponse(byte response);
 
     public abstract void sendDirContentToClient();
 
@@ -19,5 +17,4 @@ public abstract class Network {
 
     public abstract void closeConnection();
 
-    public abstract Socket getSocket();
 }

@@ -17,7 +17,7 @@ public class IOFileHandler extends FileHandler {
         this.rootStorageDir = new CloudFile(storageRootDirPath);
         this.currentStorageDir = rootStorageDir;
     }
-
+//
     public boolean loadFileToStorage(CloudFile clientFile) {
         File cloudFile = getAbsFilePathByName(clientFile.getName());
         if (!cloudFile.exists()) {
@@ -43,32 +43,32 @@ public class IOFileHandler extends FileHandler {
             }
             fos.close();
             System.out.println("\nFile uploaded");
-            network.sendResponse(Responses.OK.getString());
+            network.sendResponse(Responses.OK.get());
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
         return true;
     }
-
-    public void setCurrentStorageDir(String fileName) {
-        String newFileName;
-        CloudFile file;
-        if (fileName.equals(IOFileHandler.PARENT_DIR_MARK)) {
-            file = new CloudFile(currentStorageDir.getParent());
-            if (file.getAbsolutePath().length() <= rootStorageDir.getAbsolutePath().length()) {
-                file = new CloudFile(rootStorageDir.getAbsolutePath());
-            }
-        } else {
-            newFileName = currentStorageDir.getAbsolutePath() + "/" + fileName;
-            file = new CloudFile(newFileName);
-        }
-
-        if (file.exists() && file.isDirectory()) {
-            currentStorageDir = file;
-        }
-    }
-
+//
+//    public void setCurrentStorageDir(String fileName) {
+//        String newFileName;
+//        CloudFile file;
+//        if (fileName.equals(IOFileHandler.PARENT_DIR_MARK)) {
+//            file = new CloudFile(currentStorageDir.getParent());
+//            if (file.getAbsolutePath().length() <= rootStorageDir.getAbsolutePath().length()) {
+//                file = new CloudFile(rootStorageDir.getAbsolutePath());
+//            }
+//        } else {
+//            newFileName = currentStorageDir.getAbsolutePath() + "/" + fileName;
+//            file = new CloudFile(newFileName);
+//        }
+//
+//        if (file.exists() && file.isDirectory()) {
+//            currentStorageDir = file;
+//        }
+//    }
+//
     public void deleteFileFromStorage(String fileName){
         File file = new File(currentStorageDir.getAbsolutePath() + "/" + fileName);
         recursiveDelete(file);
@@ -99,10 +99,10 @@ public class IOFileHandler extends FileHandler {
 
     private boolean getFile(CloudFile file) {
         if (file.exists()) {
-            network.sendResponse(Responses.OK.getString());
+            network.sendResponse(Responses.OK.get());
             long fileLength = file.length();
             try {
-                network.sendResponse(String.valueOf(file.length()));
+//                network.sendResponse(String.valueOf(file.length()));
                 if (fileLength > 0) {
                     FileInputStream fis = new FileInputStream(file);
                     long numberOfSends = fileLength / bufferSize;
@@ -113,7 +113,7 @@ public class IOFileHandler extends FileHandler {
                     fis.close();
                 }
                 Thread.sleep(50); // todo Костыль. Надо найти другое решение. Без этого в передачу файла попадает ответ сервера
-                network.sendResponse(Responses.OK.getString());
+                network.sendResponse(Responses.OK.get());
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
