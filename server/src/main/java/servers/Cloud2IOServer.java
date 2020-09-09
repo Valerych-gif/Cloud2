@@ -1,6 +1,8 @@
 package servers;
 
 import connectionhandlers.IOConnectionHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import settings.Cloud2ServerSettings;
 import utils.LogUtils;
 
@@ -12,32 +14,32 @@ import java.util.concurrent.Executors;
 
 public class Cloud2IOServer extends Cloud2Server{
 
-    private static Cloud2Server instance;
+    protected static Logger logger = LogManager.getLogger(Cloud2IOServer.class);
 
     private static ServerSocket serverSocket;
     private static ExecutorService executor;
 
     public Cloud2IOServer() {
         super();
-        executor = Executors.newCachedThreadPool();
+        executor = Executors.newFixedThreadPool(100);
         try {
             serverSocket = new ServerSocket(Cloud2ServerSettings.PORT);
         } catch (IOException e) {
-            LogUtils.error(e.getMessage(), Cloud2Server.logger);
+            LogUtils.error(e.getMessage(), logger);
         }
     }
 
     public void start() {
-        LogUtils.info("Server started.", Cloud2Server.logger);
+        LogUtils.info("Server started.", logger);
         try {
             while (true) {
-                LogUtils.info("Waiting for connection", Cloud2Server.logger);
+                LogUtils.info("Server ready for new client connection", logger);
                 Socket socket = serverSocket.accept();
                 executor.execute(new IOConnectionHandler(socket));
-                LogUtils.info("Client connected", Cloud2Server.logger);
+                LogUtils.info("Client connected", logger);
             }
         } catch (Exception e) {
-            LogUtils.error(e.getMessage(), Cloud2Server.logger);
+            LogUtils.error(e.getMessage(), logger);
         }
     }
 }

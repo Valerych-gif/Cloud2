@@ -1,6 +1,5 @@
 package servers;
 
-import exceptions.CantToCreateStorageException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import settings.Cloud2ServerSettings;
@@ -8,7 +7,6 @@ import utils.LogUtils;
 import utils.SetUpUtils;
 
 import java.io.File;
-import java.util.List;
 
 public abstract class Cloud2Server {
 

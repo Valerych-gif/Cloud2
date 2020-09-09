@@ -22,39 +22,43 @@ public class AuthorisationService {
 
     private Network network;
 
-    private User user;
-    int loginLength = 0, passwordLength = 0;
-    String login = null, password = null;
-
 
     public AuthorisationService(Network network) {
         this.network = network;
-        this.user = new User (-1, "", ""); // not authorized user
         this.stage = Stage.WAITING_FOR_LOGIN_LENGTH;
     }
 
 
     public User getUserByLoginAndPasswordFromClient() {
+
+        stage = Stage.WAITING_FOR_LOGIN_LENGTH;
+
+        User user = new User(-1, "", "");
+        int loginLength = 0;
+        int passwordLength = 0;
+        String login = null;
+        String password = null;
+
         while (true) {
             switch (stage) {
                 case WAITING_FOR_LOGIN_LENGTH:
                     loginLength = network.readByteFromClient(); // max 127
-                    LogUtils.info("Login length " + loginLength + " was received", logger);
+                    LogUtils.info("Login length '" + loginLength + "' was received", logger);
                     stage = Stage.WAITING_FOR_LOGIN;
                     break;
                 case WAITING_FOR_LOGIN:
                     login = new String(network.readBytesFromClient(loginLength));
-                    LogUtils.info("Login " + login + " was received", logger);
+                    LogUtils.info("Login '" + login + "' was received", logger);
                     stage = Stage.WAITING_FOR_PASSWORD_LENGTH;
                     break;
                 case WAITING_FOR_PASSWORD_LENGTH:
                     passwordLength = network.readByteFromClient(); // max 127
-                    LogUtils.info("Password length " + passwordLength + " was received", logger);
+                    LogUtils.info("Password length '" + passwordLength + "' was received", logger);
                     stage = Stage.WAITING_FOR_PASSWORD;
                     break;
                 case WAITING_FOR_PASSWORD:
                     password = new String(network.readBytesFromClient(passwordLength));
-                    LogUtils.info("Password " + password + " was received", logger);
+                    LogUtils.info("Password '******' was received", logger);
                     stage = Stage.AUTHORIZATION_PROCESS;
                     break;
                 case AUTHORIZATION_PROCESS:
@@ -66,7 +70,7 @@ public class AuthorisationService {
                     }
                     break;
                 case AUTHORIZATION_FAIL:
-                    LogUtils.info("User " + login + " was not authorised", logger);
+                    LogUtils.info("User '" + login + "' was not authorised", logger);
                     stage = Stage.WAITING_FOR_LOGIN_LENGTH;
                     return user;
                 case AUTHORIZATION_SUCCESS:

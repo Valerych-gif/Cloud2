@@ -14,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 import utils.LogUtils;
 
 import java.io.File;
-import java.io.IOException;
 
 public abstract class ConnectionHandler implements Runnable {
 
@@ -117,9 +116,9 @@ public abstract class ConnectionHandler implements Runnable {
 //                            network.sendResponse(Responses.FAIL.getString());
 //                        }
 //                        break;
-//                    case CLOSE_CONNECTION:
-//                        closeConnection();
-//                        break;
+                    case CLOSE_CONNECTION:
+                        closeConnection();
+                        break;
                     default:
                         break;
                 }

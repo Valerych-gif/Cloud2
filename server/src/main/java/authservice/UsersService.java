@@ -26,18 +26,11 @@ public class UsersService {
 
     private Logger logger = LogManager.getLogger(UsersService.class);
 
-    private UsersService(Network network) {
+    public UsersService(Network network) {
         this.authorisationService = new AuthorisationService(network);
         this.registrationService = new RegistrationService(network);
         this.shareService = new ShareService();
         LogUtils.info("Authorization service started successfully", logger);
-    }
-
-    public static UsersService getInstance(Network network) {
-        if (instance == null) {
-            instance = new UsersService(network);
-        }
-        return instance;
     }
 
     public User getUserByLoginAndPass() {

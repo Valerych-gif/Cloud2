@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Logger;
 import settings.Cloud2ServerSettings;
 import utils.LogUtils;
 
-import java.io.IOException;
 
 public class IOCommandReceiver {
 
@@ -26,7 +25,7 @@ public class IOCommandReceiver {
     }
 
 
-    public Commands getCommandFromClient() throws IOException {
+    public Commands getCommandFromClient(){
         byte signalByte = getSignalByteFromClient();
         Commands[] commands = Commands.values();
         for (Commands c : commands) {
@@ -35,18 +34,18 @@ public class IOCommandReceiver {
         return null;
     }
 
-    public String getStringFromClient() throws IOException {
-        StringBuilder stringFromClient = new StringBuilder();
-        char b = 0;
-
-        while (true) {
-            b = (char) network.readByteFromClient();
-            if (b != Cloud2ServerSettings.END_COMMAND_CHAR) {
-                stringFromClient.append(b);
-            } else {
-                System.out.println("<-\t" + stringFromClient.toString());
-                return stringFromClient.toString();
-            }
-        }
-    }
+//    public String getStringFromClient() throws IOException {
+//        StringBuilder stringFromClient = new StringBuilder();
+//        char b = 0;
+//
+//        while (true) {
+//            b = (char) network.readByteFromClient();
+//            if (b != Cloud2ServerSettings.END_COMMAND_CHAR) {
+//                stringFromClient.append(b);
+//            } else {
+//                System.out.println("<-\t" + stringFromClient.toString());
+//                return stringFromClient.toString();
+//            }
+//        }
+//    }
 }

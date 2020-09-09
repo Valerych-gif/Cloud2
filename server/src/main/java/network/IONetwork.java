@@ -26,25 +26,6 @@ public class IONetwork extends Network {
         }
     }
 
-//    public String getStringFromClient() {
-//        StringBuilder stringFromClient = new StringBuilder();
-//        char b = 0;
-//
-//        while (true) {
-//            try {
-//                b = (char) is.readByte();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            if (b != Cloud2ServerSettings.END_COMMAND_CHAR) {
-//                stringFromClient.append(b);
-//            } else {
-//                System.out.println("<-\t" + stringFromClient.toString());
-//                return stringFromClient.toString();
-//            }
-//        }
-//    }
-
     @Override
     public void sendDirContentToClient() {
 
@@ -82,7 +63,7 @@ public class IONetwork extends Network {
         try {
             return is.readByte();
         } catch (IOException e) {
-            LogUtils.error("Error of reading byte from client " + e, logger);
+            LogUtils.error("Error of reading byte from client. " + e, logger);
         }
         return 0;
     }
@@ -93,7 +74,7 @@ public class IONetwork extends Network {
         try {
             is.read(buffer);
         } catch (IOException e) {
-            LogUtils.error("Error of reading bytes from client " + e, logger);
+            LogUtils.error("Error of reading bytes from client. " + e, logger);
         }
         return buffer;
     }
@@ -118,7 +99,7 @@ public class IONetwork extends Network {
             e.printStackTrace();
             logger.error(e);
         }
-        logger.info("Client disconnected");
+        LogUtils.info("Client disconnected", logger);
     }
 
     @Override
@@ -130,5 +111,9 @@ public class IONetwork extends Network {
             e.printStackTrace();
             logger.error(e);
         }
+    }
+
+    public Socket getSocket() {
+        return socket;
     }
 }

@@ -237,7 +237,7 @@ public class MainController implements Initializable {
 
         }
         if (isResponseOk()) {
-            refreshStorageDirContent();
+            //refreshStorageDirContent();
             this.login = l;
             this.pass = p;
             enableButtons();
