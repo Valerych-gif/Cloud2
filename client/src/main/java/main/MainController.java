@@ -346,7 +346,6 @@ public class MainController implements Initializable {
     }
 
     public boolean isResponseOk() {
-//        String response = getStringFromServer();
         byte response = 0;
         try {
             response = is.readByte();

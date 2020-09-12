@@ -1,9 +1,9 @@
 package authservice;
 
 import entities.User;
-import network.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import utils.LogUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,66 +13,55 @@ import java.util.Optional;
 
 public class RegistrationService {
 
-    Network network;
-
     private Logger logger = LogManager.getLogger(RegistrationService.class);
 
-    public RegistrationService(Network network) {
-        this.network = network;
+    public RegistrationService() {
     }
 
-    //    public void registration() throws IOException {
-//        getLoginAndPassFromClient();
-//        if (login!=null) {
-//            try {
-//                String userIdStr = authService.registration(login, pass);
-//                this.userId = userIdStr != null ? Integer.parseInt(userIdStr) : -1;
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                logger.error(e);
-//            }
-//        }
-//    }
+    public User getNewUserByLoginAndPassword(String login, String password){
+        if (!isLoginFree(login))
+            return User.UNAUTHORIZED_USER;
 
-//    public String registration(String login, String pass) throws Exception {
-//        String userIdStr = getId(login, pass);
-//        if (userIdStr == null) {
-//            userIdStr = getNewUserId();
-//            if (isLoginFree(login)) {
-//                writeNewUserIntoDB(userIdStr, login, pass);
-//            } else {
-//                return null;
-//            }
-//        }
-//        return userIdStr;
-//    }
+        int userId = getNewUserId();
+        if (userId == -1)
+            return User.UNAUTHORIZED_USER;
 
-    synchronized private boolean isLoginFree(String login) throws IOException {
-        Optional<String[]> lines = Files.lines(UsersService.AUTH_FILE_PATH)
-                .map((str) -> str.split(" "))
-                .filter((strings) -> login.equals(strings[1]))
-                .findFirst();
+        User newUser = new User (userId, login, password);
+        writeNewUserIntoDB(newUser);
+        return newUser;
+    }
+
+    synchronized private boolean isLoginFree(String login) {
+        Optional<String[]> lines = null;
+        try {
+            lines = Files.lines(UsersService.AUTH_FILE_PATH)
+                    .map((str) -> str.split(" "))
+                    .filter((strings) -> login.equals(strings[1]))
+                    .findFirst();
+        } catch (IOException e) {
+            LogUtils.error(e.toString(), logger);
+        }
         return !lines.isPresent();
     }
 
-    synchronized private String getNewUserId() throws IOException {
-        Optional<String[]> lines = Files.lines(UsersService.AUTH_FILE_PATH)
-                .map((str) -> str.split(" "))
-                .max(Comparator.comparingInt(str -> Integer.parseInt(str[0])));
-        if (lines.isPresent()) {
-            int newUserId = Integer.parseInt((lines.get())[0]) + 1;
-            return String.valueOf(newUserId);
-        } else {
-            return "0";
+    synchronized private int getNewUserId(){
+        Optional<String[]> lines = null;
+        try {
+            lines = Files.lines(UsersService.AUTH_FILE_PATH)
+                    .map((str) -> str.split(" "))
+                    .max(Comparator.comparingInt(str -> Integer.parseInt(str[0])));
+        } catch (IOException e) {
+            LogUtils.error(e.toString(), logger);
         }
+        return lines.map(strings -> Integer.parseInt((strings)[0]) + 1).orElse(-1);
     }
 
-    synchronized public void writeNewUserIntoDB(User user) throws Exception {
+    synchronized public void writeNewUserIntoDB(User user){
         String newUserStr = user.getId() + " " + user.getLogin() + " " + user.getPassword() + "\r\n";
-        Files.write(UsersService.AUTH_FILE_PATH, newUserStr.getBytes(), StandardOpenOption.APPEND);
-    }
-
-    public User createNewUserByLoginAndPassFromClient() {
-        return null;
+        try {
+            Files.write(UsersService.AUTH_FILE_PATH, newUserStr.getBytes(), StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            LogUtils.error(e.toString(), logger);
+        }
     }
 }

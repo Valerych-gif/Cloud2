@@ -19,6 +19,8 @@ public class User {
 
     private Logger logger = LogManager.getLogger(User.class);
 
+    public static final User UNAUTHORIZED_USER = new User(-1, "", "");
+
     public User( int id, String login, String password) {
         this.id = id;
         this.login = login;
@@ -31,7 +33,7 @@ public class User {
         userStorage = userStoragePath.toFile();
         if (!userStorage.exists()) {
             if (userStorage.mkdir()) {
-                logger.info("Создана корневая папка пользователя " + login);
+                LogUtils.info("Создана корневая папка пользователя " + login, logger);
             } else {
                 LogUtils.error("Создать корневую папку пользователя не удалось", logger);
             }

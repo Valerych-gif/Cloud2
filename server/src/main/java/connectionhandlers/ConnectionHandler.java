@@ -50,7 +50,7 @@ public abstract class ConnectionHandler implements Runnable {
                 switch (command) {
                     case AUTHORIZATION:
                         network.sendResponse(Responses.OK.get());
-                        this.user = usersService.getUserByLoginAndPass();
+                        this.user = usersService.authUserByLoginAndPassword();
                         if (user.getId() != -1) {
                             network.sendResponse(Responses.OK.get());
                             this.fileHandler = new IOFileHandler(user, network);
@@ -58,16 +58,15 @@ public abstract class ConnectionHandler implements Runnable {
                             network.sendResponse(Responses.FAIL.get());
                         }
                         break;
-//                    case REGISTRATION:
-//                        network.sendResponse(Responses.OK.getString());
-//                        this.user = usersService.getNewUserByLoginAndPass();
-//                        if (user != null) {
-//                            network.sendResponse(Responses.OK.getString());
-//                            user.setUpNewUser();
-//                        } else {
-//                            network.sendResponse(Responses.FAIL.getString());
-//                        }
-//                        break;
+                    case REGISTRATION:
+                        network.sendResponse(Responses.OK.get());
+                        this.user = usersService.registrationUserByLoginAndPassword();
+                        if (user != null) {
+                            network.sendResponse(Responses.OK.get());
+                        } else {
+                            network.sendResponse(Responses.FAIL.get());
+                        }
+                        break;
 //                    case UPLOAD:
 //                        if (user!=null) {
 //                            network.sendResponse(Responses.OK.getString());
