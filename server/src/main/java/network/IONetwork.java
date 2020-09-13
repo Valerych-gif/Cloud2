@@ -7,6 +7,7 @@ import utils.LogUtils;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class IONetwork extends Network {
 
@@ -72,7 +73,9 @@ public class IONetwork extends Network {
     public byte[] readBytesFromClient(int length) {
         byte[] buffer = new byte[length];
         try {
-            is.read(buffer);
+            for (int i = 0; i < length; i++) {
+                buffer[i] = is.readByte();
+            }
         } catch (IOException e) {
             LogUtils.error("Error of reading bytes from client. " + e, logger);
         }
@@ -103,7 +106,16 @@ public class IONetwork extends Network {
     }
 
     @Override
-    public void sendResponse(byte response) {
+    public void sendBytesToClient(byte[] buffer) {
+        try {
+            os.writeBytes(new String(buffer));
+        } catch (IOException e) {
+            LogUtils.error(e.toString(), logger);
+        }
+    }
+
+    @Override
+    public void sendByteToClient(byte response) {
         try {
             LogUtils.info(String.valueOf(response), logger, "->\t");
             os.writeByte(response);

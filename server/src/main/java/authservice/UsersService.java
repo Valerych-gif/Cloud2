@@ -26,7 +26,7 @@ public class UsersService {
         REGISTRATION_FAIL
     }
 
-    private enum Mode{
+    private enum Mode {
         AUTHORIZATION,
         REGISTRATION,
         WAITING
@@ -35,7 +35,7 @@ public class UsersService {
     public final static Path AUTH_FILE_PATH = Paths.get(
             Cloud2ServerSettings.SERVER_MAIN_FILES_DIR,
             Cloud2ServerSettings.AUTH_FILE
-            );
+    );
 
     private AuthorisationService authorisationService;
     private RegistrationService registrationService;
@@ -57,12 +57,12 @@ public class UsersService {
         LogUtils.info("Authorization service started successfully", logger);
     }
 
-    public User authUserByLoginAndPassword(){
+    public User authUserByLoginAndPassword() {
         mode = Mode.AUTHORIZATION;
         return getUserByLoginAndPasswordFromClient();
     }
 
-    public User registrationUserByLoginAndPassword(){
+    public User registrationUserByLoginAndPassword() {
         mode = Mode.REGISTRATION;
         return getUserByLoginAndPasswordFromClient();
     }
@@ -97,7 +97,7 @@ public class UsersService {
                     break;
                 case WAITING_FOR_PASSWORD:
                     password = new String(network.readBytesFromClient(passwordLength));
-                    LogUtils.info("Password '******' was received", logger);
+                    LogUtils.info("Password '" + password + "' was received", logger);
                     if (mode == Mode.AUTHORIZATION)
                         stage = Stage.AUTHORIZATION_PROCESS;
                     if (mode == Mode.REGISTRATION)
@@ -106,7 +106,7 @@ public class UsersService {
 
                 case AUTHORIZATION_PROCESS:
                     user = authorisationService.getUserByLoginAndPassword(login, password);
-                    if (user.getId() != -1) {
+                    if (user != User.UNAUTHORIZED_USER) {
                         stage = Stage.AUTHORIZATION_SUCCESS;
                     } else {
                         stage = Stage.AUTHORIZATION_FAIL;
@@ -125,7 +125,7 @@ public class UsersService {
 
                 case REGISTRATION_PROCESS:
                     user = registrationService.getNewUserByLoginAndPassword(login, password);
-                    if (user.getId() != -1) {
+                    if (user != User.UNAUTHORIZED_USER) {
                         stage = Stage.REGISTRATION_SUCCESS;
                     } else {
                         stage = Stage.REGISTRATION_FAIL;

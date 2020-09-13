@@ -24,9 +24,7 @@ public class AuthorisationService {
             .findFirst();
             if (userStringArray.isPresent()){
                 int id = Integer.parseInt(userStringArray.get()[0]);
-                String l = userStringArray.get()[1];
-                String p = userStringArray.get()[2];
-                return User.UNAUTHORIZED_USER;
+                return new User(id, login, password);
             } else {
                 return User.UNAUTHORIZED_USER;
             }

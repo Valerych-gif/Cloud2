@@ -5,6 +5,7 @@ import commands.Responses;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,8 +16,8 @@ public class ClientFileHandler {
     public static final String PARENT_DIR_MARK = "..";
 
     private MainController controller;
-    private InputStream is;
-    private OutputStream os;
+    private DataInputStream is;
+    private DataOutputStream os;
     private List<CloudFile> clientFileList;
     private List<CloudFile> currentStorageDirFileList;
     private String clientDirPath;
@@ -56,28 +57,82 @@ public class ClientFileHandler {
 
         controller.sendCommand(Requests.GET_DIR_CONTENT);
         if (controller.isResponseOk()) {
-            controller.sendString(currentStorageDirName);
+            try {
+                os.write((byte)currentStorageDirName.length());
+                System.out.println(currentStorageDirName.length() + " was sent");
+                os.write(currentStorageDirName.getBytes(), 0, currentStorageDirName.length());
+                System.out.println(currentStorageDirName + " was sent");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return getFilesFromStorage();
     }
 
     private List<CloudFile> getFilesFromStorage() {
         currentStorageDirFileList.clear();
-        while (true) {
-            String f = controller.getStringFromServer();
-            String fileName = "";
-            CloudFile cloudFile;
-            if (f.equals(Responses.END_OF_DIR_CONTENT.get())) break;
-            if (f.startsWith(DIR_MARK)) {
-                fileName = f.substring(DIR_MARK.length());
-                cloudFile = new CloudFile(fileName, true);
-            } else if (f.startsWith(FILE_MARK)) {
-                fileName = f.substring(FILE_MARK.length());
-                cloudFile = new CloudFile(fileName, false);
-            } else {
-                cloudFile = new CloudFile(fileName);
+//        while (true) {
+//            String f = controller.getStringFromServer();
+//            String fileName = "";
+//            CloudFile cloudFile;
+//            if (f.equals(Responses.END_OF_DIR_CONTENT.getSignalByte())) break;
+//            if (f.startsWith(DIR_MARK)) {
+//                fileName = f.substring(DIR_MARK.length());
+//                cloudFile = new CloudFile(fileName, true);
+//            } else if (f.startsWith(FILE_MARK)) {
+//                fileName = f.substring(FILE_MARK.length());
+//                cloudFile = new CloudFile(fileName, false);
+//            } else {
+//                cloudFile = new CloudFile(fileName);
+//            }
+//            currentStorageDirFileList.add(cloudFile);
+//        }
+        while (true){
+            try {
+
+                byte signalByte = is.readByte();
+
+                System.out.println(signalByte);
+                int fileNameLength;
+                if (signalByte == Responses.END_OF_DIR_CONTENT.getSignalByte())
+                    break;
+                else {
+                    fileNameLength = signalByte;
+                    System.out.println("Signal byte: " + signalByte);
+
+                    byte[] fName = new byte[fileNameLength];
+
+                    for (int i = 0; i < fileNameLength; i++) {
+                        byte b = is.readByte();
+                        fName[i] = b;
+                    }
+
+
+                    System.out.println(Arrays.toString(fName));
+                    String fileName = new String(fName);
+                    System.out.println(fileName);
+
+                    byte fType = is.readByte();
+                    boolean isDirectory = (char) fType == 'D';
+                    System.out.println(isDirectory);
+
+//                    byte fileSizeLength = is.readByte();
+//                    System.out.println(fileSizeLength);
+
+//                    long fileSize = 0;
+//                    for (int i = 0; i < fileSizeLength; i++) {
+//                        byte b = is.readByte();
+//                        System.out.println(b);
+//                        fileSize = fileSize*10 + b;
+//                    }
+
+                    long fileSize = is.readLong();
+                    System.out.println(fileSize);
+                    currentStorageDirFileList.add(new CloudFile(fileName, isDirectory, fileSize));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            currentStorageDirFileList.add(cloudFile);
         }
         return currentStorageDirFileList;
     }

@@ -4,11 +4,10 @@ import commands.Requests;
 import commands.Responses;
 import entities.User;
 import authservice.UsersService;
-import filehandlers.IOFileHandler;
 import network.IOCommandReceiver;
 import network.Network;
 import servers.Cloud2Server;
-import filehandlers.FileHandler;
+import fileserivices.FileService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utils.LogUtils;
@@ -21,7 +20,7 @@ public abstract class ConnectionHandler implements Runnable {
 
     protected Cloud2Server server;
     protected ConnectionHandler connectionHandler;
-    protected FileHandler fileHandler;
+    protected FileService fileService;
     protected UsersService usersService;
     protected Network network;
     protected IOCommandReceiver commandReceiver;
@@ -35,7 +34,7 @@ public abstract class ConnectionHandler implements Runnable {
         this.isConnectionActive = true;
         this.server = server;
         this.mainStorage = server.getStorage();
-        this.user = new User(-1, "", "");
+        this.user = User.UNAUTHORIZED_USER;
     }
 
     @Override
@@ -49,32 +48,37 @@ public abstract class ConnectionHandler implements Runnable {
                 }
                 switch (command) {
                     case AUTHORIZATION:
-                        network.sendResponse(Responses.OK.get());
+                        network.sendByteToClient(Responses.OK.getSignalByte());
                         this.user = usersService.authUserByLoginAndPassword();
-                        if (user.getId() != -1) {
-                            network.sendResponse(Responses.OK.get());
-                            this.fileHandler = new IOFileHandler(user, network);
+                        if (user != User.UNAUTHORIZED_USER) {
+                            network.sendByteToClient(Responses.OK.getSignalByte());
+                            this.fileService = new FileService(user, network);
                         } else {
-                            network.sendResponse(Responses.FAIL.get());
+                            network.sendByteToClient(Responses.FAIL.getSignalByte());
                         }
                         break;
                     case REGISTRATION:
-                        network.sendResponse(Responses.OK.get());
+                        network.sendByteToClient(Responses.OK.getSignalByte());
                         this.user = usersService.registrationUserByLoginAndPassword();
-                        if (user != null) {
-                            network.sendResponse(Responses.OK.get());
+                        if (user != User.UNAUTHORIZED_USER) {
+                            network.sendByteToClient(Responses.OK.getSignalByte());
+                            this.fileService = new FileService(user, network);
                         } else {
-                            network.sendResponse(Responses.FAIL.get());
+                            network.sendByteToClient(Responses.FAIL.getSignalByte());
                         }
                         break;
-//                    case UPLOAD:
-//                        if (user!=null) {
-//                            network.sendResponse(Responses.OK.getString());
-//                            receiveFileFromClient(); // Block
-//                        } else {
-//                            network.sendResponse(Responses.FAIL.getString());
-//                        }
-//                        break;
+                    case UPLOAD:
+                        if (user != User.UNAUTHORIZED_USER) {
+                            network.sendByteToClient(Responses.OK.getSignalByte());
+                            if (fileService.receiveFileFromClient()){ // Block
+                                network.sendByteToClient(Responses.OK.getSignalByte());
+                            } else {
+                                network.sendByteToClient(Responses.FAIL.getSignalByte());
+                            }
+                        } else {
+                            network.sendByteToClient(Responses.FAIL.getSignalByte());
+                        }
+                        break;
 //                    case DOWNLOAD:
 //                        if (user!=null) {
 //                            network.sendResponse(Responses.OK.getString());
@@ -91,14 +95,14 @@ public abstract class ConnectionHandler implements Runnable {
 //                            network.sendResponse(Responses.FAIL.getString());
 //                        }
 //                        break;
-//                    case GET_DIR_CONTENT:
-//                        if (user!=null) {
-//                            network.sendResponse(Responses.OK.getString());
-//                            sendDirContent();
-//                        } else {
-//                            network.sendResponse(Responses.FAIL.getString());
-//                        }
-//                        break;
+                    case GET_DIR_CONTENT:
+                        if (user != User.UNAUTHORIZED_USER) {
+                            network.sendByteToClient(Responses.OK.getSignalByte());
+                            fileService.sendDirContent();
+                        } else {
+                            network.sendByteToClient(Responses.FAIL.getSignalByte());
+                        }
+                        break;
 //                    case GET_SHARED_DIR_CONTENT:
 //                        if (user!=null) {
 //                            network.sendResponse(Responses.OK.getString());
@@ -238,5 +242,4 @@ public abstract class ConnectionHandler implements Runnable {
         isConnectionActive = false;
         network.closeConnection();
     }
-
 }

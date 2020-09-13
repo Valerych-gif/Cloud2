@@ -12,7 +12,7 @@ public enum Responses {
         this.signalByte = signalByte;
     }
 
-    public byte get() {
+    public byte getSignalByte() {
         return signalByte;
     }
 }

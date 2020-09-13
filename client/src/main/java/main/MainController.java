@@ -237,7 +237,7 @@ public class MainController implements Initializable {
 
         }
         if (isResponseOk()) {
-            //refreshStorageDirContent();
+            refreshStorageDirContent();
             this.login = l;
             this.pass = p;
             enableButtons();
@@ -352,7 +352,7 @@ public class MainController implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return response==Responses.OK.get();
+        return response==Responses.OK.getSignalByte();
     }
 
     public Socket getSocket() {

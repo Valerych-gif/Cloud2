@@ -1,7 +1,7 @@
 package network;
 
 public abstract class Network {
-    public abstract void sendResponse(byte response);
+    public abstract void sendByteToClient(byte response);
 
     public abstract void sendDirContentToClient();
 
@@ -17,4 +17,5 @@ public abstract class Network {
 
     public abstract void closeConnection();
 
+    public abstract void sendBytesToClient(byte[] buffer);
 }

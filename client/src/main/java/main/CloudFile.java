@@ -30,4 +30,7 @@ public class CloudFile extends File{
         return isDirectory;
     }
 
+    public long getLength() {
+        return length;
+    }
 }
