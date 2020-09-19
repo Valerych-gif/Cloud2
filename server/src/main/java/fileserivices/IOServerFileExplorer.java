@@ -61,4 +61,8 @@ public class IOServerFileExplorer extends ServerFileExplorer {
         }
         return filesInfo;
     }
+
+    public File getCurrentDirectory() {
+        return currentDirectory;
+    }
 }

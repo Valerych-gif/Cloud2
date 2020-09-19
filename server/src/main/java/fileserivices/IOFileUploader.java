@@ -7,11 +7,20 @@ import utils.LogUtils;
 import java.io.*;
 
 
-public class IOFileUploaderService implements FileUploaderService {
+public class IOFileUploader implements FileUploader {
 
-    private Logger logger = LogManager.getLogger(IOFileUploaderService.class);
+    private FileOutputStream fos;
+    private File file;
 
-    public IOFileUploaderService() {
+    private Logger logger = LogManager.getLogger(IOFileUploader.class);
+
+    public IOFileUploader(File file) {
+        this.file = file;
+        try {
+            this.fos = new FileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            LogUtils.error(e.toString(), logger);
+        }
     }
 //
 //    public boolean loadFileToStorage(CloudFile clientFile) {
@@ -47,15 +56,25 @@ public class IOFileUploaderService implements FileUploaderService {
 //        return true;
 //    }
 
-    public boolean writeBufferToFile(byte[] buffer, File file){
+
+
+    public boolean writeBufferToFile(byte[] buffer){
         try {
-            FileOutputStream fos = new FileOutputStream(file);
             fos.write(buffer, 0, buffer.length);
         } catch (Exception e) {
             LogUtils.error(e.toString(), logger);
         }
         return false;
     }
+
+    public void closeFile(){
+        try {
+            fos.close();
+        } catch (IOException e) {
+            LogUtils.error(e.toString(), logger);
+        }
+    }
+
 //
 //    public void setCurrentStorageDir(String fileName) {
 //        String newFileName;

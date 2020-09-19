@@ -1,6 +1,7 @@
 package commands;
 
 public enum Requests {
+    CONNECTION_LOST((byte)0),
     UPLOAD ((byte)10),
     DOWNLOAD ((byte)20),
     DELETE ((byte)30),

@@ -47,6 +47,9 @@ public abstract class ConnectionHandler implements Runnable {
                     command = commandReceiver.getCommandFromClient(); // Block
                 }
                 switch (command) {
+                    case CONNECTION_LOST:
+                        closeConnection();
+                        break;
                     case AUTHORIZATION:
                         network.sendByteToClient(Responses.OK.getSignalByte());
                         this.user = usersService.authUserByLoginAndPassword();

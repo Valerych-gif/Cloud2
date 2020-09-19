@@ -11,8 +11,6 @@ import java.util.Objects;
 
 public class ClientFileHandler {
 
-    public static final String DIR_MARK = "./D";
-    public static final String FILE_MARK = "./F";
     public static final String PARENT_DIR_MARK = "..";
 
     private MainController controller;
@@ -71,22 +69,6 @@ public class ClientFileHandler {
 
     private List<CloudFile> getFilesFromStorage() {
         currentStorageDirFileList.clear();
-//        while (true) {
-//            String f = controller.getStringFromServer();
-//            String fileName = "";
-//            CloudFile cloudFile;
-//            if (f.equals(Responses.END_OF_DIR_CONTENT.getSignalByte())) break;
-//            if (f.startsWith(DIR_MARK)) {
-//                fileName = f.substring(DIR_MARK.length());
-//                cloudFile = new CloudFile(fileName, true);
-//            } else if (f.startsWith(FILE_MARK)) {
-//                fileName = f.substring(FILE_MARK.length());
-//                cloudFile = new CloudFile(fileName, false);
-//            } else {
-//                cloudFile = new CloudFile(fileName);
-//            }
-//            currentStorageDirFileList.add(cloudFile);
-//        }
         while (true){
             try {
 
@@ -107,24 +89,12 @@ public class ClientFileHandler {
                         fName[i] = b;
                     }
 
-
-                    System.out.println(Arrays.toString(fName));
                     String fileName = new String(fName);
                     System.out.println(fileName);
 
                     byte fType = is.readByte();
                     boolean isDirectory = (char) fType == 'D';
                     System.out.println(isDirectory);
-
-//                    byte fileSizeLength = is.readByte();
-//                    System.out.println(fileSizeLength);
-
-//                    long fileSize = 0;
-//                    for (int i = 0; i < fileSizeLength; i++) {
-//                        byte b = is.readByte();
-//                        System.out.println(b);
-//                        fileSize = fileSize*10 + b;
-//                    }
 
                     long fileSize = is.readLong();
                     System.out.println(fileSize);
@@ -238,20 +208,20 @@ public class ClientFileHandler {
             try {
                 controller.sendCommand(Requests.UPLOAD);
                 if (controller.isResponseOk()) {
-                    controller.sendString(fileName);
-                } else {
-                    return;
-                }
-                if (controller.isResponseOk()) {
+                    os.writeByte(currentFile.getName().length());
+                    System.out.println("-> " + currentFile.getName().length());
+                    os.writeBytes(fileName);
+                    System.out.println("-> " + currentFile.getName());
                     long fileLength = currentFile.length();
-                    String fileLengthStr = String.valueOf(fileLength);
-                    controller.sendString(fileLengthStr);
+                    os.writeLong(fileLength);
+                    System.out.println("-> " + fileLength);
+
                 } else {
                     return;
                 }
-                if (controller.isResponseOk()) {
+//                if (controller.isResponseOk()) {
                     sendFile(currentFile);
-                }
+//                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

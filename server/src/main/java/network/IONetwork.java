@@ -65,8 +65,8 @@ public class IONetwork extends Network {
             return is.readByte();
         } catch (IOException e) {
             LogUtils.error("Error of reading byte from client. " + e, logger);
+            return 0;
         }
-        return 0;
     }
 
     @Override
