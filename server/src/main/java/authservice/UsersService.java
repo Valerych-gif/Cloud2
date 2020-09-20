@@ -1,7 +1,7 @@
 package authservice;
 
 import entities.User;
-import network.Network;
+import network.interfaces.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import settings.Cloud2ServerSettings;

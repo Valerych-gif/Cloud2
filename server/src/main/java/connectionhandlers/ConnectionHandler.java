@@ -4,10 +4,12 @@ import commands.Requests;
 import commands.Responses;
 import entities.User;
 import authservice.UsersService;
-import network.IOCommandReceiver;
-import network.Network;
+import fileserivices.interfaces.FileService;
+import fileserivices.interfaces.FileServiceFactory;
+import network.IONetwork.IOCommandReceiver;
+import network.interfaces.Network;
+import network.interfaces.NetworkFactory;
 import servers.Cloud2Server;
-import fileserivices.FileService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utils.LogUtils;
@@ -20,6 +22,8 @@ public abstract class ConnectionHandler implements Runnable {
 
     protected Cloud2Server server;
     protected ConnectionHandler connectionHandler;
+    protected FileServiceFactory fileServiceFactory;
+    protected NetworkFactory networkFactory;
     protected FileService fileService;
     protected UsersService usersService;
     protected Network network;
@@ -39,6 +43,9 @@ public abstract class ConnectionHandler implements Runnable {
 
     @Override
     public void run() {
+        this.commandReceiver = new IOCommandReceiver(network);
+        this.usersService = new UsersService(network);
+
         while (isConnectionActive) {
             Requests command = null;
             try {
@@ -55,7 +62,7 @@ public abstract class ConnectionHandler implements Runnable {
                         this.user = usersService.authUserByLoginAndPassword();
                         if (user != User.UNAUTHORIZED_USER) {
                             network.sendByteToClient(Responses.OK.getSignalByte());
-                            this.fileService = new FileService(user, network);
+                            this.fileService = fileServiceFactory.createFileService(user, network);
                         } else {
                             network.sendByteToClient(Responses.FAIL.getSignalByte());
                         }
@@ -65,7 +72,7 @@ public abstract class ConnectionHandler implements Runnable {
                         this.user = usersService.registrationUserByLoginAndPassword();
                         if (user != User.UNAUTHORIZED_USER) {
                             network.sendByteToClient(Responses.OK.getSignalByte());
-                            this.fileService = new FileService(user, network);
+                            this.fileService = fileServiceFactory.createFileService(user, network);
                         } else {
                             network.sendByteToClient(Responses.FAIL.getSignalByte());
                         }

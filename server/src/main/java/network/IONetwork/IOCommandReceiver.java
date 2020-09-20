@@ -1,7 +1,8 @@
-package network;
+package network.IONetwork;
 
 import commands.Requests;
 import connectionhandlers.ConnectionHandler;
+import network.interfaces.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utils.LogUtils;

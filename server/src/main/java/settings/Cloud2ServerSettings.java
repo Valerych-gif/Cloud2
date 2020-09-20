@@ -10,7 +10,9 @@ public class Cloud2ServerSettings {
     public final static String SHARED_FILE = "sharedfiles.db";
 
     public final static int BUFFER_SIZE = 1024;
-    public final static char END_COMMAND_CHAR = '|';
+
+    public final static String PARENT_DIR_MARK = "..";
+    public final static String ROOT_DIR_MARK = ".";
 
     public final static boolean DEBUG_MODE_ENABLED = true;
 }

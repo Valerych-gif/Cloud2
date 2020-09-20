@@ -1,6 +1,8 @@
-package fileserivices;
+package fileserivices.IOFileservices;
 
-import network.Network;
+import fileserivices.interfaces.FileUploaderService;
+import fileserivices.interfaces.ServerFileExplorer;
+import network.interfaces.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import settings.Cloud2ServerSettings;

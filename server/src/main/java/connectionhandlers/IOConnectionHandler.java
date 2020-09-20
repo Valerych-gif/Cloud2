@@ -2,8 +2,11 @@ package connectionhandlers;
 
 import authservice.UsersService;
 
-import network.IOCommandReceiver;
-import network.IONetwork;
+import fileserivices.IOFileservices.IOFileServiceFactory;
+import network.IONetwork.IOCommandReceiver;
+import network.IONetwork.IONetwork;
+import network.IONetwork.IONetworkFactory;
+import network.interfaces.NetworkFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,9 +18,9 @@ public class IOConnectionHandler extends ConnectionHandler {
 
     public IOConnectionHandler(Socket socket){
         super();
-        this.network = new IONetwork(socket);
-        this.commandReceiver = new IOCommandReceiver(network);
-        this.usersService = new UsersService(network);
+        this.fileServiceFactory = new IOFileServiceFactory();
+        this.networkFactory = new IONetworkFactory();
+        this.network = networkFactory.createNetwork(socket);
         this.connectionHandler = this;
     }
 

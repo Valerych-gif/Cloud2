@@ -1,15 +1,15 @@
-package network;
+package network.IONetwork;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import settings.Cloud2ServerSettings;
 import utils.LogUtils;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Arrays;
 
-public class IONetwork extends Network {
+import network.interfaces.Network;
+
+public class IONetwork implements Network {
 
     private DataInputStream is;
     private DataOutputStream os;

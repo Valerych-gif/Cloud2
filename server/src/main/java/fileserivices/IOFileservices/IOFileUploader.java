@@ -1,5 +1,6 @@
-package fileserivices;
+package fileserivices.IOFileservices;
 
+import fileserivices.interfaces.FileUploader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utils.LogUtils;

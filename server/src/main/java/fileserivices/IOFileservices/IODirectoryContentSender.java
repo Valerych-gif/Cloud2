@@ -1,8 +1,10 @@
-package fileserivices;
+package fileserivices.IOFileservices;
 
 import commands.Responses;
 import entities.FileInfo;
-import network.Network;
+import fileserivices.interfaces.DirectoryContentSender;
+import fileserivices.interfaces.ServerFileExplorer;
+import network.interfaces.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import utils.LogUtils;
@@ -10,7 +12,7 @@ import utils.LogUtils;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-public class IODirectoryContentSender implements DirectoryContentSender{
+public class IODirectoryContentSender implements DirectoryContentSender {
 
     private enum Stage {
         WAITING_FOR_DIR_NAME_LENGTH,
