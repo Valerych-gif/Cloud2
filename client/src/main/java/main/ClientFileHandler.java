@@ -154,13 +154,17 @@ public class ClientFileHandler {
             FileOutputStream fos = new FileOutputStream(downloadedFile);
             if (downloadedFileSize > 0) {
                 long numberOfSends = downloadedFileSize / bufferSize;
+                int tailSize = (int) (downloadedFileSize - (numberOfSends * bufferSize));
                 System.out.println(numberOfSends);
-                for (long i = 0; i <= numberOfSends; i++) {
+                for (long i = 0; i < numberOfSends; i++) {
                     int bytesRead = is.read(buffer);
                     System.out.println(new String(buffer));
                     fos.write(buffer, 0, bytesRead);
                     fos.flush();
                 }
+                int bytesRead = is.read(buffer, 0, tailSize);
+                fos.write(buffer, 0, bytesRead);
+                fos.flush();
             }
             fos.close();
         } catch (Exception e) {
