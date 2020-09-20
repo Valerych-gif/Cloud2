@@ -80,7 +80,7 @@ public abstract class ConnectionHandler implements Runnable {
                     case UPLOAD:
                         if (user != User.UNAUTHORIZED_USER) {
                             network.sendByteToClient(Responses.OK.getSignalByte());
-                            if (fileService.receiveFileFromClient()){ // Block
+                            if (fileService.receiveFileFromClient()) { // Block
                                 network.sendByteToClient(Responses.OK.getSignalByte());
                             } else {
                                 network.sendByteToClient(Responses.FAIL.getSignalByte());
@@ -89,14 +89,18 @@ public abstract class ConnectionHandler implements Runnable {
                             network.sendByteToClient(Responses.FAIL.getSignalByte());
                         }
                         break;
-//                    case DOWNLOAD:
-//                        if (user!=null) {
-//                            network.sendResponse(Responses.OK.getString());
-//                            sendFileToClient();
-//                        } else {
-//                            network.sendResponse(Responses.FAIL.getString());
-//                        }
-//                        break;
+                    case DOWNLOAD:
+                        if (user != User.UNAUTHORIZED_USER) {
+                            network.sendByteToClient(Responses.OK.getSignalByte());
+                            if (fileService.sendFileToClient()) { // Block
+                                network.sendByteToClient(Responses.OK.getSignalByte());
+                            } else {
+                                network.sendByteToClient(Responses.FAIL.getSignalByte());
+                            }
+                        } else {
+                            network.sendByteToClient(Responses.FAIL.getSignalByte());
+                        }
+                        break;
 //                    case DELETE:
 //                        if (user!=null) {
 //                            network.sendResponse(Responses.OK.getString());

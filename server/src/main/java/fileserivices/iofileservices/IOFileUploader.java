@@ -1,4 +1,4 @@
-package fileserivices.IOFileservices;
+package fileserivices.iofileservices;
 
 import fileserivices.interfaces.FileUploader;
 import org.apache.logging.log4j.LogManager;
@@ -11,12 +11,10 @@ import java.io.*;
 public class IOFileUploader implements FileUploader {
 
     private FileOutputStream fos;
-    private File file;
 
     private Logger logger = LogManager.getLogger(IOFileUploader.class);
 
     public IOFileUploader(File file) {
-        this.file = file;
         try {
             this.fos = new FileOutputStream(file);
         } catch (FileNotFoundException e) {

@@ -1,4 +1,4 @@
-package fileserivices.IOFileservices;
+package fileserivices.iofileservices;
 
 import entities.User;
 import fileserivices.interfaces.FileService;

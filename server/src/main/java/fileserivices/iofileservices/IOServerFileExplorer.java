@@ -1,4 +1,4 @@
-package fileserivices.IOFileservices;
+package fileserivices.iofileservices;
 
 import entities.FileInfo;
 import entities.User;
@@ -58,13 +58,19 @@ public class IOServerFileExplorer implements ServerFileExplorer {
         }
         File[] files = currentDirectory.listFiles();
         for (File file : Objects.requireNonNull(files)) {
-            FileInfo.Type type = file.isDirectory() ? FileInfo.Type.DIRECTORY : FileInfo.Type.FILE;
-            filesInfo.add(new FileInfo(file.getName(), file.length(), type));
+            filesInfo.add(getFileInfo(file.getName()));
         }
         return filesInfo;
     }
 
     public File getCurrentDirectory() {
         return currentDirectory;
+    }
+
+    @Override
+    public FileInfo getFileInfo(String fileName) {
+        File file = new File(currentDirectory.getPath() + "/" + fileName);
+        FileInfo.Type type = file.isDirectory() ? FileInfo.Type.DIRECTORY : FileInfo.Type.FILE;
+        return new FileInfo(file.getName(), file.length(), type);
     }
 }

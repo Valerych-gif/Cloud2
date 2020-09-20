@@ -11,4 +11,6 @@ public interface ServerFileExplorer {
     List<FileInfo> getCurrentDirectoryContent();
 
     File getCurrentDirectory();
+
+    FileInfo getFileInfo(String fileName);
 }

@@ -33,4 +33,12 @@ public class CloudFile extends File{
     public long getLength() {
         return length;
     }
+
+    @Override
+    public String toString() {
+        return "CloudFile{" +
+                "isDirectory=" + isDirectory +
+                ", length=" + length +
+                '}';
+    }
 }

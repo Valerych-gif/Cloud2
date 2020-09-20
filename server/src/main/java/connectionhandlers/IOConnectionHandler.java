@@ -1,12 +1,7 @@
 package connectionhandlers;
 
-import authservice.UsersService;
-
-import fileserivices.IOFileservices.IOFileServiceFactory;
-import network.IONetwork.IOCommandReceiver;
-import network.IONetwork.IONetwork;
+import fileserivices.iofileservices.IOFileServiceFactory;
 import network.IONetwork.IONetworkFactory;
-import network.interfaces.NetworkFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

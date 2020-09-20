@@ -1,4 +1,4 @@
-package fileserivices.IOFileservices;
+package fileserivices.iofileservices;
 
 import commands.Responses;
 import entities.FileInfo;

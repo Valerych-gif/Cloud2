@@ -3,11 +3,7 @@ package network.interfaces;
 public interface Network {
     void sendByteToClient(byte response);
 
-    void sendDirContentToClient();
-
-    void sendSharedFileNamesToClient();
-
-    void sendBufferToClient(byte[] buffer, int byteRead);
+    void sendBufferToClient(byte[] buffer);
 
     int readBufferFromClient(byte[] buffer);
 
@@ -18,4 +14,6 @@ public interface Network {
     void closeConnection();
 
     void sendBytesToClient(byte[] buffer);
+
+    long getLongFromClient();
 }

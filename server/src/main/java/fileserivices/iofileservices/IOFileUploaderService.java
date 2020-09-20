@@ -1,4 +1,4 @@
-package fileserivices.IOFileservices;
+package fileserivices.iofileservices;
 
 import fileserivices.interfaces.FileUploaderService;
 import fileserivices.interfaces.ServerFileExplorer;
@@ -9,7 +9,6 @@ import settings.Cloud2ServerSettings;
 import utils.LogUtils;
 
 import java.io.File;
-import java.nio.ByteBuffer;
 
 public class IOFileUploaderService implements FileUploaderService {
 
@@ -53,11 +52,7 @@ public class IOFileUploaderService implements FileUploaderService {
                     stage = Stage.WAITING_FOR_FILE_SIZE;
                     break;
                 case WAITING_FOR_FILE_SIZE:
-                    ByteBuffer byteBuffer = ByteBuffer
-                            .allocate(Long.BYTES)
-                            .put(network.readBytesFromClient(8));
-                    byteBuffer.flip();
-                    fileSize = byteBuffer.getLong();
+                    fileSize = network.getLongFromClient();
                     LogUtils.info("File size '" + fileSize + "' was received", logger);
                     stage = Stage.FILE_RECEIVE_PROCESS;
                     break;
@@ -79,14 +74,12 @@ public class IOFileUploaderService implements FileUploaderService {
 
                     buffer = network.readBytesFromClient(tailSize);
                     fileUploader.writeBufferToFile(buffer);
-                    System.out.print(new String(buffer));
                     fileUploader.closeFile();
                     stage = Stage.WAITING_FOR_FILE_NAME_LENGTH;
                     return true;
                 default:
                     throw new IllegalStateException("Unexpected value: " + stage);
             }
-
         }
     }
 }

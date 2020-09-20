@@ -56,7 +56,7 @@ public class ClientFileHandler {
         controller.sendCommand(Requests.GET_DIR_CONTENT);
         if (controller.isResponseOk()) {
             try {
-                os.write((byte)currentStorageDirName.length());
+                os.write((byte) currentStorageDirName.length());
                 System.out.println(currentStorageDirName.length() + " was sent");
                 os.write(currentStorageDirName.getBytes(), 0, currentStorageDirName.length());
                 System.out.println(currentStorageDirName + " was sent");
@@ -69,7 +69,7 @@ public class ClientFileHandler {
 
     private List<CloudFile> getFilesFromStorage() {
         currentStorageDirFileList.clear();
-        while (true){
+        while (true) {
             try {
 
                 byte signalByte = is.readByte();
@@ -116,24 +116,35 @@ public class ClientFileHandler {
     }
 
     public void downLoadFile(String downloadedFileName) {
-        String downloadedFileFullName = currentClientDir + "/" + downloadedFileName;
-        try {
-            controller.sendCommand(Requests.DOWNLOAD);
-            if (controller.isResponseOk()) {
-                controller.sendString(downloadedFileName);
-                if (controller.isResponseOk()) {
-                    String fileLengthStr = controller.getStringFromServer();
-                    long downloadedFileSize = Long.parseLong(fileLengthStr);
-                    putFileIntoUserDir(downloadedFileFullName, downloadedFileSize);
-                }
+        String downloadedFileFullName = currentClientDir.getAbsolutePath() + "/" + downloadedFileName;
+        System.out.println(downloadedFileFullName);
+        long fileSize = 0;
+        controller.sendCommand(Requests.DOWNLOAD);
+        if (controller.isResponseOk()) {
+            try {
+                int fileNameLength = downloadedFileName.length();
+                os.write(fileNameLength);
+                byte[] fileNameBytes = downloadedFileName.getBytes();
+                os.write(fileNameBytes);
+
+                byte fType = is.readByte();
+                boolean isDirectory = (char) fType == 'D';
+
+                fileSize = is.readLong();
+
+                CloudFile file = new CloudFile(new String(fileNameBytes), isDirectory, fileSize);
+                System.out.println(file);
+                putFileIntoUserDir(downloadedFileFullName, fileSize);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+
     }
 
     private void putFileIntoUserDir(String downloadedFileFullName, long downloadedFileSize) throws IOException {
         File downloadedFile = new File(downloadedFileFullName);
+
         if (!downloadedFile.exists()) {
             downloadedFile.createNewFile();
         }
@@ -143,8 +154,10 @@ public class ClientFileHandler {
             FileOutputStream fos = new FileOutputStream(downloadedFile);
             if (downloadedFileSize > 0) {
                 long numberOfSends = downloadedFileSize / bufferSize;
+                System.out.println(numberOfSends);
                 for (long i = 0; i <= numberOfSends; i++) {
                     int bytesRead = is.read(buffer);
+                    System.out.println(new String(buffer));
                     fos.write(buffer, 0, bytesRead);
                     fos.flush();
                 }
@@ -215,13 +228,10 @@ public class ClientFileHandler {
                     long fileLength = currentFile.length();
                     os.writeLong(fileLength);
                     System.out.println("-> " + fileLength);
-
                 } else {
                     return;
                 }
-//                if (controller.isResponseOk()) {
-                    sendFile(currentFile);
-//                }
+                sendFile(currentFile);
             } catch (Exception e) {
                 e.printStackTrace();
             }

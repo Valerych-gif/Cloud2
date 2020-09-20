@@ -28,24 +28,13 @@ public class IONetwork implements Network {
     }
 
     @Override
-    public void sendDirContentToClient() {
-
-    }
-
-    @Override
-    public void sendSharedFileNamesToClient() {
-
-    }
-
-    @Override
-    public void sendBufferToClient(byte[] buffer, int numberOfBytes) {
+    public void sendBufferToClient(byte[] buffer) {
         try {
-            os.write(buffer, 0, numberOfBytes);
+            os.write(buffer, 0, buffer.length);
             os.flush();
         } catch (IOException e) {
             LogUtils.error(e.toString(), logger);
         }
-
     }
 
     @Override
@@ -122,5 +111,14 @@ public class IONetwork implements Network {
         } catch (Exception e) {
             LogUtils.error("Can't to send response. " + e, logger);
         }
+    }
+
+    public long getLongFromClient(){
+        try {
+            return is.readLong();
+        } catch (IOException e) {
+            LogUtils.error("Error of long from client. " + e, logger);
+        }
+        return 0L;
     }
 }
