@@ -6,7 +6,7 @@ import entities.User;
 import authservice.UsersService;
 import fileserivices.interfaces.FileService;
 import fileserivices.interfaces.FileServiceFactory;
-import network.IONetwork.IOCommandReceiver;
+import network.ionetwork.IOCommandReceiver;
 import network.interfaces.Network;
 import network.interfaces.NetworkFactory;
 import servers.Cloud2Server;
@@ -147,10 +147,6 @@ public abstract class ConnectionHandler implements Runnable {
         }
     }
 
-//    public void sendFileToClient(){
-//        String fileName = network.getStringFromClient();
-//        fileHandler.getFileFromStorage(fileName);
-//    }
 
 
 //    public void sendSharedFileNamesToClient() {
@@ -173,62 +169,6 @@ public abstract class ConnectionHandler implements Runnable {
 //
 //    }
 
-//    public void sendDirContent() {
-//        String requestedDirFromClient = network.getStringFromClient();
-//        fileHandler.setCurrentStorageDir(requestedDirFromClient);
-//
-//        if (currentStorageDir.getAbsolutePath().length() > rootStorageDir.getAbsolutePath().length()) {
-//            sendResponse(DIR_PREFIX + PARENT_DIR_MARK);
-//        }
-//        for (File f : Objects.requireNonNull(currentStorageDir.listFiles())) {
-//            String fileName = f.getName();
-//            sendFileNameToClient(fileName);
-//        }
-//        sendResponse(Responses.END_OF_DIR_CONTENT.getString());
-//    }
-
-//    private void sendFileNameToClient(String fileName) {
-//        File f = new File(fileName);
-//        if (f.isDirectory()) {
-//            network.sendResponse(IOFileHandler.DIR_PREFIX + fileName);
-//        } else {
-//            network.sendResponse(IOFileHandler.FILE_PREFIX + fileName);
-//        }
-//    }
-//
-//    public void receiveFileFromClient(){
-//        boolean isOk = true;
-//        String fileName = getFileNameFromClient();
-//        if (fileName.length() > 0) {
-//            network.sendResponse(Responses.OK.getString());
-//        } else {
-//            System.out.println("Неправильное имя файла");
-//            isOk = false;
-//        }
-//
-//        long fileLength = getFileLengthFromClient();
-//        if (fileLength >= 0) {
-//            network.sendResponse(Responses.OK.getString());
-//        } else {
-//            System.out.println("Неправильный размер");
-//            isOk = false;
-//        }
-//
-//        if (isOk) {
-//            CloudFile file = new CloudFile(mainStorage + "/" + fileName, fileLength);
-//            fileHandler.loadFileToStorage(file);
-//        }
-//    }
-
-//    private long getFileLengthFromClient(){
-//        String fileLengthStr = network.getStringFromClient();
-//        return Long.parseLong(fileLengthStr);
-//    }
-//
-//    private String getFileNameFromClient(){
-//        return network.getStringFromClient();
-//    }
-//
 //    public void deleteFileFromStorage(){
 //        String fileName = network.getStringFromClient();
 //        fileHandler.deleteFileFromStorage(fileName);

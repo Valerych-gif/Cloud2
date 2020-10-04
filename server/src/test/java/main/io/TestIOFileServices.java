@@ -1,0 +1,67 @@
+package main.io;
+
+import commands.Responses;
+import entities.User;
+import fileserivices.interfaces.DirectoryContentSender;
+import fileserivices.interfaces.ServerFileExplorer;
+import fileserivices.iofileservices.IODirectoryContentSender;
+import fileserivices.iofileservices.IOServerFileExplorer;
+import mocks.Client;
+import network.interfaces.Network;
+import network.interfaces.NetworkFactory;
+import network.ionetwork.IONetworkFactory;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import settings.Cloud2ServerSettings;
+
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.file.Paths;
+
+public class TestIOFileServices {
+
+    private static Network network;
+    private static ServerFileExplorer serverFileExplorer;
+    private static Client client;
+    private static DirectoryContentSender directoryContentSender;
+
+    @BeforeAll
+    public static void directorySenderInit(){
+        try {
+            ServerSocket serverSocket = new ServerSocket(Cloud2ServerSettings.PORT);
+            new Thread(()->{
+                client = new Client();
+            }).start();
+            Socket socket = serverSocket.accept();
+            NetworkFactory networkFactory = new IONetworkFactory();
+            network = networkFactory.createNetwork(socket);
+            User user = new User(0, "test", "test");
+            user.setUpUser(Paths.get("../storage/0"));
+            serverFileExplorer = new IOServerFileExplorer(user);
+            directoryContentSender = new IODirectoryContentSender(network, serverFileExplorer);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void sendDirectoryContent(){
+        client.sendBytesToServer(new byte[]{0});
+        client.sendBytesToServer("".getBytes());
+        directoryContentSender.sendDirectoryContent();
+        StringBuilder stringBuilder = new StringBuilder();
+        while (true) {
+            byte fileNameLength = client.getBytesFromServer(1)[0];
+            if (fileNameLength == Responses.END_OF_DIR_CONTENT.getSignalByte())
+                break;
+            String fileName = new String(client.getBytesFromServer(fileNameLength));
+            byte fileType = client.getBytesFromServer(1)[0]; // Сливаем вникуда
+            byte fileSize = client.getBytesFromServer(8)[0]; // Сливаем вникуда
+            stringBuilder.append(fileName);
+        }
+        String string = stringBuilder.toString();
+        Assertions.assertTrue(string.contains("innerDirectory"));
+        Assertions.assertTrue(string.contains("TestFile1"));
+    }
+}

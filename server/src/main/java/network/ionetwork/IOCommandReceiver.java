@@ -1,4 +1,4 @@
-package network.IONetwork;
+package network.ionetwork;
 
 import commands.Requests;
 import connectionhandlers.ConnectionHandler;
@@ -33,19 +33,5 @@ public class IOCommandReceiver {
         }
         return null;
     }
-
-//    public String getStringFromClient() throws IOException {
-//        StringBuilder stringFromClient = new StringBuilder();
-//        char b = 0;
-//
-//        while (true) {
-//            b = (char) network.readByteFromClient();
-//            if (b != Cloud2ServerSettings.END_COMMAND_CHAR) {
-//                stringFromClient.append(b);
-//            } else {
-//                System.out.println("<-\t" + stringFromClient.toString());
-//                return stringFromClient.toString();
-//            }
-//        }
-//    }
+    
 }

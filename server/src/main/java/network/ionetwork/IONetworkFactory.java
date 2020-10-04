@@ -1,4 +1,4 @@
-package network.IONetwork;
+package network.ionetwork;
 
 import network.interfaces.Network;
 import network.interfaces.NetworkFactory;

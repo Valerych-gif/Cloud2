@@ -1,4 +1,4 @@
-package network.IONetwork;
+package network.ionetwork;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -72,6 +72,34 @@ public class IONetwork implements Network {
     }
 
     @Override
+    public void sendBytesToClient(byte[] buffer) {
+        try {
+            os.writeBytes(new String(buffer));
+        } catch (IOException e) {
+            LogUtils.error(e.toString(), logger);
+        }
+    }
+
+    @Override
+    public void sendByteToClient(byte response) {
+        try {
+            os.writeByte(response);
+        } catch (Exception e) {
+            LogUtils.error("Can't to send response. " + e, logger);
+        }
+    }
+
+
+    public long getLongFromClient(){
+        try {
+            return is.readLong();
+        } catch (IOException e) {
+            LogUtils.error("Error of long from client. " + e, logger);
+            return 0L;
+        }
+    }
+
+    @Override
     public void closeConnection() {
         try {
             is.close();
@@ -92,33 +120,5 @@ public class IONetwork implements Network {
             logger.error(e);
         }
         LogUtils.info("Client disconnected", logger);
-    }
-
-    @Override
-    public void sendBytesToClient(byte[] buffer) {
-        try {
-            os.writeBytes(new String(buffer));
-        } catch (IOException e) {
-            LogUtils.error(e.toString(), logger);
-        }
-    }
-
-    @Override
-    public void sendByteToClient(byte response) {
-        try {
-            LogUtils.info(String.valueOf(response), logger, "->\t");
-            os.writeByte(response);
-        } catch (Exception e) {
-            LogUtils.error("Can't to send response. " + e, logger);
-        }
-    }
-
-    public long getLongFromClient(){
-        try {
-            return is.readLong();
-        } catch (IOException e) {
-            LogUtils.error("Error of long from client. " + e, logger);
-        }
-        return 0L;
     }
 }

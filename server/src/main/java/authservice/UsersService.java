@@ -107,6 +107,7 @@ public class UsersService {
                 case AUTHORIZATION_PROCESS:
                     user = authorisationService.getUserByLoginAndPassword(login, password);
                     if (user != User.UNAUTHORIZED_USER) {
+                        user.setUpUser();
                         stage = Stage.AUTHORIZATION_SUCCESS;
                     } else {
                         stage = Stage.AUTHORIZATION_FAIL;
@@ -126,6 +127,7 @@ public class UsersService {
                 case REGISTRATION_PROCESS:
                     user = registrationService.getNewUserByLoginAndPassword(login, password);
                     if (user != User.UNAUTHORIZED_USER) {
+                        user.setUpUser();
                         stage = Stage.REGISTRATION_SUCCESS;
                     } else {
                         stage = Stage.REGISTRATION_FAIL;

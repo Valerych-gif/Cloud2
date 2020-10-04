@@ -21,15 +21,19 @@ public class User {
 
     public static final User UNAUTHORIZED_USER = new User(-1, "", "");
 
-    public User( int id, String login, String password) {
+    public User(int id, String login, String password) {
         this.id = id;
         this.login = login;
         this.password = password;
-        setUpUser();
     }
 
     public void setUpUser() {
         Path userStoragePath = Paths.get(Cloud2ServerSettings.STORAGE_ROOT_DIR, String.valueOf(id));
+        setUpUser(userStoragePath);
+    }
+
+    public void setUpUser(Path userStoragePath){
+        System.out.println(userStoragePath.toFile().getAbsolutePath());
         userStorage = userStoragePath.toFile();
         if (!userStorage.exists()) {
             if (userStorage.mkdir()) {

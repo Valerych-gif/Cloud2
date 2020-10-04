@@ -55,7 +55,6 @@ public class IOFileDownloader implements FileDownloader {
         byte[] buffer = new byte[length];
         try {
             fis.read(buffer, 0, length);
-            System.out.println(new String(buffer));
             return buffer;
         } catch (IOException e) {
             LogUtils.error(e.toString(), logger);

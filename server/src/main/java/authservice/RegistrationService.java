@@ -32,7 +32,7 @@ public class RegistrationService {
     }
 
     synchronized private boolean isLoginFree(String login) {
-        Optional<String[]> lines = null;
+        Optional<String[]> lines = Optional.empty();
         try {
             lines = Files.lines(UsersService.AUTH_FILE_PATH)
                     .map((str) -> str.split(" "))
@@ -45,7 +45,7 @@ public class RegistrationService {
     }
 
     synchronized private int getNewUserId(){
-        Optional<String[]> lines = null;
+        Optional<String[]> lines = Optional.empty();
         try {
             lines = Files.lines(UsersService.AUTH_FILE_PATH)
                     .map((str) -> str.split(" "))
