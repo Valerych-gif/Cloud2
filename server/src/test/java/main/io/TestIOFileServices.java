@@ -10,11 +10,13 @@ import mocks.Client;
 import network.interfaces.Network;
 import network.interfaces.NetworkFactory;
 import network.ionetwork.IONetworkFactory;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import settings.Cloud2ServerSettings;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
@@ -25,11 +27,12 @@ public class TestIOFileServices {
     private static ServerFileExplorer serverFileExplorer;
     private static Client client;
     private static DirectoryContentSender directoryContentSender;
+    private static ServerSocket serverSocket;
 
     @BeforeAll
-    public static void directorySenderInit(){
+    public static void ioServicesInit(){
         try {
-            ServerSocket serverSocket = new ServerSocket(Cloud2ServerSettings.PORT);
+            serverSocket = new ServerSocket(Cloud2ServerSettings.PORT);
             new Thread(()->{
                 client = new Client();
             }).start();
@@ -45,8 +48,24 @@ public class TestIOFileServices {
         }
     }
 
+    @AfterAll
+    public static void clearResources(){
+        try {
+            serverSocket.close();
+            network.closeConnection();
+            client.closeconnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Test
     public void sendDirectoryContent(){
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         client.sendBytesToServer(new byte[]{0});
         client.sendBytesToServer("".getBytes());
         directoryContentSender.sendDirectoryContent();

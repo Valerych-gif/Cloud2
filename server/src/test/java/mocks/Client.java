@@ -25,9 +25,10 @@ public class Client {
     public byte[] getBytesFromServer(int length){
         try {
             byte[] bytes = new byte[length];
+            Thread.sleep(100);
             is.read(bytes);
             return bytes;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -57,5 +58,15 @@ public class Client {
             e.printStackTrace();
         }
         return l;
+    }
+
+    public void closeconnection() {
+        try {
+            is.close();
+            os.close();
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
