@@ -48,4 +48,14 @@ public class Client {
             e.printStackTrace();
         }
     }
+
+    public Long getLong() {
+        long l = 0;
+        try {
+            l = is.readLong();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return l;
+    }
 }

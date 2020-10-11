@@ -56,8 +56,8 @@ public class TestIOFileServices {
             if (fileNameLength == Responses.END_OF_DIR_CONTENT.getSignalByte())
                 break;
             String fileName = new String(client.getBytesFromServer(fileNameLength));
-            byte fileType = client.getBytesFromServer(1)[0]; // Сливаем вникуда
-            byte fileSize = client.getBytesFromServer(8)[0]; // Сливаем вникуда
+            byte fileType = client.getBytesFromServer(1)[0]; // Сливаем вникуд
+            Long fileSize = client.getLong(); // Сливаем вникуда
             stringBuilder.append(fileName);
         }
         String string = stringBuilder.toString();
