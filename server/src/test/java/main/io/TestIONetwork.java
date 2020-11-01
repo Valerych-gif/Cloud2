@@ -43,7 +43,7 @@ public class TestIONetwork {
         try {
             serverSocket.close();
             network.closeConnection();
-            client.closeconnection();
+            client.closeConnection();
         } catch (IOException e) {
             e.printStackTrace();
         }

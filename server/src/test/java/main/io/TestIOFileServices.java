@@ -24,7 +24,6 @@ import java.nio.file.Paths;
 public class TestIOFileServices {
 
     private static Network network;
-    private static ServerFileExplorer serverFileExplorer;
     private static Client client;
     private static DirectoryContentSender directoryContentSender;
     private static ServerSocket serverSocket;
@@ -41,7 +40,7 @@ public class TestIOFileServices {
             network = networkFactory.createNetwork(socket);
             User user = new User(0, "test", "test");
             user.setUpUser(Paths.get("../storage/0"));
-            serverFileExplorer = new IOServerFileExplorer(user);
+            ServerFileExplorer serverFileExplorer = new IOServerFileExplorer(user);
             directoryContentSender = new IODirectoryContentSender(network, serverFileExplorer);
         } catch (Exception e) {
             e.printStackTrace();
@@ -53,7 +52,7 @@ public class TestIOFileServices {
         try {
             serverSocket.close();
             network.closeConnection();
-            client.closeconnection();
+            client.closeConnection();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -61,11 +60,7 @@ public class TestIOFileServices {
 
     @Test
     public void sendDirectoryContent(){
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
         client.sendBytesToServer(new byte[]{0});
         client.sendBytesToServer("".getBytes());
         directoryContentSender.sendDirectoryContent();

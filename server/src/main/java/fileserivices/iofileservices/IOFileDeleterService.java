@@ -13,6 +13,8 @@ import java.io.FileNotFoundException;
 
 public class IOFileDeleterService implements FileDeleterService {
 
+    private static final String FILE_SEPARATOR = System.getProperty("file.separator");
+
     private enum Stage {
         WAITING_FOR_FILE_NAME_LENGTH,
         WAITING_FOR_FILE_NAME,
@@ -47,7 +49,7 @@ public class IOFileDeleterService implements FileDeleterService {
                     stage = Stage.FILE_DELETE_PROCESS;
                     break;
                 case FILE_DELETE_PROCESS:
-                    String fileToDeletePathStr = serverFileExplorer.getCurrentDirectory().getPath() + "/" + fileName;
+                    String fileToDeletePathStr = serverFileExplorer.getCurrentDirectory().getPath() + FILE_SEPARATOR + fileName;
                     File fileToDelete = new File(fileToDeletePathStr);
                     FileDeleter fileDeleter = new IOFileDeleter();
                     if (fileToDelete.exists()){

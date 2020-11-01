@@ -60,7 +60,7 @@ public class Client {
         return l;
     }
 
-    public void closeconnection() {
+    public void closeConnection() {
         try {
             is.close();
             os.close();

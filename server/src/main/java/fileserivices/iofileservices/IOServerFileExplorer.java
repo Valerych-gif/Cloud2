@@ -15,10 +15,12 @@ import java.util.Objects;
 
 public class IOServerFileExplorer implements ServerFileExplorer {
 
-    private File currentDirectory;
-    private File userRootDirectory;
+    public static final String FILE_SEPARATOR = System.getProperty("file.separator");
 
-    private Logger logger = LogManager.getLogger(IOServerFileExplorer.class);
+    private File currentDirectory;
+    private final File userRootDirectory;
+
+    private final Logger logger = LogManager.getLogger(IOServerFileExplorer.class);
 
     public IOServerFileExplorer(User user) {
         userRootDirectory = user.getUserStorage();
@@ -28,9 +30,12 @@ public class IOServerFileExplorer implements ServerFileExplorer {
     @Override
     public boolean goToDirectory(String dirPath) {
         LogUtils.info("Trying to change current directory to '" + dirPath + "'", logger);
-        String directoryPath = dirPath.equals("") ? "" : "/" + dirPath;
+        String directoryPath = dirPath.equals("") ? "" : FILE_SEPARATOR + dirPath;
         File directory = new File(currentDirectory.getPath() + directoryPath);
-        boolean isDirectory = dirPath.equals(Cloud2ServerSettings.ROOT_DIR_MARK)||dirPath.equals(Cloud2ServerSettings.PARENT_DIR_MARK)|| directory.isDirectory();
+        boolean isDirectory = dirPath
+                .equals(Cloud2ServerSettings.ROOT_DIR_MARK)||
+                dirPath.equals(Cloud2ServerSettings.PARENT_DIR_MARK)||
+                directory.isDirectory();
         if (!isDirectory) return false;
         switch (dirPath) {
             case Cloud2ServerSettings.PARENT_DIR_MARK:
@@ -69,7 +74,7 @@ public class IOServerFileExplorer implements ServerFileExplorer {
 
     @Override
     public FileInfo getFileInfo(String fileName) {
-        File file = new File(currentDirectory.getPath() + "/" + fileName);
+        File file = new File(currentDirectory.getPath() + FILE_SEPARATOR + fileName);
         FileInfo.Type type = file.isDirectory() ? FileInfo.Type.DIRECTORY : FileInfo.Type.FILE;
         return new FileInfo(file.getName(), file.length(), type);
     }
