@@ -69,7 +69,6 @@ public class IOFileUploaderService implements FileUploaderService {
                     for (int i = 0; i < numberOfParcels; i++) {
                         network.readBufferFromClient(buffer);
                         fileUploader.writeBufferToFile(buffer);
-                        System.out.print(new String(buffer));
                     }
 
                     buffer = network.readBytesFromClient(tailSize);

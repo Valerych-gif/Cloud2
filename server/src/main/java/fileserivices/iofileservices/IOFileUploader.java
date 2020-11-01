@@ -12,7 +12,7 @@ public class IOFileUploader implements FileUploader {
 
     private FileOutputStream fos;
 
-    private Logger logger = LogManager.getLogger(IOFileUploader.class);
+    private final Logger logger = LogManager.getLogger(IOFileUploader.class);
 
     public IOFileUploader(File file) {
         try {

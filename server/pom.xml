@@ -11,12 +11,7 @@
 
     <artifactId>server</artifactId>
     <dependencies>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.6.2</version>
-            <scope>compile</scope>
-        </dependency>
+
         <dependency>
             <groupId>com.geekbrains</groupId>
             <artifactId>common</artifactId>
@@ -24,6 +19,5 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
-
 
 </project>
