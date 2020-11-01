@@ -14,7 +14,7 @@ public class IOFileDownloader implements FileDownloader {
 
     private FileInputStream fis;
 
-    private Logger logger = LogManager.getLogger(IOFileUploader.class);
+    private final Logger logger = LogManager.getLogger(IOFileUploader.class);
 
     public IOFileDownloader(File file) {
         try {
@@ -25,22 +25,15 @@ public class IOFileDownloader implements FileDownloader {
     }
 
     @Override
-    public boolean readBufferFromFile(byte[] buffer) {
+    public void readBufferFromFile(byte[] buffer) {
         try {
-            fis.read(buffer);
+            int read = fis.read(buffer);
+            if (read==-1){
+                throw new RuntimeException();
+            }
         } catch (IOException e) {
             LogUtils.error(e.toString(), logger);
         }
-        return false;
-    }
-
-    public boolean isFileEnded() {
-        try {
-            return fis.available() <= 0;
-        } catch (IOException e) {
-            LogUtils.error(e.toString(), logger);
-        }
-        return false;
     }
 
     public void closeFile() {
@@ -54,8 +47,11 @@ public class IOFileDownloader implements FileDownloader {
     public byte[] readBytesFromFile(int length) {
         byte[] buffer = new byte[length];
         try {
-            fis.read(buffer, 0, length);
-            return buffer;
+            if (!(fis.read(buffer, 0, length)==-1)){
+                return buffer;
+            } else {
+                throw new RuntimeException();
+            }
         } catch (IOException e) {
             LogUtils.error(e.toString(), logger);
         }

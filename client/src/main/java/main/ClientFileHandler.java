@@ -175,7 +175,13 @@ public class ClientFileHandler {
     public void deleteStorageFile(String fileName) {
         controller.sendCommand(Requests.DELETE);
         if (controller.isResponseOk()) {
-            controller.sendString(fileName);
+            try {
+                byte fileNameSize = (byte) fileName.length();
+                os.write(fileNameSize);
+                os.write(fileName.getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

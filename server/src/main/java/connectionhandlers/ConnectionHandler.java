@@ -18,7 +18,7 @@ import java.io.File;
 
 public abstract class ConnectionHandler implements Runnable {
 
-    private Logger logger = LogManager.getLogger(ConnectionHandler.class);
+    private final Logger logger = LogManager.getLogger(ConnectionHandler.class);
 
     protected Cloud2Server server;
     protected ConnectionHandler connectionHandler;
@@ -80,11 +80,8 @@ public abstract class ConnectionHandler implements Runnable {
                     case UPLOAD:
                         if (user != User.UNAUTHORIZED_USER) {
                             network.sendByteToClient(Responses.OK.getSignalByte());
-                            if (fileService.receiveFileFromClient()) { // Block
-                                network.sendByteToClient(Responses.OK.getSignalByte());
-                            } else {
-                                network.sendByteToClient(Responses.FAIL.getSignalByte());
-                            }
+                            fileService.receiveFileFromClient();
+                            network.sendByteToClient(Responses.OK.getSignalByte());
                         } else {
                             network.sendByteToClient(Responses.FAIL.getSignalByte());
                         }
@@ -92,23 +89,20 @@ public abstract class ConnectionHandler implements Runnable {
                     case DOWNLOAD:
                         if (user != User.UNAUTHORIZED_USER) {
                             network.sendByteToClient(Responses.OK.getSignalByte());
-                            if (fileService.sendFileToClient()) { // Block
-                                network.sendByteToClient(Responses.OK.getSignalByte());
-                            } else {
-                                network.sendByteToClient(Responses.FAIL.getSignalByte());
-                            }
+                            fileService.sendFileToClient();  // Block
+                            network.sendByteToClient(Responses.OK.getSignalByte());
                         } else {
                             network.sendByteToClient(Responses.FAIL.getSignalByte());
                         }
                         break;
-//                    case DELETE:
-//                        if (user!=null) {
-//                            network.sendResponse(Responses.OK.getString());
-//                            deleteFileFromStorage();
-//                        } else {
-//                            network.sendResponse(Responses.FAIL.getString());
-//                        }
-//                        break;
+                    case DELETE:
+                        if (user != User.UNAUTHORIZED_USER) {
+                            network.sendByteToClient(Responses.OK.getSignalByte());
+                            fileService.deleteFileFromServer();
+                        } else {
+                            network.sendByteToClient(Responses.FAIL.getSignalByte());
+                        }
+                        break;
                     case GET_DIR_CONTENT:
                         if (user != User.UNAUTHORIZED_USER) {
                             network.sendByteToClient(Responses.OK.getSignalByte());
@@ -146,7 +140,6 @@ public abstract class ConnectionHandler implements Runnable {
             }
         }
     }
-
 
 
 //    public void sendSharedFileNamesToClient() {

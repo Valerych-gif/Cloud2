@@ -1,7 +1,6 @@
 package fileserivices.iofileservices;
 
 import entities.FileInfo;
-import fileserivices.interfaces.FileDownloader;
 import fileserivices.interfaces.FileDownloaderService;
 import fileserivices.interfaces.ServerFileExplorer;
 import network.interfaces.Network;
@@ -11,9 +10,6 @@ import settings.Cloud2ServerSettings;
 import utils.LogUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class IOFileDownloaderService implements FileDownloaderService {
@@ -25,12 +21,10 @@ public class IOFileDownloaderService implements FileDownloaderService {
         FILE_SEND_PROCESS
     }
 
-    private Stage stage;
+    private final Network network;
+    private final ServerFileExplorer serverFileExplorer;
 
-    private Network network;
-    private ServerFileExplorer serverFileExplorer;
-
-    private Logger logger = LogManager.getLogger(IOFileDownloaderService.class);
+    private final Logger logger = LogManager.getLogger(IOFileDownloaderService.class);
 
     public IOFileDownloaderService(Network network, ServerFileExplorer serverFileExplorer) {
         this.network = network;
@@ -38,11 +32,11 @@ public class IOFileDownloaderService implements FileDownloaderService {
     }
 
     @Override
-    public boolean sendFileToClient() {
+    public void sendFileToClient() {
         int fileNameLength = 0;
         String fileName = "";
         FileInfo fileInfo = null;
-        stage = Stage.WAITING_FOR_FILE_NAME_LENGTH;
+        Stage stage = Stage.WAITING_FOR_FILE_NAME_LENGTH;
         while (true) {
             switch (stage) {
                 case WAITING_FOR_FILE_NAME_LENGTH:
@@ -84,8 +78,7 @@ public class IOFileDownloaderService implements FileDownloaderService {
                     buffer = fileDownloader.readBytesFromFile(tailSize);
                     network.sendBufferToClient(buffer);
                     fileDownloader.closeFile();
-                    stage = Stage.WAITING_FOR_FILE_NAME_LENGTH;
-                    return true;
+                    return;
                 default:
                     throw new IllegalStateException("Unexpected value: " + stage);
             }

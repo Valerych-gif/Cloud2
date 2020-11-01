@@ -1,8 +1,10 @@
 package fileserivices.interfaces;
 
-public interface FileService {
-    boolean receiveFileFromClient();
-    boolean sendDirContent();
+import java.io.FileNotFoundException;
 
-    boolean sendFileToClient();
+public interface FileService {
+    void receiveFileFromClient();
+    void sendDirContent();
+    void sendFileToClient();
+    void deleteFileFromServer() throws FileNotFoundException;
 }

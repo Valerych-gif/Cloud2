@@ -7,28 +7,40 @@ import fileserivices.interfaces.FileService;
 import fileserivices.interfaces.FileUploaderService;
 import network.interfaces.Network;
 
+import java.io.FileNotFoundException;
+
 public class IOFileService implements FileService {
 
-    private FileUploaderService fileUploaderService;
-    private FileDownloaderService fileDownloaderService;
-    private DirectoryContentSender directoryContentSender;
+    private final FileUploaderService fileUploaderService;
+    private final FileDownloaderService fileDownloaderService;
+    private final IOFileDeleterService fileDeleterService;
+    private final DirectoryContentSender directoryContentSender;
 
     public IOFileService(User user, Network network) {
         IOServerFileExplorer serverFileExplorer = new IOServerFileExplorer(user);
         this.fileUploaderService = new IOFileUploaderService(network, serverFileExplorer);
         this.fileDownloaderService = new IOFileDownloaderService(network, serverFileExplorer);
+        this.fileDeleterService = new IOFileDeleterService(network, serverFileExplorer);
         this.directoryContentSender = new IODirectoryContentSender(network, serverFileExplorer);
     }
 
-    public boolean sendDirContent() {
-        return directoryContentSender.sendDirectoryContent();
+    @Override
+    public void sendDirContent() {
+        directoryContentSender.sendDirectoryContent();
     }
 
-    public boolean receiveFileFromClient() {
-        return fileUploaderService.receiveFileFromClient();
+    @Override
+    public void receiveFileFromClient() {
+        fileUploaderService.receiveFileFromClient();
     }
 
-    public boolean sendFileToClient(){
-        return fileDownloaderService.sendFileToClient();
+    @Override
+    public void sendFileToClient(){
+        fileDownloaderService.sendFileToClient();
+    }
+
+    @Override
+    public void deleteFileFromServer() throws FileNotFoundException {
+        fileDeleterService.deleteFile();
     }
 }

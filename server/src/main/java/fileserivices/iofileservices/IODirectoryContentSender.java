@@ -20,12 +20,10 @@ public class IODirectoryContentSender implements DirectoryContentSender {
         SEND_DIR_PROCESS
     }
 
-    private Stage stage;
+    private final Network network;
+    private final ServerFileExplorer serverFileExplorer;
 
-    private Network network;
-    private ServerFileExplorer serverFileExplorer;
-
-    private Logger logger = LogManager.getLogger(IODirectoryContentSender.class);
+    private final Logger logger = LogManager.getLogger(IODirectoryContentSender.class);
 
     public IODirectoryContentSender(Network network, ServerFileExplorer serverFileExplorer) {
         this.network = network;
@@ -33,10 +31,10 @@ public class IODirectoryContentSender implements DirectoryContentSender {
     }
 
     @Override
-    public boolean sendDirectoryContent() {
+    public void sendDirectoryContent() {
         int dirNameLength = 0;
         String dirName = "";
-        stage = Stage.WAITING_FOR_DIR_NAME_LENGTH;
+        Stage stage = Stage.WAITING_FOR_DIR_NAME_LENGTH;
         boolean isDirectoryEnd = false;
         while (!isDirectoryEnd) {
             switch (stage) {
@@ -79,6 +77,5 @@ public class IODirectoryContentSender implements DirectoryContentSender {
                     throw new IllegalStateException("Unexpected value: " + stage);
             }
         }
-        return false;
     }
 }

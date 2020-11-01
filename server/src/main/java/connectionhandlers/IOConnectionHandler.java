@@ -9,7 +9,7 @@ import java.net.Socket;
 
 public class IOConnectionHandler extends ConnectionHandler {
 
-    private Logger logger = LogManager.getLogger(IOConnectionHandler.class);
+    private final Logger logger = LogManager.getLogger(IOConnectionHandler.class);
 
     public IOConnectionHandler(Socket socket){
         super();
