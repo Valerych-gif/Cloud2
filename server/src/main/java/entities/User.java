@@ -33,7 +33,6 @@ public class User {
     }
 
     public void setUpUser(Path userStoragePath){
-        System.out.println(userStoragePath.toFile().getAbsolutePath());
         userStorage = userStoragePath.toFile();
         if (!userStorage.exists()) {
             if (userStorage.mkdir()) {

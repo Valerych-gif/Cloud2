@@ -6,11 +6,10 @@ import network.interfaces.Network;
 import network.interfaces.NetworkFactory;
 import network.ionetwork.IOCommandReceiver;
 import network.ionetwork.IONetworkFactory;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import settings.Cloud2ServerSettings;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Random;
@@ -20,12 +19,13 @@ public class TestIONetwork {
     private static IOCommandReceiver ioCommandReceiver;
     private static Client client;
     private static int bufferSize;
+    private static ServerSocket serverSocket;
 
     @BeforeAll
     static void networkInit(){
         bufferSize = Cloud2ServerSettings.BUFFER_SIZE;
         try {
-            ServerSocket serverSocket = new ServerSocket(Cloud2ServerSettings.PORT);
+            serverSocket = new ServerSocket(Cloud2ServerSettings.PORT);
             new Thread(()->{
                 client = new Client();
             }).start();
@@ -34,6 +34,17 @@ public class TestIONetwork {
             network = networkFactory.createNetwork(socket);
             ioCommandReceiver = new IOCommandReceiver(network);
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @AfterAll
+    public static void clearResources(){
+        try {
+            serverSocket.close();
+            network.closeConnection();
+            client.closeconnection();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
