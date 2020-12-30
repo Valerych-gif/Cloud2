@@ -6,12 +6,16 @@ import entities.User;
 import authservice.UsersService;
 import fileserivices.interfaces.FileService;
 import fileserivices.interfaces.FileServiceFactory;
+import fileserivices.interfaces.ServerFileExplorer;
+import fileserivices.interfaces.ServerFileExplorerFactory;
 import network.ionetwork.IOCommandReceiver;
 import network.interfaces.Network;
 import network.interfaces.NetworkFactory;
 import servers.Cloud2Server;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import shareservice.interfaces.ShareFileService;
+import shareservice.interfaces.ShareFileServiceFactory;
 import utils.LogUtils;
 
 import java.io.File;
@@ -23,9 +27,13 @@ public abstract class ConnectionHandler implements Runnable {
     protected Cloud2Server server;
     protected ConnectionHandler connectionHandler;
     protected FileServiceFactory fileServiceFactory;
+    protected ShareFileServiceFactory shareFileServiceFactory;
     protected NetworkFactory networkFactory;
+    protected ServerFileExplorerFactory serverFileExplorerFactory;
+    protected ServerFileExplorer serverFileExplorer;
     protected FileService fileService;
     protected UsersService usersService;
+    protected ShareFileService shareFileService;
     protected Network network;
     protected IOCommandReceiver commandReceiver;
     protected File mainStorage;
@@ -62,7 +70,7 @@ public abstract class ConnectionHandler implements Runnable {
                         this.user = usersService.authUserByLoginAndPassword();
                         if (user != User.UNAUTHORIZED_USER) {
                             network.sendByteToClient(Responses.OK.getSignalByte());
-                            this.fileService = fileServiceFactory.createFileService(user, network);
+                            setUpServices();
                         } else {
                             network.sendByteToClient(Responses.FAIL.getSignalByte());
                         }
@@ -72,7 +80,7 @@ public abstract class ConnectionHandler implements Runnable {
                         this.user = usersService.registrationUserByLoginAndPassword();
                         if (user != User.UNAUTHORIZED_USER) {
                             network.sendByteToClient(Responses.OK.getSignalByte());
-                            this.fileService = fileServiceFactory.createFileService(user, network);
+                            setUpServices();
                         } else {
                             network.sendByteToClient(Responses.FAIL.getSignalByte());
                         }
@@ -111,22 +119,22 @@ public abstract class ConnectionHandler implements Runnable {
                             network.sendByteToClient(Responses.FAIL.getSignalByte());
                         }
                         break;
-//                    case GET_SHARED_DIR_CONTENT:
-//                        if (user!=null) {
-//                            network.sendResponse(Responses.OK.getString());
-//                            sendSharedFilesToClient();
-//                        } else {
-//                            network.sendResponse(Responses.FAIL.getString());
-//                        }
-//                        break;
-//                    case SHARE:
-//                        if (user!=null) {
-//                            network.sendResponse(Responses.OK.getString());
-//                            authService.shareFile();
-//                        } else {
-//                            network.sendResponse(Responses.FAIL.getString());
-//                        }
-//                        break;
+                    case GET_SHARED_DIR_CONTENT:
+                        if (user != User.UNAUTHORIZED_USER) {
+                            network.sendByteToClient(Responses.OK.getSignalByte());
+                            shareFileService.sendSharedFilesDirToClient();
+                        } else {
+                            network.sendByteToClient(Responses.FAIL.getSignalByte());
+                        }
+                        break;
+                    case SHARE:
+                        if (user != User.UNAUTHORIZED_USER) {
+                            network.sendByteToClient(Responses.OK.getSignalByte());
+                            shareFileService.shareFileByCommandFromClient();
+                        } else {
+                            network.sendByteToClient(Responses.FAIL.getSignalByte());
+                        }
+                        break;
                     case CLOSE_CONNECTION:
                         closeConnection();
                         break;
@@ -141,50 +149,12 @@ public abstract class ConnectionHandler implements Runnable {
         }
     }
 
+    private void setUpServices() {
+        this.serverFileExplorer = serverFileExplorerFactory.createServerFileExplorer(user, network);
+        this.fileService = fileServiceFactory.createFileService(network, serverFileExplorer);
+        this.shareFileService = shareFileServiceFactory.createShareFileService(user, network, serverFileExplorer);
+    }
 
-//    public void sendSharedFileNamesToClient() {
-//        try {
-//            File[] files;
-//            files = authService.getSharedFiles(connectionHandler.getUserId());
-//            for (File f : Objects.requireNonNull(files)) {
-//                String fileName = f.getAbsolutePath();
-//                File storageAbsPath = new File(Cloud2ServerSettings.STORAGE_ROOT_DIR);
-//                int storageAbsPathLength = storageAbsPath.getAbsolutePath().length();
-//                String fileNameToSend = fileName.substring(storageAbsPathLength);
-//                System.out.println(fileNameToSend);
-//                sendFileNameToClient(fileNameToSend);
-//            }
-//            sendResponse(Responses.END_OF_DIR_CONTENT.getString());
-//        } catch (IOException e) {
-//            logger.error(e);
-//            e.printStackTrace();
-//        }
-//
-//    }
-
-//    public void deleteFileFromStorage(){
-//        String fileName = network.getStringFromClient();
-//        fileHandler.deleteFileFromStorage(fileName);
-//    }
-
-//    public void sendSharedFilesToClient() {
-//        network.sendSharedFileNamesToClient();
-//    }
-
-    //    public void shareFile(){
-//        String nickName = network.getStringFromClient();
-//        String fileName = network.getStringFromClient();
-//        String fileFullPathName = fileHandler.getAbsFilePathByName(fileName).getAbsolutePath();
-//        String fileNameForShare = fileFullPathName.substring(fileHandler.getStorageRootDirPath().length());
-//        String userIdStr = String.valueOf(userId);
-//        System.out.println(fileNameForShare);
-//        try {
-//            authService.shareFile(nickName, userIdStr, fileNameForShare);
-//        } catch (IOException e) {
-//            logger.error(e);
-//            e.printStackTrace();
-//        }
-//    }
     public void closeConnection() {
         isConnectionActive = false;
         network.closeConnection();

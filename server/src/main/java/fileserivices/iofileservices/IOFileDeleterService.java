@@ -6,14 +6,13 @@ import fileserivices.interfaces.ServerFileExplorer;
 import network.interfaces.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import settings.Cloud2ServerSettings;
 import utils.LogUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 
 public class IOFileDeleterService implements FileDeleterService {
-
-    private static final String FILE_SEPARATOR = System.getProperty("file.separator");
 
     private enum Stage {
         WAITING_FOR_FILE_NAME_LENGTH,
@@ -49,7 +48,7 @@ public class IOFileDeleterService implements FileDeleterService {
                     stage = Stage.FILE_DELETE_PROCESS;
                     break;
                 case FILE_DELETE_PROCESS:
-                    String fileToDeletePathStr = serverFileExplorer.getCurrentDirectory().getPath() + FILE_SEPARATOR + fileName;
+                    String fileToDeletePathStr = serverFileExplorer.getCurrentDirectory().getPath() + Cloud2ServerSettings.FILE_SEPARATOR + fileName;
                     File fileToDelete = new File(fileToDeletePathStr);
                     FileDeleter fileDeleter = new IOFileDeleter();
                     if (fileToDelete.exists()){

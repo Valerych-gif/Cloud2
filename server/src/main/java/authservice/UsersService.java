@@ -5,11 +5,13 @@ import network.interfaces.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import settings.Cloud2ServerSettings;
-import shareservice.ShareService;
 import utils.LogUtils;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 public class UsersService {
 
@@ -37,21 +39,19 @@ public class UsersService {
             Cloud2ServerSettings.AUTH_FILE
     );
 
-    private AuthorisationService authorisationService;
-    private RegistrationService registrationService;
-    private ShareService shareService;
-    private Network network;
+    private final AuthorisationService authorisationService;
+    private final RegistrationService registrationService;
+    private final Network network;
 
     private Stage stage;
     private Mode mode;
 
-    private Logger logger = LogManager.getLogger(UsersService.class);
+    private final Logger logger = LogManager.getLogger(UsersService.class);
 
     public UsersService(Network network) {
         this.network = network;
         this.authorisationService = new AuthorisationService();
         this.registrationService = new RegistrationService();
-        this.shareService = new ShareService();
         this.mode = Mode.WAITING;
         this.stage = Stage.WAITING_FOR_LOGIN_LENGTH;
         LogUtils.info("Authorization service started successfully", logger);
@@ -147,7 +147,4 @@ public class UsersService {
         }
     }
 
-    public void shareFile() {
-        shareService.shareFileByCommandFromClient();
-    }
 }

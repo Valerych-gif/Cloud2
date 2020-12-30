@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class AuthorisationService {
 
-    private Logger logger = LogManager.getLogger(AuthorisationService.class);
+    private final Logger logger = LogManager.getLogger(AuthorisationService.class);
 
     public AuthorisationService() {
     }

@@ -20,7 +20,6 @@ public class IOFileDeleter implements FileDeleter {
 
     @Override
     public void deleteDirectory(String path) {
-        System.out.println("=== Directory " + path + " marked to delete ===");
         File directory = new File(path);
         File[] files = directory.listFiles();
         if(files != null) {

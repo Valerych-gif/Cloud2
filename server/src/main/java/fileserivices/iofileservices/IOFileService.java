@@ -1,10 +1,6 @@
 package fileserivices.iofileservices;
 
-import entities.User;
-import fileserivices.interfaces.DirectoryContentSender;
-import fileserivices.interfaces.FileDownloaderService;
-import fileserivices.interfaces.FileService;
-import fileserivices.interfaces.FileUploaderService;
+import fileserivices.interfaces.*;
 import network.interfaces.Network;
 
 import java.io.FileNotFoundException;
@@ -13,11 +9,10 @@ public class IOFileService implements FileService {
 
     private final FileUploaderService fileUploaderService;
     private final FileDownloaderService fileDownloaderService;
-    private final IOFileDeleterService fileDeleterService;
+    private final FileDeleterService fileDeleterService;
     private final DirectoryContentSender directoryContentSender;
 
-    public IOFileService(User user, Network network) {
-        IOServerFileExplorer serverFileExplorer = new IOServerFileExplorer(user);
+    public IOFileService(Network network, ServerFileExplorer serverFileExplorer) {
         this.fileUploaderService = new IOFileUploaderService(network, serverFileExplorer);
         this.fileDownloaderService = new IOFileDownloaderService(network, serverFileExplorer);
         this.fileDeleterService = new IOFileDeleterService(network, serverFileExplorer);

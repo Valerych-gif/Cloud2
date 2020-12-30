@@ -19,14 +19,10 @@ public class IOFileUploaderService implements FileUploaderService {
         FILE_RECEIVE_PROCESS
     }
 
-    private IOFileUploaderService.Stage stage;
+    private final Network network;
+    private final ServerFileExplorer serverFileExplorer;
 
-    private byte[] buffer;
-
-    private Network network;
-    private ServerFileExplorer serverFileExplorer;
-
-    private Logger logger = LogManager.getLogger(IOFileUploaderService.class);
+    private final Logger logger = LogManager.getLogger(IOFileUploaderService.class);
 
     public IOFileUploaderService(Network network, ServerFileExplorer serverFileExplorer) {
         this.network = network;
@@ -38,7 +34,7 @@ public class IOFileUploaderService implements FileUploaderService {
         int fileNameLength = 0;
         long fileSize = 0;
         String fileName = "";
-        stage = Stage.WAITING_FOR_FILE_NAME_LENGTH;
+        Stage stage = Stage.WAITING_FOR_FILE_NAME_LENGTH;
         while (true) {
             switch (stage) {
                 case WAITING_FOR_FILE_NAME_LENGTH:
@@ -58,12 +54,15 @@ public class IOFileUploaderService implements FileUploaderService {
                     break;
                 case FILE_RECEIVE_PROCESS:
                     int byteBufferSize = Cloud2ServerSettings.BUFFER_SIZE;
-                    buffer = new byte[byteBufferSize];
+                    byte[] buffer = new byte[byteBufferSize];
 
                     long numberOfParcels = fileSize / byteBufferSize;
                     int tailSize = (int) (fileSize - (numberOfParcels * byteBufferSize));
 
-                    File fileToUpload = new File(serverFileExplorer.getCurrentDirectory().getPath() + "/" + fileName);
+                    File fileToUpload = new File(
+                            serverFileExplorer.getCurrentDirectory().getPath()
+                                    + Cloud2ServerSettings.FILE_SEPARATOR
+                                    + fileName);
                     IOFileUploader fileUploader = new IOFileUploader(fileToUpload);
 
                     for (int i = 0; i < numberOfParcels; i++) {
@@ -74,7 +73,6 @@ public class IOFileUploaderService implements FileUploaderService {
                     buffer = network.readBytesFromClient(tailSize);
                     fileUploader.writeBufferToFile(buffer);
                     fileUploader.closeFile();
-                    stage = Stage.WAITING_FOR_FILE_NAME_LENGTH;
                     return true;
                 default:
                     throw new IllegalStateException("Unexpected value: " + stage);

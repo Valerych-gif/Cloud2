@@ -13,6 +13,7 @@ import modalWindows.ShareModalWindow;
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class MainController implements Initializable {
@@ -339,8 +340,16 @@ public class MainController implements Initializable {
         if (activePanel.equals(STORAGE_PANEL)) {
             sendCommand(Requests.SHARE);
             if (isResponseOk()) {
-                sendString(nickName);
-                sendString(activeFile);
+                byte nickNameLength = (byte) nickName.length();
+                byte activeFileLength = (byte) activeFile.length();
+                try {
+                    os.write(nickNameLength);
+                    os.write(nickName.getBytes(StandardCharsets.UTF_8));
+                    os.write(activeFileLength);
+                    os.write(activeFile.getBytes(StandardCharsets.UTF_8));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
