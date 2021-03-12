@@ -18,7 +18,7 @@
       <Label layoutX="550.0" layoutY="32.0" text="or" />
       <Button fx:id="regButton" layoutX="578.0" layoutY="28.0" mnemonicParsing="false" text="Registration" />
       <PasswordField fx:id="passField" layoutX="299.0" layoutY="28.0" />
-      <Button fx:id="swapButton" layoutX="121.0" layoutY="580.0" mnemonicParsing="false" text="Swap to shared entities" />
+      <Button fx:id="swapButton" layoutX="121.0" layoutY="580.0" mnemonicParsing="false" text="Swap to shared ru.valerych.cloud2.entities" />
       <Button fx:id="shareButton" layoutX="260.0" layoutY="580.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="52.0" text="Share" />
    </AnchorPane>
    <columnConstraints>

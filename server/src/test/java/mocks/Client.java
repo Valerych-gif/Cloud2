@@ -1,6 +1,6 @@
 package mocks;
 
-import settings.Cloud2ServerSettings;
+import ru.valerych.cloud2.settings.Cloud2ServerSettings;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

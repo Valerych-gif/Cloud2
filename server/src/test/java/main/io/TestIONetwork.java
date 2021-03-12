@@ -2,12 +2,12 @@ package main.io;
 
 import commands.Requests;
 import mocks.Client;
-import network.interfaces.Network;
-import network.interfaces.NetworkFactory;
-import network.ionetwork.IOCommandReceiver;
-import network.ionetwork.IONetworkFactory;
+import ru.valerych.cloud2.network.interfaces.Network;
+import ru.valerych.cloud2.network.interfaces.NetworkFactory;
+import ru.valerych.cloud2.network.ionetwork.IOCommandReceiver;
+import ru.valerych.cloud2.network.ionetwork.IONetworkFactory;
 import org.junit.jupiter.api.*;
-import settings.Cloud2ServerSettings;
+import ru.valerych.cloud2.settings.Cloud2ServerSettings;
 
 import java.io.IOException;
 import java.net.ServerSocket;

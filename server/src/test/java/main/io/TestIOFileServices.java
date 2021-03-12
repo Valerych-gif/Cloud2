@@ -1,20 +1,20 @@
 package main.io;
 
 import commands.Responses;
-import entities.User;
-import fileserivices.interfaces.DirectoryContentSender;
-import fileserivices.interfaces.ServerFileExplorer;
-import fileserivices.iofileservices.IODirectoryContentSender;
-import fileserivices.iofileservices.IOServerFileExplorer;
+import ru.valerych.cloud2.entities.User;
+import ru.valerych.cloud2.fileserivices.interfaces.DirectoryContentSender;
+import ru.valerych.cloud2.fileserivices.interfaces.ServerFileExplorer;
+import ru.valerych.cloud2.fileserivices.iofileservices.IODirectoryContentSender;
+import ru.valerych.cloud2.fileserivices.iofileservices.IOServerFileExplorer;
 import mocks.Client;
-import network.interfaces.Network;
-import network.interfaces.NetworkFactory;
-import network.ionetwork.IONetworkFactory;
+import ru.valerych.cloud2.network.interfaces.Network;
+import ru.valerych.cloud2.network.interfaces.NetworkFactory;
+import ru.valerych.cloud2.network.ionetwork.IONetworkFactory;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import settings.Cloud2ServerSettings;
+import ru.valerych.cloud2.settings.Cloud2ServerSettings;
 
 import java.io.IOException;
 import java.net.ServerSocket;
