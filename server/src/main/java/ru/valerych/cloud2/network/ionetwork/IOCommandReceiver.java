@@ -4,7 +4,6 @@ import commands.Requests;
 import ru.valerych.cloud2.network.interfaces.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.valerych.cloud2.utils.LogUtils;
 
 
 public class IOCommandReceiver {
@@ -19,7 +18,7 @@ public class IOCommandReceiver {
 
     public byte getSignalByteFromClient(){
         byte signalByte = network.readByteFromClient();
-        LogUtils.info(String.valueOf(signalByte), logger, "<-\t");
+        logger.info(String.format("Got signal byte '%s' from client", String.valueOf(signalByte)));
         return signalByte;
     }
 

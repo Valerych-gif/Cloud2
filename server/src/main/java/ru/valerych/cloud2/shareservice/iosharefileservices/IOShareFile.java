@@ -8,7 +8,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
 import ru.valerych.cloud2.shareservice.interfaces.ShareFile;
-import ru.valerych.cloud2.utils.LogUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,22 +55,22 @@ public class IOShareFile implements ShareFile {
             switch (stage) {
                 case WAITING_FOR_USERNAME_LENGTH:
                     userNameLength = network.readByteFromClient();
-                    LogUtils.info("Length of username '" + userNameLength + "' was received", logger);
+                    logger.info("Length of username '" + userNameLength + "' was received");
                     stage = Stage.WAITING_FOR_USERNAME;
                     break;
                 case WAITING_FOR_USERNAME:
                     userName = new String(network.readBytesFromClient(userNameLength));
-                    LogUtils.info("Username '" + userName + "' was received", logger);
+                    logger.info("Username '" + userName + "' was received");
                     stage = Stage.WAITING_FOR_FILENAME_LENGTH;
                     break;
                 case WAITING_FOR_FILENAME_LENGTH:
                     fileNameLength = network.readByteFromClient();
-                    LogUtils.info("Length of file name '" + fileNameLength + "' was received", logger);
+                    logger.info("Length of file name '" + fileNameLength + "' was received");
                     stage = Stage.WAITING_FOR_FILENAME;
                     break;
                 case WAITING_FOR_FILENAME:
                     fileName = new String(network.readBytesFromClient(fileNameLength));
-                    LogUtils.info("File name '" + fileName + "' was received", logger);
+                    logger.info("File name '" + fileName + "' was received");
                     stage = Stage.SHARE_FILE_PROCESS;
                     break;
                 case SHARE_FILE_PROCESS:
@@ -91,9 +90,9 @@ public class IOShareFile implements ShareFile {
         try {
             Files.write(SHARE_FILE_PATH, shareLine.getBytes(), StandardOpenOption.APPEND);
         } catch (IOException e) {
-            LogUtils.error(e.toString(), logger);
+            logger.error(e.toString(), logger);
         }
-        LogUtils.info(shareLine, logger, "В файл " + SHARE_FILE_PATH + " записана строка ");
+        logger.info(shareLine, logger, "В файл " + SHARE_FILE_PATH + " записана строка ");
     }
 
     public int getUserIdByUsername(String username) {
@@ -104,7 +103,7 @@ public class IOShareFile implements ShareFile {
                     .findFirst();
             return userStringArray.map(strings -> Integer.parseInt(strings[0])).orElse(-1);
         } catch (IOException e) {
-            LogUtils.error("Authorization file can not be read", logger);
+            logger.error("Authorization file can not be read");
         }
         return -1;
     }

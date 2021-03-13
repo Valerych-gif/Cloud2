@@ -5,7 +5,6 @@ import ru.valerych.cloud2.network.interfaces.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
-import ru.valerych.cloud2.utils.LogUtils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,7 +50,7 @@ public class UsersService {
         this.registrationService = new RegistrationService();
         this.mode = Mode.WAITING;
         this.stage = Stage.WAITING_FOR_LOGIN_LENGTH;
-        LogUtils.info("Authorization service started successfully", logger);
+        logger.info("Authorization service started successfully");
     }
 
     public User authUserByLoginAndPassword() {
@@ -79,22 +78,22 @@ public class UsersService {
             switch (stage) {
                 case WAITING_FOR_LOGIN_LENGTH:
                     loginLength = network.readByteFromClient(); // max 127
-                    LogUtils.info("Login length '" + loginLength + "' was received", logger);
+                    logger.info("Login length '" + loginLength + "' was received");
                     stage = Stage.WAITING_FOR_LOGIN;
                     break;
                 case WAITING_FOR_LOGIN:
                     login = new String(network.readBytesFromClient(loginLength));
-                    LogUtils.info("Login '" + login + "' was received", logger);
+                    logger.info("Login '" + login + "' was received", logger);
                     stage = Stage.WAITING_FOR_PASSWORD_LENGTH;
                     break;
                 case WAITING_FOR_PASSWORD_LENGTH:
                     passwordLength = network.readByteFromClient(); // max 127
-                    LogUtils.info("Password length was received", logger);
+                    logger.info("Password length was received");
                     stage = Stage.WAITING_FOR_PASSWORD;
                     break;
                 case WAITING_FOR_PASSWORD:
                     password = new String(network.readBytesFromClient(passwordLength));
-                    LogUtils.info("Password '" + password + "' was received", logger);
+                    logger.info("Password '" + password + "' was received");
                     if (mode == Mode.AUTHORIZATION)
                         stage = Stage.AUTHORIZATION_PROCESS;
                     if (mode == Mode.REGISTRATION)
@@ -111,12 +110,12 @@ public class UsersService {
                     }
                     break;
                 case AUTHORIZATION_SUCCESS:
-                    LogUtils.info("User " + login + " authorised successfully", logger);
+                    logger.info("User " + login + " authorised successfully");
                     stage = Stage.WAITING_FOR_LOGIN_LENGTH;
                     mode = Mode.WAITING;
                     return user;
                 case AUTHORIZATION_FAIL:
-                    LogUtils.info("User '" + login + "' was not authorised", logger);
+                    logger.info("User '" + login + "' was not authorised");
                     stage = Stage.WAITING_FOR_LOGIN_LENGTH;
                     mode = Mode.WAITING;
                     return User.UNAUTHORIZED_USER;
@@ -131,12 +130,12 @@ public class UsersService {
                     }
                     break;
                 case REGISTRATION_SUCCESS:
-                    LogUtils.info("New user " + login + " registered successfully", logger);
+                    logger.info("New user " + login + " registered successfully");
                     stage = Stage.WAITING_FOR_LOGIN_LENGTH;
                     mode = Mode.WAITING;
                     return user;
                 case REGISTRATION_FAIL:
-                    LogUtils.info("New user '" + login + "' was not registered", logger);
+                    logger.info("New user '" + login + "' was not registered");
                     stage = Stage.WAITING_FOR_LOGIN_LENGTH;
                     mode = Mode.WAITING;
                     return User.UNAUTHORIZED_USER;

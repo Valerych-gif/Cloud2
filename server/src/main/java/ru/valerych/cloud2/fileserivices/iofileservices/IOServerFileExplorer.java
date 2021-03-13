@@ -6,7 +6,6 @@ import ru.valerych.cloud2.fileserivices.interfaces.ServerFileExplorer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
-import ru.valerych.cloud2.utils.LogUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ public class IOServerFileExplorer implements ServerFileExplorer {
 
     @Override
     public boolean goToDirectory(String dirPath) {
-        LogUtils.info("Trying to change current directory to '" + dirPath + "'", logger);
+        logger.info("Trying to change current directory to '" + dirPath + "'");
         String directoryPath = dirPath.equals("") ? "" : Cloud2ServerSettings.FILE_SEPARATOR + dirPath;
         File directory = new File(currentDirectory.getPath() + directoryPath);
         boolean isDirectory = dirPath
@@ -48,7 +47,7 @@ public class IOServerFileExplorer implements ServerFileExplorer {
                 currentDirectory = new File(currentDirectory.getPath() + directoryPath);
                 break;
         }
-        LogUtils.info("Current server directory is '" + currentDirectory.getAbsolutePath() + "'", logger);
+        logger.info("Current server directory is '" + currentDirectory.getAbsolutePath() + "'");
         return currentDirectory.exists();
     }
 

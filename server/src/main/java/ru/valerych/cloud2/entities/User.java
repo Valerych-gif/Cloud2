@@ -3,7 +3,6 @@ package ru.valerych.cloud2.entities;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
-import ru.valerych.cloud2.utils.LogUtils;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -17,7 +16,7 @@ public class User {
 
     private File userStorage;
 
-    private Logger logger = LogManager.getLogger(User.class);
+    private final Logger logger = LogManager.getLogger(User.class);
 
     public static final User UNAUTHORIZED_USER = new User(-1, "", "");
 
@@ -36,9 +35,9 @@ public class User {
         userStorage = userStoragePath.toFile();
         if (!userStorage.exists()) {
             if (userStorage.mkdir()) {
-                LogUtils.info("Создана корневая папка пользователя " + login, logger);
+                logger.info("Создана корневая папка пользователя " + login);
             } else {
-                LogUtils.error("Создать корневую папку пользователя не удалось", logger);
+                logger.error("Создать корневую папку пользователя не удалось");
             }
         }
     }

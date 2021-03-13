@@ -16,7 +16,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.shareservice.interfaces.ShareFileService;
 import ru.valerych.cloud2.shareservice.interfaces.ShareFileServiceFactory;
-import ru.valerych.cloud2.utils.LogUtils;
 
 import java.io.File;
 
@@ -42,7 +41,7 @@ public abstract class ConnectionHandler implements Runnable {
 
     public ConnectionHandler() {
         Cloud2Server server = Cloud2Server.getInstance();
-        LogUtils.info("Connection accepted", logger);
+        logger.info("Connection accepted");
         this.isConnectionActive = true;
         this.server = server;
         this.mainStorage = server.getStorage();
@@ -58,7 +57,7 @@ public abstract class ConnectionHandler implements Runnable {
             Requests command = null;
             try {
                 while (command == null) {
-                    LogUtils.info("Waiting for signal byte from client", logger);
+                    logger.info("Waiting for signal byte from client");
                     command = commandReceiver.getCommandFromClient(); // Block
                 }
                 switch (command) {

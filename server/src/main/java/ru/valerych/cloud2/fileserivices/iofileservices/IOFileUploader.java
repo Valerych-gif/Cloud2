@@ -3,7 +3,6 @@ package ru.valerych.cloud2.fileserivices.iofileservices;
 import ru.valerych.cloud2.fileserivices.interfaces.FileUploader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.valerych.cloud2.utils.LogUtils;
 
 import java.io.*;
 
@@ -18,7 +17,7 @@ public class IOFileUploader implements FileUploader {
         try {
             this.fos = new FileOutputStream(file);
         } catch (FileNotFoundException e) {
-            LogUtils.error(e.toString(), logger);
+            logger.error(e.toString());
         }
     }
 
@@ -26,7 +25,7 @@ public class IOFileUploader implements FileUploader {
         try {
             fos.write(buffer, 0, buffer.length);
         } catch (Exception e) {
-            LogUtils.error(e.toString(), logger);
+            logger.error(e.toString());
         }
         return false;
     }
@@ -35,7 +34,7 @@ public class IOFileUploader implements FileUploader {
         try {
             fos.close();
         } catch (IOException e) {
-            LogUtils.error(e.toString(), logger);
+            logger.error(e.toString());
         }
     }
 }

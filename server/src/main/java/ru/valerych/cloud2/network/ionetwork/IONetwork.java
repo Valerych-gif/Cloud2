@@ -2,7 +2,6 @@ package ru.valerych.cloud2.network.ionetwork;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.valerych.cloud2.utils.LogUtils;
 
 import java.io.*;
 import java.net.Socket;
@@ -15,7 +14,7 @@ public class IONetwork implements Network {
     private DataOutputStream os;
     private Socket socket;
 
-    private Logger logger = LogManager.getLogger(IONetwork.class);
+    private final Logger logger = LogManager.getLogger(IONetwork.class);
 
     public IONetwork(Socket socket) {
         try {
@@ -23,7 +22,7 @@ public class IONetwork implements Network {
             this.is = new DataInputStream(socket.getInputStream());
             this.os = new DataOutputStream(socket.getOutputStream());
         } catch (IOException e) {
-            LogUtils.error(e.toString(), logger);
+            logger.error(e.toString());
         }
     }
 
@@ -33,7 +32,7 @@ public class IONetwork implements Network {
             os.write(buffer, 0, buffer.length);
             os.flush();
         } catch (IOException e) {
-            LogUtils.error(e.toString(), logger);
+            logger.error(e.toString());
         }
     }
 
@@ -43,7 +42,7 @@ public class IONetwork implements Network {
         try {
             bytesRead = is.read(buffer);
         } catch (IOException e) {
-            LogUtils.error(e.toString(), logger);
+            logger.error(e.toString());
         }
         return bytesRead;
     }
@@ -53,7 +52,7 @@ public class IONetwork implements Network {
         try {
             return is.readByte();
         } catch (IOException e) {
-            LogUtils.error("Error of reading byte from client. " + e, logger);
+            logger.error("Error of reading byte from client. " + e);
             return 0;
         }
     }
@@ -66,7 +65,7 @@ public class IONetwork implements Network {
                 buffer[i] = is.readByte();
             }
         } catch (IOException e) {
-            LogUtils.error("Error of reading bytes from client. " + e, logger);
+            logger.error("Error of reading bytes from client. " + e);
         }
         return buffer;
     }
@@ -76,7 +75,7 @@ public class IONetwork implements Network {
         try {
             os.writeBytes(new String(buffer));
         } catch (IOException e) {
-            LogUtils.error(e.toString(), logger);
+            logger.error(e.toString(), logger);
         }
     }
 
@@ -85,7 +84,7 @@ public class IONetwork implements Network {
         try {
             os.writeByte(response);
         } catch (Exception e) {
-            LogUtils.error("Can't to send response. " + e, logger);
+            logger.error("Can't to send response. " + e);
         }
     }
 
@@ -94,7 +93,7 @@ public class IONetwork implements Network {
         try {
             return is.readLong();
         } catch (IOException e) {
-            LogUtils.error("Error of long from client. " + e, logger);
+            logger.error("Error of long from client. " + e);
             return 0L;
         }
     }
@@ -119,6 +118,6 @@ public class IONetwork implements Network {
             e.printStackTrace();
             logger.error(e);
         }
-        LogUtils.info("Client disconnected", logger);
+        logger.info("Client disconnected");
     }
 }

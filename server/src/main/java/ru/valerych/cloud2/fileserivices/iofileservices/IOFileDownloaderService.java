@@ -7,7 +7,6 @@ import ru.valerych.cloud2.network.interfaces.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
-import ru.valerych.cloud2.utils.LogUtils;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -41,12 +40,12 @@ public class IOFileDownloaderService implements FileDownloaderService {
             switch (stage) {
                 case WAITING_FOR_FILE_NAME_LENGTH:
                     fileNameLength = network.readByteFromClient();
-                    LogUtils.info("Length of file name '" + fileNameLength + "' was received", logger);
+                    logger.info("Length of file name '" + fileNameLength + "' was received");
                     stage = Stage.WAITING_FOR_FILE_NAME;
                     break;
                 case WAITING_FOR_FILE_NAME:
                     fileName = new String(network.readBytesFromClient(fileNameLength));
-                    LogUtils.info("File name '" + fileName + "' was received", logger);
+                    logger.info("File name '" + fileName + "' was received");
                     stage = Stage.SENDING_FILE_INFO;
                     break;
                 case SENDING_FILE_INFO:
@@ -54,11 +53,11 @@ public class IOFileDownloaderService implements FileDownloaderService {
 
                     byte type = fileInfo.getType().getMark();
                     network.sendByteToClient(type);
-                    LogUtils.info("File type '" + type + "' was sent", logger);
+                    logger.info("File type '" + type + "' was sent");
 
                     byte[] fileSizeBytes = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(fileInfo.getFileSize()).array();
                     network.sendBytesToClient(fileSizeBytes);
-                    LogUtils.info("File size '" + fileInfo.getFileSize() + "' was sent", logger);
+                    logger.info("File size '" + fileInfo.getFileSize() + "' was sent");
                     stage = Stage.FILE_SEND_PROCESS;
 
                     break;

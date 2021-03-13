@@ -3,7 +3,6 @@ package ru.valerych.cloud2.servers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
-import ru.valerych.cloud2.utils.LogUtils;
 import ru.valerych.cloud2.utils.SetUpUtils;
 
 import java.io.File;
@@ -19,17 +18,17 @@ public abstract class Cloud2Server {
         try {
             SetUpUtils.setUpServersFiles();
         } catch (Exception e) {
-            LogUtils.error(e.getMessage(), logger);
+            logger.error(e.getMessage());
         }
     }
 
     public static Cloud2Server getInstance() {
-        if (Cloud2Server.server==null) {
+        if (server==null) {
             if (Cloud2ServerSettings.SERVER_TYPE.equals("IOServer")) {
-                Cloud2Server.server = new Cloud2IOServer();
+                server = new Cloud2IOServer();
             }
         }
-        return Cloud2Server.server;
+        return server;
     }
 
     private static boolean isFileExist() {

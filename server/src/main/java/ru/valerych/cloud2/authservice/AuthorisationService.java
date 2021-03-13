@@ -3,7 +3,6 @@ package ru.valerych.cloud2.authservice;
 import ru.valerych.cloud2.entities.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.valerych.cloud2.utils.LogUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,7 +28,7 @@ public class AuthorisationService {
                 return User.UNAUTHORIZED_USER;
             }
         } catch (IOException e) {
-            LogUtils.error("Authorization file can not be read", logger);
+            logger.error("Authorization file can not be read");
         }
         return User.UNAUTHORIZED_USER;
     }

@@ -3,7 +3,6 @@ package ru.valerych.cloud2.authservice;
 import ru.valerych.cloud2.entities.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.valerych.cloud2.utils.LogUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,7 +12,7 @@ import java.util.Optional;
 
 public class RegistrationService {
 
-    private Logger logger = LogManager.getLogger(RegistrationService.class);
+    private final Logger logger = LogManager.getLogger(RegistrationService.class);
 
     public RegistrationService() {
     }
@@ -39,7 +38,7 @@ public class RegistrationService {
                     .filter((strings) -> login.equals(strings[1]))
                     .findFirst();
         } catch (IOException e) {
-            LogUtils.error(e.toString(), logger);
+            logger.error(e.toString());
         }
         return !lines.isPresent();
     }
@@ -51,7 +50,7 @@ public class RegistrationService {
                     .map((str) -> str.split(" "))
                     .max(Comparator.comparingInt(str -> Integer.parseInt(str[0])));
         } catch (IOException e) {
-            LogUtils.error(e.toString(), logger);
+            logger.error(e.toString());
         }
         return lines.map(strings -> Integer.parseInt((strings)[0]) + 1).orElse(-1);
     }
@@ -61,7 +60,7 @@ public class RegistrationService {
         try {
             Files.write(UsersService.AUTH_FILE_PATH, newUserStr.getBytes(), StandardOpenOption.APPEND);
         } catch (IOException e) {
-            LogUtils.error(e.toString(), logger);
+            logger.error(e.toString());
         }
     }
 }

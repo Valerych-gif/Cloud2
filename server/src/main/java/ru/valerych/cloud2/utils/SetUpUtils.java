@@ -18,33 +18,33 @@ public class SetUpUtils {
 
         if (!storage.exists()) {
             if (storage.mkdir()) {
-                LogUtils.info("Создана корневая папка сетевого хранилища", logger);
+                logger.info("Создана корневая папка сетевого хранилища");
             } else {
-                LogUtils.error("Не удалось создать корневую папку сетевого хранилища", logger);
+                logger.error("Не удалось создать корневую папку сетевого хранилища");
             }
         }
 
         if (!serversMainFilesDir.exists()) {
             if (serversMainFilesDir.mkdir()) {
-                LogUtils.info("Создана корневая папка файлов управления сервером", logger);
+                logger.info("Создана корневая папка файлов управления сервером");
             } else {
-                LogUtils.error("Не удалось создать корневую папку файлов управления сервером", logger);
+                logger.error("Не удалось создать корневую папку файлов управления сервером");
             }
         }
 
         if (!authFile.exists()) {
             if (authFile.createNewFile()) {
-                LogUtils.info("Создан файл аутентификации", logger);
+                logger.info("Создан файл аутентификации");
             } else {
-                LogUtils.error("Не удалось создать файл аутентификации", logger);
+                logger.error("Не удалось создать файл аутентификации");
             }
         }
 
         if (!sharedFiles.exists()) {
             if (sharedFiles.createNewFile()) {
-                LogUtils.info("Создан файл расшареных файлов", logger);
+                logger.info("Создан файл расшареных файлов");
             } else {
-                LogUtils.error("Не удалось создать файл  расшареных файлов", logger);
+                logger.error("Не удалось создать файл  расшареных файлов");
             }
         }
 

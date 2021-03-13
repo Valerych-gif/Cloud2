@@ -4,7 +4,6 @@ import ru.valerych.cloud2.connectionhandlers.IOConnectionHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
-import ru.valerych.cloud2.utils.LogUtils;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -14,7 +13,7 @@ import java.util.concurrent.Executors;
 
 public class Cloud2IOServer extends Cloud2Server{
 
-    protected static Logger logger = LogManager.getLogger(Cloud2IOServer.class);
+    private static final Logger logger = LogManager.getLogger(Cloud2IOServer.class);
 
     private static ServerSocket serverSocket;
     private static ExecutorService executor;
@@ -25,21 +24,21 @@ public class Cloud2IOServer extends Cloud2Server{
         try {
             serverSocket = new ServerSocket(Cloud2ServerSettings.PORT);
         } catch (IOException e) {
-            LogUtils.error(e.getMessage(), logger);
+            logger.error(e.getMessage());
         }
     }
 
     public void start() {
-        LogUtils.info("Server started.", logger);
+        logger.info("Server started.");
         try {
             while (true) {
-                LogUtils.info("Server ready for new client connection", logger);
+                logger.info("Server ready for new client connection");
                 Socket socket = serverSocket.accept();
                 executor.execute(new IOConnectionHandler(socket));
-                LogUtils.info("Client connected", logger);
+                logger.info("Client connected");
             }
         } catch (Exception e) {
-            LogUtils.error(e.getMessage(), logger);
+            logger.error(e.getMessage());
         }
     }
 }

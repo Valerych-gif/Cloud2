@@ -6,7 +6,6 @@ import ru.valerych.cloud2.network.interfaces.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
-import ru.valerych.cloud2.utils.LogUtils;
 
 import java.io.File;
 
@@ -39,17 +38,17 @@ public class IOFileUploaderService implements FileUploaderService {
             switch (stage) {
                 case WAITING_FOR_FILE_NAME_LENGTH:
                     fileNameLength = network.readByteFromClient();
-                    LogUtils.info("Length of file name '" + fileNameLength + "' was received", logger);
+                    logger.info("Length of file name '" + fileNameLength + "' was received");
                     stage = Stage.WAITING_FOR_FILE_NAME;
                     break;
                 case WAITING_FOR_FILE_NAME:
                     fileName = new String(network.readBytesFromClient(fileNameLength));
-                    LogUtils.info("File name '" + fileName + "' was received", logger);
+                    logger.info("File name '" + fileName + "' was received");
                     stage = Stage.WAITING_FOR_FILE_SIZE;
                     break;
                 case WAITING_FOR_FILE_SIZE:
                     fileSize = network.getLongFromClient();
-                    LogUtils.info("File size '" + fileSize + "' was received", logger);
+                    logger.info("File size '" + fileSize + "' was received");
                     stage = Stage.FILE_RECEIVE_PROCESS;
                     break;
                 case FILE_RECEIVE_PROCESS:

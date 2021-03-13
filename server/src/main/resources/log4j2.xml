@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <Property name="filename">logs/server.log</Property>
+    </Properties>
+    <Appenders>
+        <Console name="STDOUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        <RollingFile name="fileLogger" fileName="logs/errors.log" filePattern="logs/errors-%d{yyyy-MM-dd}.log">
+            <PatternLayout>
+                <pattern>%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Logger name="ru.valerych.cloud2" level="INFO" additivity="true">
+            <AppenderRef ref="fileLogger" level="ERROR"/>
+        </Logger>
+        <Root level="INFO">
+            <AppenderRef ref="STDOUT"/>
+        </Root>
+    </Loggers>
+</Configuration>

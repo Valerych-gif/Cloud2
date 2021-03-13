@@ -3,7 +3,6 @@ package ru.valerych.cloud2.fileserivices.iofileservices;
 import ru.valerych.cloud2.fileserivices.interfaces.FileDownloader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.valerych.cloud2.utils.LogUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,7 +19,7 @@ public class IOFileDownloader implements FileDownloader {
         try {
             this.fis = new FileInputStream(file);
         } catch (FileNotFoundException e) {
-            LogUtils.error(e.toString(), logger);
+            logger.error(e.toString());
         }
     }
 
@@ -32,7 +31,7 @@ public class IOFileDownloader implements FileDownloader {
                 throw new RuntimeException();
             }
         } catch (IOException e) {
-            LogUtils.error(e.toString(), logger);
+            logger.error(e.toString());
         }
     }
 
@@ -40,7 +39,7 @@ public class IOFileDownloader implements FileDownloader {
         try {
             fis.close();
         } catch (IOException e) {
-            LogUtils.error(e.toString(), logger);
+            logger.error(e.toString());
         }
     }
 
@@ -53,7 +52,7 @@ public class IOFileDownloader implements FileDownloader {
                 throw new RuntimeException();
             }
         } catch (IOException e) {
-            LogUtils.error(e.toString(), logger);
+            logger.error(e.toString());
         }
         return buffer;
     }
