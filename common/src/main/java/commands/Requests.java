@@ -12,7 +12,7 @@ public enum Requests {
     REGISTRATION ((byte)80),
     SHARE ((byte)90);
 
-    Byte signalByte;
+    private final Byte signalByte;
 
     Requests(byte signalByte) {
         this.signalByte = signalByte;
@@ -24,6 +24,6 @@ public enum Requests {
 
     @Override
     public String toString() {
-        return String.valueOf(signalByte);
+        return this.name();
     }
 }

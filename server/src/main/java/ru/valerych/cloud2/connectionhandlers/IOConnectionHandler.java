@@ -1,7 +1,7 @@
 package ru.valerych.cloud2.connectionhandlers;
 
-import ru.valerych.cloud2.fileserivices.iofileservices.IOFileServiceFactory;
-import ru.valerych.cloud2.fileserivices.iofileservices.IOServerFileExplorerFactory;
+import ru.valerych.cloud2.fileservices.iofileservices.IOFileServiceFactory;
+import ru.valerych.cloud2.fileservices.iofileservices.IOServerFileExplorerFactory;
 import ru.valerych.cloud2.network.ionetwork.IONetworkFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

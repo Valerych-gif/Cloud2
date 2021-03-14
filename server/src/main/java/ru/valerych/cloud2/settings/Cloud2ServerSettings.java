@@ -14,6 +14,4 @@ public class Cloud2ServerSettings {
 
     public final static String PARENT_DIR_MARK = "..";
     public final static String ROOT_DIR_MARK = ".";
-
-    public final static boolean DEBUG_MODE_ENABLED = true;
 }

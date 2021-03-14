@@ -2,7 +2,7 @@ package ru.valerych.cloud2.shareservice.iosharefileservices;
 
 import ru.valerych.cloud2.authservice.UsersService;
 import ru.valerych.cloud2.entities.User;
-import ru.valerych.cloud2.fileserivices.interfaces.ServerFileExplorer;
+import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
 import ru.valerych.cloud2.network.interfaces.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 public class IOCommandReceiver {
 
-    Network network;
+    private final Network network;
 
     protected Logger logger = LogManager.getLogger(IOCommandReceiver.class);
 
@@ -17,9 +17,7 @@ public class IOCommandReceiver {
     }
 
     public byte getSignalByteFromClient(){
-        byte signalByte = network.readByteFromClient();
-        logger.info(String.format("Got signal byte '%s' from client", String.valueOf(signalByte)));
-        return signalByte;
+        return network.readByteFromClient();
     }
 
 
@@ -27,7 +25,10 @@ public class IOCommandReceiver {
         byte signalByte = getSignalByteFromClient();
         Requests[] commands = Requests.values();
         for (Requests c : commands) {
-            if (signalByte == c.get()) return c;
+            if (signalByte == c.get()){
+                logger.info(String.format("Got signal byte '%s' [%s] from client", String.valueOf(signalByte), c));
+                return c;
+            }
         }
         return null;
     }
