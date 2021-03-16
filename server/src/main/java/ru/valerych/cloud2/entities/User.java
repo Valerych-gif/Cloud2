@@ -10,9 +10,9 @@ import java.nio.file.Paths;
 
 public class User {
 
-    private int id;
-    private String login;
-    private String password;
+    private final int id;
+    private final String login;
+    private final String password;
 
     private File userStorage;
 
@@ -35,9 +35,9 @@ public class User {
         userStorage = userStoragePath.toFile();
         if (!userStorage.exists()) {
             if (userStorage.mkdir()) {
-                logger.info("Создана корневая папка пользователя " + login);
+                logger.info(String.format("Создана корневая папка '%s' пользователя '%s'", userStorage.getAbsolutePath(), login));
             } else {
-                logger.error("Создать корневую папку пользователя не удалось");
+                logger.error(String.format("Создать корневую папку '%s' пользователя '%s' не удалось ", userStorage.getAbsolutePath(), login));
             }
         }
     }

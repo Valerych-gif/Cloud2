@@ -1,6 +1,6 @@
 package ru.valerych.cloud2.fileservices.iofileservices;
 
-import commands.Responses;
+import ru.valerych.cloud2.commands.Responses;
 import ru.valerych.cloud2.entities.FileInfo;
 import ru.valerych.cloud2.fileservices.interfaces.DirectoryContentSender;
 import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;

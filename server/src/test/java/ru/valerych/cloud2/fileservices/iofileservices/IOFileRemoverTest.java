@@ -6,16 +6,11 @@ import ru.valerych.cloud2.entities.User;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static ru.valerych.cloud2.fileservices.iofileservices.IOFileServicesConstants.*;
+
 class IOFileRemoverTest {
-
-
-    private static final String USER_DIRECTORY = "../storage/0";
-    private static final String USER_INNER_DIRECTORY = "/innerDirectoryForRemove";
-    private static final String DIRECTORY_FOR_RECURSIVE_REMOVE = "/directoryForRecursiveRemove";
-    private static final String USER_FILE = "/userFileToRemove.txt";
 
     private final IOFileRemover fileRemover = new IOFileRemover();
 

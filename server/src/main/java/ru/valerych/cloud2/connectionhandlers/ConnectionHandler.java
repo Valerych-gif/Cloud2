@@ -1,7 +1,7 @@
 package ru.valerych.cloud2.connectionhandlers;
 
-import commands.Requests;
-import commands.Responses;
+import ru.valerych.cloud2.commands.Requests;
+import ru.valerych.cloud2.commands.Responses;
 import ru.valerych.cloud2.entities.User;
 import ru.valerych.cloud2.authservice.UsersService;
 import ru.valerych.cloud2.fileservices.interfaces.FileService;

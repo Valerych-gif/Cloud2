@@ -1,11 +1,10 @@
 package main;
 
-import commands.Requests;
-import commands.Responses;
+import ru.valerych.cloud2.commands.Requests;
+import ru.valerych.cloud2.commands.Responses;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 

@@ -1,4 +1,4 @@
-package commands;
+package ru.valerych.cloud2.commands;
 
 public enum Responses {
     OK ((byte)100),

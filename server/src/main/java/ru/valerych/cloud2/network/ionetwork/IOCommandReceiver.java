@@ -1,6 +1,6 @@
 package ru.valerych.cloud2.network.ionetwork;
 
-import commands.Requests;
+import ru.valerych.cloud2.commands.Requests;
 import ru.valerych.cloud2.network.interfaces.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

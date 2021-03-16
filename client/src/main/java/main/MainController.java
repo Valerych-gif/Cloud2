@@ -1,7 +1,7 @@
 package main;
 
-import commands.Requests;
-import commands.Responses;
+import ru.valerych.cloud2.commands.Requests;
+import ru.valerych.cloud2.commands.Responses;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;

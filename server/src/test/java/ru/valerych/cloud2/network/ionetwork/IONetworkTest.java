@@ -1,6 +1,6 @@
 package ru.valerych.cloud2.network.ionetwork;
 
-import commands.Requests;
+import ru.valerych.cloud2.commands.Requests;
 import ru.valerych.cloud2.testutils.Client;
 import ru.valerych.cloud2.network.interfaces.Network;
 import ru.valerych.cloud2.network.interfaces.NetworkFactory;
@@ -20,11 +20,14 @@ public class IONetworkTest {
     private static ServerSocket serverSocket;
 
     @BeforeAll
-    static void networkInit() {
+    static void networkInit(){
         bufferSize = Cloud2ServerSettings.BUFFER_SIZE;
         try {
             serverSocket = new ServerSocket(Cloud2ServerSettings.PORT);
-            new Thread(() -> client = new Client()).start();
+            new Thread(()->{
+                client = new Client();
+            }).start();
+            Thread.sleep(500);
             Socket socket = serverSocket.accept();
             NetworkFactory networkFactory = new IONetworkFactory();
             network = networkFactory.createNetwork(socket);
@@ -35,7 +38,7 @@ public class IONetworkTest {
     }
 
     @AfterAll
-    public static void clearResources() {
+    public static void clearResources(){
         try {
             serverSocket.close();
             network.closeConnection();
@@ -47,7 +50,7 @@ public class IONetworkTest {
 
     @Test
     @DisplayName("Sending buffer to client is success")
-    public void sendBufferToClientSuccessTest() {
+    public void sendBufferToClientSuccessTest(){
         byte[] sentBuffer = getRandomBufferContent();
         network.sendBufferToClient(sentBuffer);
         byte[] receivedBuffer = client.getBytesFromServer(sentBuffer.length);
@@ -56,7 +59,7 @@ public class IONetworkTest {
 
     @Test
     @DisplayName("Reading buffer client is success")
-    public void readBufferFromClientSuccessTest() {
+    public void readBufferFromClientSuccessTest(){
         byte[] sentBuffer = getRandomBufferContent();
         client.sendBytesToServer(sentBuffer);
         byte[] receivedBuffer = new byte[bufferSize];
@@ -66,8 +69,8 @@ public class IONetworkTest {
 
     @Test
     @DisplayName("Reading one byte from client is success")
-    public void readByteFromClientSuccessTest() {
-        byte[] sentByte = new byte[]{getRandomByte()};
+    public void readByteFromClientSuccessTest(){
+        byte[] sentByte = new byte[] {getRandomByte()};
         client.sendBytesToServer(sentByte);
         byte receiveByte = network.readByteFromClient();
         Assertions.assertEquals(sentByte[0], receiveByte);
@@ -75,7 +78,7 @@ public class IONetworkTest {
 
     @Test
     @DisplayName("Reading bytes client is success")
-    public void readBytesFromClientSuccessTest() {
+    public void readBytesFromClientSuccessTest(){
         String string = "Hello World";
         byte[] stringBytes = string.getBytes();
         client.sendBytesToServer(stringBytes);
@@ -85,7 +88,7 @@ public class IONetworkTest {
 
     @Test
     @DisplayName("Sending bytes to client is success")
-    public void sendBytesToClientSuccessTest() {
+    public void sendBytesToClientSuccessTest(){
         byte[] sentBytes = getRandomBufferContent();
         network.sendBytesToClient(sentBytes);
         byte[] receivedBytes = client.getBytesFromServer(sentBytes.length);
@@ -94,8 +97,8 @@ public class IONetworkTest {
 
     @Test
     @DisplayName("Sending one byte to client is success")
-    public void sendByteToClientSuccessTest() {
-        byte sentByte = new byte[]{getRandomByte()}[0];
+    public void sendByteToClientSuccessTest(){
+        byte sentByte = new byte[] {getRandomByte()}[0];
         network.sendByteToClient(sentByte);
         byte receivedByte = client.getBytesFromServer(1)[0];
         Assertions.assertEquals(sentByte, receivedByte);
@@ -103,7 +106,7 @@ public class IONetworkTest {
 
     @Test
     @DisplayName("Getting Long from client is success")
-    public void getLongFromClientSuccessTest() {
+    public void getLongFromClientSuccessTest(){
         Random random = new Random();
         long sentLong = random.nextLong();
         client.sendLongToServer(sentLong);
@@ -113,7 +116,7 @@ public class IONetworkTest {
 
     @Test
     @DisplayName("Getting signal byte from client is success")
-    public void getSignalByteFromClientSuccessTest() {
+    public void getSignalByteFromClientSuccessTest(){
         byte[] sentByte1 = new byte[]{50};
         client.sendBytesToServer(sentByte1);
         byte receivedByte1 = ioCommandReceiver.getSignalByteFromClient();
@@ -130,7 +133,7 @@ public class IONetworkTest {
 
     @Test
     @DisplayName("Getting command from client is success")
-    public void getCommandFromClientSuccessTest() {
+    public void getCommandFromClientSuccessTest(){
         byte[] sentByte1 = new byte[]{50};
         client.sendBytesToServer(sentByte1);
         Requests receivedCommand1 = ioCommandReceiver.getCommandFromClient();
@@ -145,17 +148,17 @@ public class IONetworkTest {
         Assertions.assertNull(receivedCommand3);
     }
 
-    private byte[] getRandomBufferContent() {
+    private byte[] getRandomBufferContent(){
         int bufferSize = Cloud2ServerSettings.BUFFER_SIZE;
-        byte[] sentBuffer = new byte[bufferSize];
+        byte[] sentBuffer = new  byte[bufferSize];
         for (int i = 0; i < bufferSize; i++) {
             sentBuffer[i] = getRandomByte();
         }
         return sentBuffer;
     }
 
-    private byte getRandomByte() {
+    private byte getRandomByte(){
         Random random = new Random();
-        return (byte) random.nextInt(127);
+        return (byte)random.nextInt(127);
     }
 }

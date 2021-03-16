@@ -1,6 +1,6 @@
 package main;
 
-import commands.Requests;
+import ru.valerych.cloud2.commands.Requests;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;

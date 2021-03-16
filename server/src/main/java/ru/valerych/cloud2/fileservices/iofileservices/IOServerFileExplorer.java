@@ -27,8 +27,8 @@ public class IOServerFileExplorer implements ServerFileExplorer {
 
     @Override
     public boolean goToDirectory(String dirPath) {
-        logger.info("Trying to change current directory to '" + dirPath + "'");
         String directoryPath = dirPath.equals("") ? "" : Cloud2ServerSettings.FILE_SEPARATOR + dirPath;
+        logger.info("Trying to change current directory to '" + directoryPath + "'");
         File directory = new File(currentDirectory.getPath() + directoryPath);
         boolean isDirectory = dirPath
                 .equals(Cloud2ServerSettings.ROOT_DIR_MARK)||

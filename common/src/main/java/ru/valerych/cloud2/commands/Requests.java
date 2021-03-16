@@ -1,4 +1,4 @@
-package commands;
+package ru.valerych.cloud2.commands;
 
 public enum Requests {
     CONNECTION_LOST((byte)0),

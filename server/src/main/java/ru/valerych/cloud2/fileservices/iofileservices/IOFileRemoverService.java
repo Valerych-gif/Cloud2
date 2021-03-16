@@ -59,6 +59,7 @@ public class IOFileRemoverService implements FileRemoverService {
                             logger.info(String.format("File '%s' was removed", fileToDeletePathStr));
                         }
                     } else {
+                        logger.error(String.format("File '%s' isn't exist", fileToDelete.getAbsolutePath()));
                         throw new FileNotFoundException();
                     }
                     return;
