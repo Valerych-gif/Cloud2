@@ -10,6 +10,7 @@ import ru.valerych.cloud2.settings.Cloud2ServerSettings;
 import ru.valerych.cloud2.testutils.Client;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -24,7 +25,6 @@ class IOFileRemoverServiceTest {
     private static Client client;
     private static ServerSocket serverSocket;
 
-    private static User user;
     private static IOServerFileExplorer serverFileExplorer;
     private static FileRemoverService fileRemoverService;
 
@@ -40,12 +40,7 @@ class IOFileRemoverServiceTest {
             NetworkFactory networkFactory = new IONetworkFactory();
             network = networkFactory.createNetwork(socket);
 
-            File directory = new File(USER_DIRECTORY + FILE_SEPARATOR + USER_INNER_DIRECTORY);
-            if (!directory.exists()) {
-                directory.mkdir();
-            }
-
-            user = new User(0, "test", "test");
+            User user = new User(0, "test", "test");
             user.setUpUser(Paths.get("..", "storage", "0"));
             serverFileExplorer = new IOServerFileExplorer(user);
             fileRemoverService = new IOFileRemoverService(network, serverFileExplorer);
@@ -58,6 +53,10 @@ class IOFileRemoverServiceTest {
 
     @AfterAll
     public static void clearResources(){
+        File userFile = new File(USER_DIRECTORY + FILE_SEPARATOR + USER_FILE);
+        if (userFile.exists()) {
+            userFile.delete();
+        }
         try {
             serverSocket.close();
             network.closeConnection();
@@ -82,5 +81,38 @@ class IOFileRemoverServiceTest {
         client.sendBytesToServer(USER_FILE.getBytes(StandardCharsets.UTF_8));
         fileRemoverService.deleteFile();
         Assertions.assertFalse(userFile.exists());
+    }
+
+    @Test
+    @DisplayName("Deleting file is fail (File not found")
+    void deleteFileFileNotFoundTest() throws IOException {
+
+        File userFile = new File(USER_DIRECTORY + FILE_SEPARATOR + USER_FILE);
+        if (userFile.exists()) {
+            userFile.delete();
+        }
+        Assertions.assertFalse(userFile.exists());
+
+        serverFileExplorer.goToDirectory(USER_DIRECTORY);
+        client.sendBytesToServer(new byte[]{(byte) USER_FILE.length()});
+        client.sendBytesToServer(USER_FILE.getBytes(StandardCharsets.UTF_8));
+        Assertions.assertThrows(FileNotFoundException.class, ()->fileRemoverService.deleteFile());
+    }
+
+    @Test
+    @DisplayName("Deleting directory is success")
+    void deleteDirectorySuccessTest() throws IOException {
+
+        File directory = new File(USER_DIRECTORY + FILE_SEPARATOR + USER_INNER_DIRECTORY);
+        if (!directory.exists()) {
+            directory.mkdir();
+        }
+        Assertions.assertTrue(directory.exists());
+
+        serverFileExplorer.goToDirectory(USER_DIRECTORY);
+        client.sendBytesToServer(new byte[]{(byte) USER_INNER_DIRECTORY.length()});
+        client.sendBytesToServer(USER_INNER_DIRECTORY.getBytes(StandardCharsets.UTF_8));
+        fileRemoverService.deleteFile();
+        Assertions.assertFalse(directory.exists());
     }
 }

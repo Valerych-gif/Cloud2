@@ -11,10 +11,13 @@ import ru.valerych.cloud2.network.ionetwork.IONetworkFactory;
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
 import ru.valerych.cloud2.testutils.Client;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
+
+import static ru.valerych.cloud2.fileservices.iofileservices.IOFileServicesConstants.*;
 
 public class IODirectoryContentSenderTest {
 
@@ -25,6 +28,7 @@ public class IODirectoryContentSenderTest {
 
     @BeforeAll
     public static void ioServicesInit(){
+
         try {
             serverSocket = new ServerSocket(Cloud2ServerSettings.PORT);
             new Thread(()-> client = new Client()).start();
@@ -42,6 +46,14 @@ public class IODirectoryContentSenderTest {
 
     @AfterAll
     public static void clearResources(){
+        File directory = new File(USER_DIRECTORY + FILE_SEPARATOR + USER_INNER_DIRECTORY);
+        if (directory.exists()) {
+            directory.delete();
+        }
+        File userFile = new File(USER_DIRECTORY + FILE_SEPARATOR + USER_FILE);
+        if (userFile.exists()) {
+            userFile.delete();
+        }
         try {
             serverSocket.close();
             network.closeConnection();
@@ -53,7 +65,16 @@ public class IODirectoryContentSenderTest {
 
     @Test
     @DisplayName("Sending directory content to client is success")
-    public void sendDirectoryContentSuccessTest(){
+    public void sendDirectoryContentSuccessTest() throws IOException {
+
+        File directory = new File(USER_DIRECTORY + FILE_SEPARATOR + USER_INNER_DIRECTORY);
+        if (!directory.exists()) {
+            directory.mkdir();
+        }
+        File userFile = new File(USER_DIRECTORY + FILE_SEPARATOR + USER_FILE);
+        if (!userFile.exists()) {
+            userFile.createNewFile();
+        }
 
         client.sendBytesToServer(new byte[]{0});
         client.sendBytesToServer("".getBytes());
@@ -69,7 +90,7 @@ public class IODirectoryContentSenderTest {
             stringBuilder.append(fileName);
         }
         String string = stringBuilder.toString();
-        Assertions.assertTrue(string.contains("innerDirectory"));
-        Assertions.assertTrue(string.contains("TestFile1"));
+        Assertions.assertTrue(string.contains(USER_INNER_DIRECTORY));
+        Assertions.assertTrue(string.contains(USER_FILE));
     }
 }

@@ -22,19 +22,19 @@ class IOFileRemoverTest {
 
     @AfterAll
     static void clearRecourses(){
-        File userFile = new File(USER_DIRECTORY + USER_FILE);
+        File userFile = new File(USER_DIRECTORY + FILE_SEPARATOR + USER_FILE);
         if (userFile.exists()) {
             userFile.delete();
         }
-        File directory = new File(USER_DIRECTORY + USER_INNER_DIRECTORY);
+        File directory = new File(USER_DIRECTORY + FILE_SEPARATOR + USER_INNER_DIRECTORY);
         if (directory.exists()) {
             directory.delete();
         }
-        File userFile2 = new File(USER_DIRECTORY + DIRECTORY_FOR_RECURSIVE_REMOVE + USER_FILE);
+        File userFile2 = new File(USER_DIRECTORY + FILE_SEPARATOR + DIRECTORY_FOR_RECURSIVE_REMOVE + FILE_SEPARATOR + USER_FILE);
         if (userFile2.exists()) {
             userFile2.delete();
         }
-        File directory2 = new File(USER_DIRECTORY + USER_INNER_DIRECTORY);
+        File directory2 = new File(USER_DIRECTORY + FILE_SEPARATOR + USER_INNER_DIRECTORY);
         if (directory2.exists()) {
             directory2.delete();
         }
@@ -43,61 +43,61 @@ class IOFileRemoverTest {
     @Test
     @DisplayName("Deleting of one file is success")
     void deleteOneFileSuccessTest() throws IOException {
-        File userFile = new File(USER_DIRECTORY + USER_FILE);
+        File userFile = new File(USER_DIRECTORY + FILE_SEPARATOR + USER_FILE);
         if (!userFile.exists()) {
             userFile.createNewFile();
         }
         Assertions.assertTrue(userFile.exists());
-        fileRemover.deleteOneFile(USER_DIRECTORY + USER_FILE);
+        fileRemover.deleteOneFile(USER_DIRECTORY + FILE_SEPARATOR + USER_FILE);
         Assertions.assertFalse(userFile.exists());
     }
 
     @Test
     @DisplayName("Deleting of one file is fail (File not found)")
     void deleteOneFileFileNotFoundTest() throws IOException {
-        File userFile = new File(USER_DIRECTORY + USER_FILE);
+        File userFile = new File(USER_DIRECTORY + FILE_SEPARATOR + USER_FILE);
         if (userFile.exists()) {
             userFile.delete();
         }
-        Assertions.assertThrows(FileNotFoundException.class, ()->fileRemover.deleteOneFile(USER_DIRECTORY + USER_FILE));
+        Assertions.assertThrows(FileNotFoundException.class, ()->fileRemover.deleteOneFile(USER_DIRECTORY + FILE_SEPARATOR + USER_FILE));
     }
 
     @Test
     @DisplayName("Deleting of empty directory is success")
     void deleteEmptyDirectoryTest() throws FileNotFoundException {
-        File directory = new File(USER_DIRECTORY + USER_INNER_DIRECTORY);
+        File directory = new File(USER_DIRECTORY + FILE_SEPARATOR + USER_INNER_DIRECTORY);
         if (!directory.exists()) {
             directory.mkdir();
         }
         Assertions.assertTrue(directory.exists());
-        fileRemover.deleteDirectory(USER_DIRECTORY + USER_INNER_DIRECTORY);
+        fileRemover.deleteDirectory(USER_DIRECTORY + FILE_SEPARATOR + USER_INNER_DIRECTORY);
         Assertions.assertFalse(directory.exists());
     }
 
     @Test
     @DisplayName("Deleting of empty directory is fail (Directory not found)")
     void deleteEmptyDirectoryNotFoundTest() throws IOException {
-        File directory = new File(USER_DIRECTORY + USER_INNER_DIRECTORY);
+        File directory = new File(USER_DIRECTORY + FILE_SEPARATOR + USER_INNER_DIRECTORY);
         if (directory.exists()) {
             directory.delete();
         }
-        Assertions.assertThrows(FileNotFoundException.class, ()->fileRemover.deleteDirectory(USER_DIRECTORY + USER_INNER_DIRECTORY));
+        Assertions.assertThrows(FileNotFoundException.class, ()->fileRemover.deleteDirectory(USER_DIRECTORY + FILE_SEPARATOR + USER_INNER_DIRECTORY));
     }
 
     @Test
     @DisplayName("Deleting of not empty directory is success")
     void deleteNotEmptyDirectoryTest() throws IOException {
-        File directory = new File(USER_DIRECTORY + DIRECTORY_FOR_RECURSIVE_REMOVE);
+        File directory = new File(USER_DIRECTORY + FILE_SEPARATOR + DIRECTORY_FOR_RECURSIVE_REMOVE);
         if (!directory.exists()) {
             directory.mkdir();
         }
 
-        File userFile = new File(USER_DIRECTORY + DIRECTORY_FOR_RECURSIVE_REMOVE + USER_FILE);
+        File userFile = new File(USER_DIRECTORY + FILE_SEPARATOR + DIRECTORY_FOR_RECURSIVE_REMOVE + FILE_SEPARATOR + USER_FILE);
         if (!userFile.exists()) {
             userFile.createNewFile();
         }
         Assertions.assertTrue(userFile.exists());
-        fileRemover.deleteDirectory(USER_DIRECTORY + DIRECTORY_FOR_RECURSIVE_REMOVE);
+        fileRemover.deleteDirectory(USER_DIRECTORY + FILE_SEPARATOR + DIRECTORY_FOR_RECURSIVE_REMOVE);
         Assertions.assertFalse(directory.exists());
         Assertions.assertFalse(userFile.exists());
     }
@@ -105,14 +105,14 @@ class IOFileRemoverTest {
     @Test
     @DisplayName("Deleting of not empty directory is fail (Directory not found)")
     void deleteNotEmptyDirectoryNotFoundTest() throws IOException {
-        File userFile = new File(USER_DIRECTORY + DIRECTORY_FOR_RECURSIVE_REMOVE + USER_FILE);
+        File userFile = new File(USER_DIRECTORY + FILE_SEPARATOR + DIRECTORY_FOR_RECURSIVE_REMOVE + FILE_SEPARATOR + USER_FILE);
         if (userFile.exists()) {
             userFile.delete();
         }
-        File directory = new File(USER_DIRECTORY + USER_INNER_DIRECTORY);
+        File directory = new File(USER_DIRECTORY + FILE_SEPARATOR + USER_INNER_DIRECTORY);
         if (directory.exists()) {
             directory.delete();
         }
-        Assertions.assertThrows(FileNotFoundException.class, ()->fileRemover.deleteDirectory(USER_DIRECTORY + USER_INNER_DIRECTORY));
+        Assertions.assertThrows(FileNotFoundException.class, ()->fileRemover.deleteDirectory(USER_DIRECTORY + FILE_SEPARATOR + USER_INNER_DIRECTORY));
     }
 }
