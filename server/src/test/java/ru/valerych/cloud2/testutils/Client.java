@@ -51,13 +51,12 @@ public class Client {
     }
 
     public Long getLong() {
-        long l = 0;
         try {
-            l = is.readLong();
+            return is.readLong();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return l;
+        return 0L;
     }
 
     public void closeConnection() {

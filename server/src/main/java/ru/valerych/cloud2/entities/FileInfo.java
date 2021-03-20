@@ -6,7 +6,7 @@ public class FileInfo {
         DIRECTORY((byte)'D'),
         FILE ((byte)'F');
 
-        private byte mark;
+        private final byte mark;
 
         Type(byte mark) {
             this.mark = mark;
@@ -17,9 +17,9 @@ public class FileInfo {
         }
     }
 
-    private String fileName;
-    private long fileSize;
-    private Type type;
+    private final String fileName;
+    private final long fileSize;
+    private final Type type;
 
     public FileInfo(String fileName, long fileSize, Type type) {
         this.fileName = fileName;

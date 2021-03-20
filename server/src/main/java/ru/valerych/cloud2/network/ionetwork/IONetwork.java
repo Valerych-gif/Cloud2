@@ -73,7 +73,9 @@ public class IONetwork implements Network {
     @Override
     public void sendBytesToClient(byte[] buffer) {
         try {
-            os.writeBytes(new String(buffer));
+            for (byte b : buffer) {
+                os.writeByte(b);
+            }
         } catch (IOException e) {
             logger.error(e.toString(), logger);
         }
