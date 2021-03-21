@@ -1,9 +1,6 @@
 package ru.valerych.cloud2.fileservices.iofileservices;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import ru.valerych.cloud2.entities.User;
 import ru.valerych.cloud2.fileservices.interfaces.FileDownloaderService;
 import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
@@ -18,10 +15,10 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 import static ru.valerych.cloud2.fileservices.iofileservices.IOFileServicesConstants.USER_FILE;
-import static ru.valerych.cloud2.testutils.ServerFileStructureUtils.*;
+import static ru.valerych.cloud2.testutils.ServerFileStructureUtils.createFilledUserFile;
+import static ru.valerych.cloud2.testutils.ServerFileStructureUtils.removeFileStructure;
 
 class IOFileDownloaderServiceTest {
 
@@ -32,7 +29,6 @@ class IOFileDownloaderServiceTest {
 
     @BeforeAll
     public static void ioServicesInit() {
-
 
         try {
             serverSocket = new ServerSocket(Cloud2ServerSettings.PORT);
@@ -62,7 +58,8 @@ class IOFileDownloaderServiceTest {
     }
 
     @Test
-    void sendFileToClient() {
+    @DisplayName("Sending of file to client is success")
+    void sendFileToClientSuccessTest() {
         File userFile = createFilledUserFile();
         client.sendBytesToServer(new byte[]{Byte.parseByte(String.valueOf(USER_FILE.length()))});
         client.sendBytesToServer(USER_FILE.getBytes());

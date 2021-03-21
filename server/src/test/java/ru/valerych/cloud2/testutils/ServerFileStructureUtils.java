@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import static ru.valerych.cloud2.fileservices.iofileservices.IOFileServicesConstants.*;
 import static ru.valerych.cloud2.settings.Cloud2ServerSettings.BUFFER_SIZE;
@@ -125,8 +127,27 @@ public class ServerFileStructureUtils {
         }
     }
 
+    public static void removeClientFiles() {
+        List<File> files = new ArrayList<>();
+        files.add(new File(USER_DIRECTORY + FILE_SEPARATOR + FAKE_CLIENT_TEST_FILE1));
+        files.add(new File(USER_DIRECTORY + FILE_SEPARATOR + FAKE_CLIENT_TEST_FILE2));
+        files.add(new File(USER_DIRECTORY + FILE_SEPARATOR + FAKE_CLIENT_EMPTY_TEST));
+
+        for (File file : files) {
+            if (file.exists()) {
+                try {
+                    if (!file.delete())
+                        throw new IOException(String.format("Can't to remove file %s", file.getAbsolutePath()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     public static void removeFileStructure() {
         removeUserFile();
+        removeClientFiles();
         removeUserDirectory();
         removeUserDirectoryForRecursiveRemoving();
     }

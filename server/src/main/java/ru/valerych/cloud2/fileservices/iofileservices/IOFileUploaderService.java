@@ -52,31 +52,35 @@ public class IOFileUploaderService implements FileUploaderService {
                     stage = Stage.FILE_RECEIVE_PROCESS;
                     break;
                 case FILE_RECEIVE_PROCESS:
-                    int byteBufferSize = Cloud2ServerSettings.BUFFER_SIZE;
-                    byte[] buffer = new byte[byteBufferSize];
-
-                    long numberOfParcels = fileSize / byteBufferSize;
-                    int tailSize = (int) (fileSize - (numberOfParcels * byteBufferSize));
-
-                    File fileToUpload = new File(
-                            serverFileExplorer.getCurrentDirectory().getPath()
-                                    + Cloud2ServerSettings.FILE_SEPARATOR
-                                    + fileName);
-                    IOFileUploader fileUploader = new IOFileUploader(fileToUpload);
-
-                    for (int i = 0; i < numberOfParcels; i++) {
-                        network.readBufferFromClient(buffer);
-                        fileUploader.writeBufferToFile(buffer);
-                    }
-
-                    buffer = network.readBytesFromClient(tailSize);
-                    fileUploader.writeBufferToFile(buffer);
-                    fileUploader.closeFile();
+                    gettingFileFromClient(fileName, fileSize);
                     return true;
                 default:
                     throw new IllegalStateException("Unexpected value: " + stage);
             }
         }
+    }
+
+    private void gettingFileFromClient(String fileName, long fileSize) {
+        int byteBufferSize = Cloud2ServerSettings.BUFFER_SIZE;
+        byte[] buffer = new byte[byteBufferSize];
+
+        long numberOfParcels = fileSize / byteBufferSize;
+        int tailSize = (int) (fileSize - (numberOfParcels * byteBufferSize));
+
+        File fileToUpload = new File(
+                serverFileExplorer.getCurrentDirectory().getPath()
+                        + Cloud2ServerSettings.FILE_SEPARATOR
+                        + fileName);
+        IOFileUploader fileUploader = new IOFileUploader(fileToUpload);
+
+        for (int i = 0; i < numberOfParcels; i++) {
+            network.readBufferFromClient(buffer);
+            fileUploader.writeBufferToFile(buffer);
+        }
+
+        buffer = network.readBytesFromClient(tailSize);
+        fileUploader.writeBufferToFile(buffer);
+        fileUploader.closeFile();
     }
 }
 

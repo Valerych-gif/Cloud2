@@ -36,8 +36,9 @@ public class Client {
 
     public void sendBytesToServer(byte[] bytes){
         try {
+            Thread.sleep(100);
             os.write(bytes);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
