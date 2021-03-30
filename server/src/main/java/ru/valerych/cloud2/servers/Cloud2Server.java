@@ -3,7 +3,7 @@ package ru.valerych.cloud2.servers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
-import ru.valerych.cloud2.testutils.SetUpUtils;
+import ru.valerych.cloud2.utils.SetUpUtils;
 
 import java.io.File;
 

@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static ru.valerych.cloud2.settings.Cloud2ServerSettings.BUFFER_SIZE;
-import static ru.valerych.cloud2.testutils.ServerFileStructureUtils.*;
+import static ru.valerych.cloud2.utils.ServerFileStructureUtils.*;
 
 class IOFileDownloaderTest {
 

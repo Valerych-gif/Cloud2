@@ -9,7 +9,7 @@ import ru.valerych.cloud2.network.interfaces.Network;
 import ru.valerych.cloud2.network.interfaces.NetworkFactory;
 import ru.valerych.cloud2.network.ionetwork.IONetworkFactory;
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
-import ru.valerych.cloud2.testutils.Client;
+import ru.valerych.cloud2.utils.Client;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 
 import static ru.valerych.cloud2.fileservices.iofileservices.IOFileServicesConstants.USER_FILE;
 import static ru.valerych.cloud2.fileservices.iofileservices.IOFileServicesConstants.USER_INNER_DIRECTORY;
-import static ru.valerych.cloud2.testutils.ServerFileStructureUtils.*;
+import static ru.valerych.cloud2.utils.ServerFileStructureUtils.*;
 
 public class IODirectoryContentSenderTest {
 

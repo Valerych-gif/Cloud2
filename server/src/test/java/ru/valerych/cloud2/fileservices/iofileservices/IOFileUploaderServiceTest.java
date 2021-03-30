@@ -8,7 +8,7 @@ import ru.valerych.cloud2.network.interfaces.Network;
 import ru.valerych.cloud2.network.interfaces.NetworkFactory;
 import ru.valerych.cloud2.network.ionetwork.IONetworkFactory;
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
-import ru.valerych.cloud2.testutils.Client;
+import ru.valerych.cloud2.utils.Client;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static ru.valerych.cloud2.fileservices.iofileservices.IOFileServicesConstants.*;
-import static ru.valerych.cloud2.testutils.ServerFileStructureUtils.removeFileStructure;
+import static ru.valerych.cloud2.utils.ServerFileStructureUtils.removeFileStructure;
 
 class IOFileUploaderServiceTest {
 

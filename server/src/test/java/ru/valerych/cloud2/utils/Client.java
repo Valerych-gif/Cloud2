@@ -1,4 +1,4 @@
-package ru.valerych.cloud2.testutils;
+package ru.valerych.cloud2.utils;
 
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
 

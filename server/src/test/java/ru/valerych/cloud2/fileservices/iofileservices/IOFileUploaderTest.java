@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 
-import static ru.valerych.cloud2.testutils.ServerFileStructureUtils.createUserFile;
-import static ru.valerych.cloud2.testutils.ServerFileStructureUtils.removeUserFile;
+import static ru.valerych.cloud2.utils.ServerFileStructureUtils.createUserFile;
+import static ru.valerych.cloud2.utils.ServerFileStructureUtils.removeUserFile;
 
 class IOFileUploaderTest {
 

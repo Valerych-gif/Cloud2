@@ -1,7 +1,7 @@
 package ru.valerych.cloud2.network.ionetwork;
 
 import ru.valerych.cloud2.commands.Requests;
-import ru.valerych.cloud2.testutils.Client;
+import ru.valerych.cloud2.utils.Client;
 import ru.valerych.cloud2.network.interfaces.Network;
 import ru.valerych.cloud2.network.interfaces.NetworkFactory;
 import org.junit.jupiter.api.*;

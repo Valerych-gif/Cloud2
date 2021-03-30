@@ -1,4 +1,4 @@
-package ru.valerych.cloud2.testutils;
+package ru.valerych.cloud2.utils;
 
 import java.io.File;
 import java.io.FileOutputStream;

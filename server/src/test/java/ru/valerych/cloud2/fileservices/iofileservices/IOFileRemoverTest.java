@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 import static ru.valerych.cloud2.fileservices.iofileservices.IOFileServicesConstants.*;
-import static ru.valerych.cloud2.testutils.ServerFileStructureUtils.*;
+import static ru.valerych.cloud2.utils.ServerFileStructureUtils.*;
 
 class IOFileRemoverTest {
 
