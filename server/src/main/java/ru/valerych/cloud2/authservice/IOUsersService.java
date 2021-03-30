@@ -2,6 +2,8 @@ package ru.valerych.cloud2.authservice;
 
 import ru.valerych.cloud2.authservice.interfaces.UsersService;
 import ru.valerych.cloud2.entities.User;
+import ru.valerych.cloud2.exceptions.UserCantBeAuthorized;
+import ru.valerych.cloud2.exceptions.UserNotFoundException;
 import ru.valerych.cloud2.network.interfaces.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,7 +33,7 @@ public class IOUsersService implements UsersService {
         WAITING
     }
 
-    public final static Path AUTH_FILE_PATH = Paths.get(
+    public static final Path AUTH_FILE_PATH = Paths.get(
             Cloud2ServerSettings.SERVER_MAIN_FILES_DIR,
             Cloud2ServerSettings.AUTH_FILE
     );
@@ -104,7 +106,13 @@ public class IOUsersService implements UsersService {
                     break;
 
                 case AUTHORIZATION_PROCESS:
-                    user = authorisationService.getUserByLoginAndPassword(login, password);
+                    try {
+                        user = authorisationService.getUserByLoginAndPassword(login, password);
+                    } catch (UserNotFoundException e) {
+                        logger.error(e);
+                    } catch (UserCantBeAuthorized e){
+                        logger.warn(e);
+                    }
                     if (user != User.UNAUTHORIZED_USER) {
                         user.setUpUser();
                         stage = Stage.AUTHORIZATION_SUCCESS;

@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static ru.valerych.cloud2.settings.Cloud2ServerSettings.*;
+
 
 public class IOServerFileExplorer implements ServerFileExplorer {
 
@@ -27,20 +29,20 @@ public class IOServerFileExplorer implements ServerFileExplorer {
 
     @Override
     public boolean goToDirectory(String dirPath) {
-        String directoryPath = dirPath.equals("") ? "" : Cloud2ServerSettings.FILE_SEPARATOR + dirPath;
+        String directoryPath = dirPath.equals("") ? "" : FILE_SEPARATOR + dirPath;
         logger.info("Trying to change current directory to '" + directoryPath + "'");
         File directory = new File(currentDirectory.getPath() + directoryPath);
         boolean isDirectory = dirPath
-                .equals(Cloud2ServerSettings.ROOT_DIR_MARK)||
-                dirPath.equals(Cloud2ServerSettings.PARENT_DIR_MARK)||
+                .equals(ROOT_DIR_MARK)||
+                dirPath.equals(PARENT_DIR_MARK)||
                 directory.isDirectory();
         if (!isDirectory) return false;
         switch (dirPath) {
-            case Cloud2ServerSettings.PARENT_DIR_MARK:
+            case PARENT_DIR_MARK:
                 if (!currentDirectory.equals(userRootDirectory))
                     currentDirectory = new File(currentDirectory.getParent());
                 break;
-            case Cloud2ServerSettings.ROOT_DIR_MARK:
+            case ROOT_DIR_MARK:
                 currentDirectory = new File(userRootDirectory.getPath());
                 break;
             default:
@@ -56,8 +58,8 @@ public class IOServerFileExplorer implements ServerFileExplorer {
         List<FileInfo> filesInfo = new ArrayList<>();
         if (!currentDirectory.equals(userRootDirectory)) {
             System.out.println(currentDirectory + " " + userRootDirectory);
-            filesInfo.add(new FileInfo(Cloud2ServerSettings.ROOT_DIR_MARK, 0, FileInfo.Type.DIRECTORY));
-            filesInfo.add(new FileInfo(Cloud2ServerSettings.PARENT_DIR_MARK, 0, FileInfo.Type.DIRECTORY));
+            filesInfo.add(new FileInfo(ROOT_DIR_MARK, 0, FileInfo.Type.DIRECTORY));
+            filesInfo.add(new FileInfo(PARENT_DIR_MARK, 0, FileInfo.Type.DIRECTORY));
         }
         File[] files = currentDirectory.listFiles();
         for (File file : Objects.requireNonNull(files)) {
@@ -72,7 +74,7 @@ public class IOServerFileExplorer implements ServerFileExplorer {
 
     @Override
     public FileInfo getFileInfo(String fileName) {
-        File file = new File(currentDirectory.getPath() + Cloud2ServerSettings.FILE_SEPARATOR + fileName);
+        File file = new File(currentDirectory.getPath() + FILE_SEPARATOR + fileName);
         FileInfo.Type type = file.isDirectory() ? FileInfo.Type.DIRECTORY : FileInfo.Type.FILE;
         return new FileInfo(file.getName(), file.length(), type);
     }

@@ -22,14 +22,14 @@ public class Cloud2ServerSettings {
     static {
         properties = new Properties();
         try {
-            properties.load(new FileInputStream("server/src/main/resources/application.properties"));
+            properties.load(new FileInputStream("src/test/resources/application-test.properties"));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         String tmp;
         tmp =properties.getProperty("server.main-files-dir");
-        SERVER_MAIN_FILES_DIR = tmp!=null&&!tmp.trim().equals("")?tmp:"./sfiles";
+        SERVER_MAIN_FILES_DIR = tmp!=null&&!tmp.trim().equals("")?tmp:"src/test/sfiles";
         SERVER_TYPE = "IOServer";
         PORT = 8189;
         STORAGE_ROOT_DIR = "storage";
