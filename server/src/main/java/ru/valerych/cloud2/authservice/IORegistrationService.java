@@ -1,5 +1,6 @@
 package ru.valerych.cloud2.authservice;
 
+import ru.valerych.cloud2.authservice.interfaces.RegistrationService;
 import ru.valerych.cloud2.entities.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,13 +11,14 @@ import java.nio.file.StandardOpenOption;
 import java.util.Comparator;
 import java.util.Optional;
 
-public class RegistrationService {
+public class IORegistrationService implements RegistrationService {
 
-    private final Logger logger = LogManager.getLogger(RegistrationService.class);
+    private final Logger logger = LogManager.getLogger(IORegistrationService.class);
 
-    public RegistrationService() {
+    public IORegistrationService() {
     }
 
+    @Override
     public User getNewUserByLoginAndPassword(String login, String password){
         if (!isLoginFree(login))
             return User.UNAUTHORIZED_USER;
@@ -33,7 +35,7 @@ public class RegistrationService {
     synchronized private boolean isLoginFree(String login) {
         Optional<String[]> lines = Optional.empty();
         try {
-            lines = Files.lines(UsersService.AUTH_FILE_PATH)
+            lines = Files.lines(IOUsersService.AUTH_FILE_PATH)
                     .map((str) -> str.split(" "))
                     .filter((strings) -> login.equals(strings[1]))
                     .findFirst();
@@ -46,7 +48,7 @@ public class RegistrationService {
     synchronized private int getNewUserId(){
         Optional<String[]> lines = Optional.empty();
         try {
-            lines = Files.lines(UsersService.AUTH_FILE_PATH)
+            lines = Files.lines(IOUsersService.AUTH_FILE_PATH)
                     .map((str) -> str.split(" "))
                     .max(Comparator.comparingInt(str -> Integer.parseInt(str[0])));
         } catch (IOException e) {
@@ -55,10 +57,11 @@ public class RegistrationService {
         return lines.map(strings -> Integer.parseInt((strings)[0]) + 1).orElse(-1);
     }
 
+    @Override
     synchronized public void writeNewUserIntoDB(User user){
         String newUserStr = user.getId() + " " + user.getLogin() + " " + user.getPassword() + "\r\n";
         try {
-            Files.write(UsersService.AUTH_FILE_PATH, newUserStr.getBytes(), StandardOpenOption.APPEND);
+            Files.write(IOUsersService.AUTH_FILE_PATH, newUserStr.getBytes(), StandardOpenOption.APPEND);
         } catch (IOException e) {
             logger.error(e.toString());
         }

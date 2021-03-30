@@ -3,7 +3,7 @@ package ru.valerych.cloud2.connectionhandlers;
 import ru.valerych.cloud2.commands.Requests;
 import ru.valerych.cloud2.commands.Responses;
 import ru.valerych.cloud2.entities.User;
-import ru.valerych.cloud2.authservice.UsersService;
+import ru.valerych.cloud2.authservice.IOUsersService;
 import ru.valerych.cloud2.fileservices.interfaces.FileService;
 import ru.valerych.cloud2.fileservices.interfaces.FileServiceFactory;
 import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
@@ -31,7 +31,7 @@ public abstract class ConnectionHandler implements Runnable {
     protected ServerFileExplorerFactory serverFileExplorerFactory;
     protected ServerFileExplorer serverFileExplorer;
     protected FileService fileService;
-    protected UsersService usersService;
+    protected IOUsersService usersService;
     protected ShareFileService shareFileService;
     protected Network network;
     protected IOCommandReceiver commandReceiver;
@@ -51,7 +51,7 @@ public abstract class ConnectionHandler implements Runnable {
     @Override
     public void run() {
         this.commandReceiver = new IOCommandReceiver(network);
-        this.usersService = new UsersService(network);
+        this.usersService = new IOUsersService(network);
 
         while (isConnectionActive) {
             Requests command = null;

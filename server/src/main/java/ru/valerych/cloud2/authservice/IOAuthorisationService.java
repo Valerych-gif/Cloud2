@@ -1,5 +1,6 @@
 package ru.valerych.cloud2.authservice;
 
+import ru.valerych.cloud2.authservice.interfaces.AuthorisationService;
 import ru.valerych.cloud2.entities.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,16 +9,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Optional;
 
-public class AuthorisationService {
+public class IOAuthorisationService implements AuthorisationService {
 
-    private final Logger logger = LogManager.getLogger(AuthorisationService.class);
+    private final Logger logger = LogManager.getLogger(IOAuthorisationService.class);
 
-    public AuthorisationService() {
+    public IOAuthorisationService() {
     }
 
+    @Override
     public User getUserByLoginAndPassword(String login, String password) {
         try {
-            Optional<String[]> userStringArray = Files.lines(UsersService.AUTH_FILE_PATH)
+            Optional<String[]> userStringArray = Files.lines(IOUsersService.AUTH_FILE_PATH)
             .map(s -> s.split(" "))
             .filter(s -> s[1].equals(login) && s[2].equals(password))
             .findFirst();

@@ -1,5 +1,6 @@
 package ru.valerych.cloud2.authservice;
 
+import ru.valerych.cloud2.authservice.interfaces.UsersService;
 import ru.valerych.cloud2.entities.User;
 import ru.valerych.cloud2.network.interfaces.Network;
 import org.apache.logging.log4j.LogManager;
@@ -9,7 +10,7 @@ import ru.valerych.cloud2.settings.Cloud2ServerSettings;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class UsersService {
+public class IOUsersService implements UsersService {
 
     private enum Stage {
         WAITING_FOR_LOGIN_LENGTH,
@@ -35,29 +36,31 @@ public class UsersService {
             Cloud2ServerSettings.AUTH_FILE
     );
 
-    private final AuthorisationService authorisationService;
-    private final RegistrationService registrationService;
+    private final IOAuthorisationService authorisationService;
+    private final IORegistrationService registrationService;
     private final Network network;
 
     private Stage stage;
     private Mode mode;
 
-    private final Logger logger = LogManager.getLogger(UsersService.class);
+    private final Logger logger = LogManager.getLogger(IOUsersService.class);
 
-    public UsersService(Network network) {
+    public IOUsersService(Network network) {
         this.network = network;
-        this.authorisationService = new AuthorisationService();
-        this.registrationService = new RegistrationService();
+        this.authorisationService = new IOAuthorisationService();
+        this.registrationService = new IORegistrationService();
         this.mode = Mode.WAITING;
         this.stage = Stage.WAITING_FOR_LOGIN_LENGTH;
         logger.info("Authorization service started successfully");
     }
 
+    @Override
     public User authUserByLoginAndPassword() {
         mode = Mode.AUTHORIZATION;
         return getUserByLoginAndPasswordFromClient();
     }
 
+    @Override
     public User registrationUserByLoginAndPassword() {
         mode = Mode.REGISTRATION;
         return getUserByLoginAndPasswordFromClient();

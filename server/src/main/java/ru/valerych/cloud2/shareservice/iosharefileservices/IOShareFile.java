@@ -1,6 +1,6 @@
 package ru.valerych.cloud2.shareservice.iosharefileservices;
 
-import ru.valerych.cloud2.authservice.UsersService;
+import ru.valerych.cloud2.authservice.IOUsersService;
 import ru.valerych.cloud2.entities.User;
 import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
 import ru.valerych.cloud2.network.interfaces.Network;
@@ -97,7 +97,7 @@ public class IOShareFile implements ShareFile {
 
     public int getUserIdByUsername(String username) {
         try {
-            Optional<String[]> userStringArray = Files.lines(UsersService.AUTH_FILE_PATH)
+            Optional<String[]> userStringArray = Files.lines(IOUsersService.AUTH_FILE_PATH)
                     .map(s -> s.split(" "))
                     .filter(s -> s[1].equals(username))
                     .findFirst();
