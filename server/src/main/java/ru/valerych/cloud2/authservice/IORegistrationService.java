@@ -4,63 +4,70 @@ import ru.valerych.cloud2.authservice.interfaces.RegistrationService;
 import ru.valerych.cloud2.entities.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.valerych.cloud2.exceptions.LoginIsNotFreeException;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.Comparator;
 import java.util.Optional;
 
+import static ru.valerych.cloud2.authservice.IOUsersService.AUTH_FILE_PATH;
+
 public class IORegistrationService implements RegistrationService {
 
     private final Logger logger = LogManager.getLogger(IORegistrationService.class);
+    private final File authFile;
 
     public IORegistrationService() {
+        authFile = AUTH_FILE_PATH.toFile();
     }
 
     @Override
-    public User getNewUserByLoginAndPassword(String login, String password){
+    public User getNewUserByLoginAndPassword(String login, String password) throws LoginIsNotFreeException {
+
         if (!isLoginFree(login))
-            return User.UNAUTHORIZED_USER;
+            throw new LoginIsNotFreeException("Login '" + login + "' already in use");
 
         int userId = getNewUserId();
-        if (userId == -1)
-            return User.UNAUTHORIZED_USER;
 
-        User newUser = new User (userId, login, password);
+        User newUser = new User(userId, login, password);
         writeNewUserIntoDB(newUser);
         return newUser;
     }
 
     synchronized private boolean isLoginFree(String login) {
-        Optional<String[]> lines = Optional.empty();
-        try {
-            lines = Files.lines(IOUsersService.AUTH_FILE_PATH)
-                    .map((str) -> str.split(" "))
-                    .filter((strings) -> login.equals(strings[1]))
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(authFile)))) {
+            Optional<String[]> userStringArray = reader.lines()
+                    .map(s -> s.split(" "))
+                    .filter(s -> s[1].equals(login))
                     .findFirst();
+            if (userStringArray.isPresent()) return false;
         } catch (IOException e) {
-            logger.error(e.toString());
+            logger.error(e);
         }
-        return !lines.isPresent();
+        return true;
     }
 
-    synchronized private int getNewUserId(){
-        Optional<String[]> lines = Optional.empty();
-        try {
-            lines = Files.lines(IOUsersService.AUTH_FILE_PATH)
-                    .map((str) -> str.split(" "))
-                    .max(Comparator.comparingInt(str -> Integer.parseInt(str[0])));
+    synchronized private int getNewUserId() {
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(authFile)))) {
+            Optional<Integer> userStringArray = reader.lines()
+                    .map(s -> s.split(" "))
+                    .map(s->Integer.parseInt(s[0]))
+                    .max(Comparator.comparingInt(a -> a));
+            return userStringArray.orElse(0)+1;
         } catch (IOException e) {
-            logger.error(e.toString());
+            logger.error(e);
         }
-        return lines.map(strings -> Integer.parseInt((strings)[0]) + 1).orElse(-1);
+        return 1;
     }
 
-    synchronized private void writeNewUserIntoDB(User user){
-        String newUserStr = user.getId() + " " + user.getLogin() + " " + user.getPassword() + "\r\n";
-        try {
-            Files.write(IOUsersService.AUTH_FILE_PATH, newUserStr.getBytes(), StandardOpenOption.APPEND);
+    synchronized private void writeNewUserIntoDB(User user) {
+        String newUserStr = user.getId() + " " + user.getLogin() + " " + user.getPassword() + System.lineSeparator();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(authFile, true))) {
+            writer.write(newUserStr);
+            writer.flush();
         } catch (IOException e) {
             logger.error(e.toString());
         }
