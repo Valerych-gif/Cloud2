@@ -57,8 +57,7 @@ public class IORegistrationService implements RegistrationService {
         return lines.map(strings -> Integer.parseInt((strings)[0]) + 1).orElse(-1);
     }
 
-    @Override
-    synchronized public void writeNewUserIntoDB(User user){
+    synchronized private void writeNewUserIntoDB(User user){
         String newUserStr = user.getId() + " " + user.getLogin() + " " + user.getPassword() + "\r\n";
         try {
             Files.write(IOUsersService.AUTH_FILE_PATH, newUserStr.getBytes(), StandardOpenOption.APPEND);
