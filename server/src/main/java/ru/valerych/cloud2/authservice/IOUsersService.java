@@ -48,14 +48,17 @@ public class IOUsersService implements UsersService {
     @Override
     public User authUserByLoginAndPassword() throws UserNotFoundException, UserCantBeAuthorized {
         getUserByLoginAndPasswordFromClient();
-        return authorisationService.getUserByLoginAndPassword(login, password);
+        User user = authorisationService.getUserByLoginAndPassword(login, password);
+        user.setUpUser();
+        return user;
     }
 
     @Override
     public User registrationUserByLoginAndPassword() throws LoginIsNotFreeException {
-            getUserByLoginAndPasswordFromClient();
-
-        return registrationService.getNewUserByLoginAndPassword(login, password);
+        getUserByLoginAndPasswordFromClient();
+        User user = registrationService.getNewUserByLoginAndPassword(login, password);
+        user.setUpUser();
+        return user;
     }
 
     private void getUserByLoginAndPasswordFromClient() {
