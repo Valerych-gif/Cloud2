@@ -3,9 +3,11 @@ package ru.valerych.cloud2.fileservices.iofileservices;
 import org.junit.jupiter.api.*;
 import ru.valerych.cloud2.entities.FileInfo;
 import ru.valerych.cloud2.entities.User;
+import ru.valerych.cloud2.exceptions.IsNotDirectoryException;
 import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +31,7 @@ class IOServerFileExplorerTest {
 
     @Test
     @DisplayName("Going to directory is success")
-    void goToDirectorySuccessTest() {
+    void goToDirectorySuccessTest() throws IsNotDirectoryException, FileNotFoundException {
         File directory = createUserDirectory();
         ServerFileExplorer fileExplorer = new IOServerFileExplorer(user);
         fileExplorer.goToDirectory("");
@@ -39,6 +41,23 @@ class IOServerFileExplorerTest {
         currentDirectory = fileExplorer.getCurrentDirectory();
         Assertions.assertEquals(new File("../storage/0/" + directory.getName()), currentDirectory);
 
+    }
+
+    @Test
+    @DisplayName("Going to directory is fail. FileNotFoundException")
+    void goToDirectoryFileNotFoundException() {
+        File directory = new File("someDir");
+        ServerFileExplorer fileExplorer = new IOServerFileExplorer(user);
+        Assertions.assertThrows(FileNotFoundException.class, ()->fileExplorer.goToDirectory(directory.getName()));
+    }
+
+    @Test
+    @DisplayName("Going to directory is fail. IsNotDirectoryException")
+    void goToDirectoryIsNotDirectoryException() {
+        createUserDirectory();
+        File file = createUserFile();
+        ServerFileExplorer fileExplorer = new IOServerFileExplorer(user);
+        Assertions.assertThrows(IsNotDirectoryException.class, ()->fileExplorer.goToDirectory(file.getName()));
     }
 
     @Test

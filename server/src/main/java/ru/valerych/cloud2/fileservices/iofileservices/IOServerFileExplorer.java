@@ -2,12 +2,14 @@ package ru.valerych.cloud2.fileservices.iofileservices;
 
 import ru.valerych.cloud2.entities.FileInfo;
 import ru.valerych.cloud2.entities.User;
+import ru.valerych.cloud2.exceptions.IsNotDirectoryException;
 import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -28,15 +30,16 @@ public class IOServerFileExplorer implements ServerFileExplorer {
     }
 
     @Override
-    public boolean goToDirectory(String dirPath) {
+    public File goToDirectory(String dirPath) throws IsNotDirectoryException, FileNotFoundException {
         String directoryPath = dirPath.equals("") ? "" : FILE_SEPARATOR + dirPath;
         logger.info("Trying to change current directory to '" + directoryPath + "'");
         File directory = new File(currentDirectory.getPath() + directoryPath);
+        if (!directory.exists()) throw new FileNotFoundException(String.format("Directory '%s' isn't exists. Attempt to change directory failed", directory.getAbsolutePath()));
         boolean isDirectory = dirPath
                 .equals(ROOT_DIR_MARK)||
                 dirPath.equals(PARENT_DIR_MARK)||
                 directory.isDirectory();
-        if (!isDirectory) return false;
+        if (!isDirectory) throw new IsNotDirectoryException(String.format("'%s' isn't directory. Attempt to change directory failed", directory.getAbsolutePath()));
         switch (dirPath) {
             case PARENT_DIR_MARK:
                 if (!currentDirectory.equals(userRootDirectory))
@@ -50,7 +53,7 @@ public class IOServerFileExplorer implements ServerFileExplorer {
                 break;
         }
         logger.info("Current server directory is '" + currentDirectory.getAbsolutePath() + "'");
-        return currentDirectory.exists();
+        return currentDirectory;
     }
 
     @Override

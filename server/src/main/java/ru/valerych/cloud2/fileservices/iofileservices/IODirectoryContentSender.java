@@ -2,12 +2,14 @@ package ru.valerych.cloud2.fileservices.iofileservices;
 
 import ru.valerych.cloud2.commands.Responses;
 import ru.valerych.cloud2.entities.FileInfo;
+import ru.valerych.cloud2.exceptions.IsNotDirectoryException;
 import ru.valerych.cloud2.fileservices.interfaces.DirectoryContentSender;
 import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
 import ru.valerych.cloud2.network.interfaces.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.FileNotFoundException;
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -48,7 +50,11 @@ public class IODirectoryContentSender implements DirectoryContentSender {
                     stage = Stage.SEND_DIR_PROCESS;
                     break;
                 case SEND_DIR_PROCESS:
-                    serverFileExplorer.goToDirectory(dirName);
+                    try {
+                        serverFileExplorer.goToDirectory(dirName);
+                    } catch (IsNotDirectoryException | FileNotFoundException e) {
+                        logger.error(e);
+                    }
                     List<FileInfo> filesInfo = serverFileExplorer.getCurrentDirectoryContent();
                     for (FileInfo fileInfo : filesInfo) {
                         byte fileNameLength = (byte) fileInfo.getFileName().length();

@@ -2,6 +2,7 @@ package ru.valerych.cloud2.fileservices.iofileservices;
 
 import org.junit.jupiter.api.*;
 import ru.valerych.cloud2.entities.User;
+import ru.valerych.cloud2.exceptions.IsNotDirectoryException;
 import ru.valerych.cloud2.fileservices.interfaces.FileRemoverService;
 import ru.valerych.cloud2.network.interfaces.Network;
 import ru.valerych.cloud2.network.interfaces.NetworkFactory;
@@ -69,7 +70,6 @@ class IOFileRemoverServiceTest {
         File userFile = createUserFile();
         Assertions.assertTrue(userFile.exists());
 
-        serverFileExplorer.goToDirectory(USER_DIRECTORY);
         client.sendBytesToServer(new byte[]{(byte) USER_FILE.length()});
         client.sendBytesToServer(USER_FILE.getBytes(StandardCharsets.UTF_8));
         fileRemoverService.deleteFile();
@@ -82,7 +82,6 @@ class IOFileRemoverServiceTest {
 
         removeUserFile();
 
-        serverFileExplorer.goToDirectory(USER_DIRECTORY);
         client.sendBytesToServer(new byte[]{(byte) USER_FILE.length()});
         client.sendBytesToServer(USER_FILE.getBytes(StandardCharsets.UTF_8));
         Assertions.assertThrows(FileNotFoundException.class, ()->fileRemoverService.deleteFile());
@@ -95,7 +94,6 @@ class IOFileRemoverServiceTest {
         File directory = createUserDirectory();
         Assertions.assertTrue(directory.exists());
 
-        serverFileExplorer.goToDirectory(USER_DIRECTORY);
         client.sendBytesToServer(new byte[]{(byte) USER_INNER_DIRECTORY.length()});
         client.sendBytesToServer(USER_INNER_DIRECTORY.getBytes(StandardCharsets.UTF_8));
         fileRemoverService.deleteFile();
