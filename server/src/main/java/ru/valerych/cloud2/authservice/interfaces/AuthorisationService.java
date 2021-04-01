@@ -6,4 +6,6 @@ import ru.valerych.cloud2.exceptions.UserNotFoundException;
 
 public interface AuthorisationService {
     User getUserByLoginAndPassword(String login, String password) throws UserNotFoundException, UserCantBeAuthorized;
+
+    int getUserIdByLogin(String login) throws UserNotFoundException;
 }

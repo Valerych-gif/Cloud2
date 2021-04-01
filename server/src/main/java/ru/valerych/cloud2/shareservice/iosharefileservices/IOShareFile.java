@@ -1,7 +1,10 @@
 package ru.valerych.cloud2.shareservice.iosharefileservices;
 
+import ru.valerych.cloud2.authservice.IOAuthorisationService;
 import ru.valerych.cloud2.authservice.IOUsersService;
+import ru.valerych.cloud2.authservice.interfaces.AuthorisationService;
 import ru.valerych.cloud2.entities.User;
+import ru.valerych.cloud2.exceptions.UserNotFoundException;
 import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
 import ru.valerych.cloud2.network.interfaces.Network;
 import org.apache.logging.log4j.LogManager;
@@ -9,8 +12,7 @@ import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
 import ru.valerych.cloud2.shareservice.interfaces.ShareFile;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,10 +41,10 @@ public class IOShareFile implements ShareFile {
         this.serverFileExplorer = serverFileExplorer;
     }
 
-    public final static Path SHARE_FILE_PATH = Paths.get(
+    public final static File SHARE_FILE = Paths.get(
             Cloud2ServerSettings.SERVER_MAIN_FILES_DIR,
             Cloud2ServerSettings.SHARED_FILE
-    );
+    ).toFile();
     private final Logger logger = LogManager.getLogger(IOShareFile.class.getName());
 
     @Override
@@ -74,7 +76,13 @@ public class IOShareFile implements ShareFile {
                     stage = Stage.SHARE_FILE_PROCESS;
                     break;
                 case SHARE_FILE_PROCESS:
-                    int receiverId = getUserIdByUsername(userName);
+                    AuthorisationService authorisationService = new IOAuthorisationService();
+                    int receiverId = 0;
+                    try {
+                        receiverId = authorisationService.getUserIdByLogin(userName);
+                    } catch (UserNotFoundException e) {
+                        logger.error(String.format("Attempt to share file '%s' to user '%s' failed. User not found", fileName, userName));
+                    }
                     shareFile(receiverId, fileName);
                     isFileShared = true;
                     break;
@@ -86,43 +94,33 @@ public class IOShareFile implements ShareFile {
 
     private void shareFile(int receiverId, String fileName) {
         String pathToFile = serverFileExplorer.getCurrentDirectory().getPath();
-        String shareLine = user.getId() + " " + receiverId + " " + pathToFile + Cloud2ServerSettings.FILE_SEPARATOR + fileName + "\r\n";
-        try {
-            Files.write(SHARE_FILE_PATH, shareLine.getBytes(), StandardOpenOption.APPEND);
+        String shareLine = user.getId() + " " + receiverId + " " + pathToFile + Cloud2ServerSettings.FILE_SEPARATOR + fileName + System.lineSeparator();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(SHARE_FILE, true))) {
+            writer.write(shareLine);
+            writer.flush();
+            logger.info(String.format("There was written string '%s' in file '%s'", shareLine, SHARE_FILE.getAbsolutePath()));
         } catch (IOException e) {
-            logger.error(e.toString(), logger);
+            logger.error(String.format("There was unsuccessful attempt to write string '%s' in file '%s'", shareLine, SHARE_FILE.getAbsolutePath()));
         }
-        logger.info(shareLine, logger, "В файл " + SHARE_FILE_PATH + " записана строка ");
     }
 
-    public int getUserIdByUsername(String username) {
-        try {
-            Optional<String[]> userStringArray = Files.lines(IOUsersService.AUTH_FILE_PATH)
+    public File[] getSharedFiles(int userId) {
+        String idStr = String.valueOf(userId);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(SHARE_FILE)))) {
+            return (File[]) reader.lines()
                     .map(s -> s.split(" "))
-                    .filter(s -> s[1].equals(username))
-                    .findFirst();
-            return userStringArray.map(strings -> Integer.parseInt(strings[0])).orElse(-1);
+                    .filter(s -> s[0].equals(idStr) || s[0].equals("-1"))
+                    .map(strings -> new File(
+                            Cloud2ServerSettings.STORAGE_ROOT_DIR
+                                    + Cloud2ServerSettings.FILE_SEPARATOR
+                                    + strings[1]
+                                    + Cloud2ServerSettings.FILE_SEPARATOR
+                                    + strings[2])).toArray();
+        } catch (FileNotFoundException e) {
+            logger.fatal(e);
         } catch (IOException e) {
-            logger.error("Authorization file can not be read");
+            logger.error(String.format("Share files DB '%s' can not be read", SHARE_FILE.getAbsolutePath()));
         }
-        return -1;
-    }
-
-    public File[] getSharedFiles(int userId) throws IOException {
-        String id = String.valueOf(userId);
-        List<String[]> fileNames = Files.lines(SHARE_FILE_PATH)
-                .map((str) -> str.split(" "))
-                .filter(str -> str[0].equals(id) || str[0].equals("-1"))
-                .collect(Collectors.toList());
-        File[] files = new File[fileNames.size()];
-        for (int i = 0; i < files.length; i++) {
-            files[i] = new File(
-                    Cloud2ServerSettings.STORAGE_ROOT_DIR
-                            + Cloud2ServerSettings.FILE_SEPARATOR
-                            + fileNames.get(i)[1]
-                            + Cloud2ServerSettings.FILE_SEPARATOR
-                            + fileNames.get(i)[2]);
-        }
-        return files;
+        return new File[]{};
     }
 }
