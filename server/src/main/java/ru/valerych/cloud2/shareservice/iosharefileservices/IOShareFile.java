@@ -1,25 +1,21 @@
 package ru.valerych.cloud2.shareservice.iosharefileservices;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.authservice.IOAuthorisationService;
-import ru.valerych.cloud2.authservice.IOUsersService;
 import ru.valerych.cloud2.authservice.interfaces.AuthorisationService;
 import ru.valerych.cloud2.entities.User;
 import ru.valerych.cloud2.exceptions.UserNotFoundException;
 import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
 import ru.valerych.cloud2.network.interfaces.Network;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
 import ru.valerych.cloud2.shareservice.interfaces.ShareFile;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class IOShareFile implements ShareFile {
 
@@ -77,13 +73,12 @@ public class IOShareFile implements ShareFile {
                     break;
                 case SHARE_FILE_PROCESS:
                     AuthorisationService authorisationService = new IOAuthorisationService();
-                    int receiverId = 0;
                     try {
-                        receiverId = authorisationService.getUserIdByLogin(userName);
+                        int receiverId = authorisationService.getUserIdByLogin(userName);
+                        shareFile(receiverId, fileName);
                     } catch (UserNotFoundException e) {
                         logger.error(String.format("Attempt to share file '%s' to user '%s' failed. User not found", fileName, userName));
                     }
-                    shareFile(receiverId, fileName);
                     isFileShared = true;
                     break;
                 default:
@@ -102,25 +97,5 @@ public class IOShareFile implements ShareFile {
         } catch (IOException e) {
             logger.error(String.format("There was unsuccessful attempt to write string '%s' in file '%s'", shareLine, SHARE_FILE.getAbsolutePath()));
         }
-    }
-
-    public File[] getSharedFiles(int userId) {
-        String idStr = String.valueOf(userId);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(SHARE_FILE)))) {
-            return (File[]) reader.lines()
-                    .map(s -> s.split(" "))
-                    .filter(s -> s[0].equals(idStr) || s[0].equals("-1"))
-                    .map(strings -> new File(
-                            Cloud2ServerSettings.STORAGE_ROOT_DIR
-                                    + Cloud2ServerSettings.FILE_SEPARATOR
-                                    + strings[1]
-                                    + Cloud2ServerSettings.FILE_SEPARATOR
-                                    + strings[2])).toArray();
-        } catch (FileNotFoundException e) {
-            logger.fatal(e);
-        } catch (IOException e) {
-            logger.error(String.format("Share files DB '%s' can not be read", SHARE_FILE.getAbsolutePath()));
-        }
-        return new File[]{};
     }
 }

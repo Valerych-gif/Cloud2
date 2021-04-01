@@ -5,5 +5,4 @@ import java.io.IOException;
 
 public interface ShareFile {
     void shareFileByCommandFromClient();
-    File[] getSharedFiles(int userId) throws IOException;
 }

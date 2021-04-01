@@ -38,7 +38,10 @@ public class IOSharedFilesDirectoryContentSender implements SharedFilesDirectory
             filesInfo = reader.lines()
                     .map(s -> s.split(" "))
                     .filter(s -> (user.getId() == Integer.parseInt(s[1])))
-                    .filter(s -> new File(STORAGE_ROOT_DIR + FILE_SEPARATOR + s[0] + FILE_SEPARATOR + s[2]).exists())
+                    .filter(s -> {
+                        File file = new File(s[2]);
+                        return file.exists();
+                    })
                     .map(s -> {
                         String fileName = s[2];
                         File file = new File(fileName);

@@ -1,19 +1,21 @@
 package ru.valerych.cloud2.shareservice.iosharefileservices;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import ru.valerych.cloud2.authservice.IOUsersService;
-import ru.valerych.cloud2.commands.Responses;
-import ru.valerych.cloud2.entities.FileInfo;
 import ru.valerych.cloud2.entities.User;
+import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
+import ru.valerych.cloud2.fileservices.iofileservices.IOServerFileExplorer;
 import ru.valerych.cloud2.network.interfaces.Network;
 import ru.valerych.cloud2.network.interfaces.NetworkFactory;
 import ru.valerych.cloud2.network.ionetwork.IONetworkFactory;
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
-import ru.valerych.cloud2.shareservice.interfaces.SharedFilesDirectoryContentSender;
+import ru.valerych.cloud2.shareservice.interfaces.ShareFile;
 import ru.valerych.cloud2.utils.Client;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -22,23 +24,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.valerych.cloud2.fileservices.iofileservices.IOFileServicesConstants.USER_FILE;
+import static org.junit.jupiter.api.Assertions.*;
+import static ru.valerych.cloud2.fileservices.iofileservices.IOFileServicesConstants.FILE_TO_SHARE;
 import static ru.valerych.cloud2.settings.Cloud2ServerSettings.*;
 import static ru.valerych.cloud2.utils.ServerFileStructureUtils.createUserFile;
 import static ru.valerych.cloud2.utils.ServerFileStructureUtils.removeFileStructure;
 
-class IOSharedFilesDirectoryContentSenderTest {
+class IOShareFileTest {
 
     private static Network network;
     private static Client client;
 
     private static ServerSocket serverSocket;
+    private static final Path shareFilePath = Paths.get(SERVER_MAIN_FILES_DIR, SHARED_FILE);
 
-    private static final Path SHARE_FILE_PATH = Paths.get(SERVER_MAIN_FILES_DIR, SHARED_FILE);
 
     @BeforeAll
     public static void ioServicesInit() {
@@ -55,10 +57,8 @@ class IOSharedFilesDirectoryContentSenderTest {
             Files.write(IOUsersService.AUTH_FILE_PATH, ("0 testSender test" + System.lineSeparator()).getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
             Files.write(IOUsersService.AUTH_FILE_PATH, ("1 testReceiver test"+ System.lineSeparator()).getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
 
-            Files.deleteIfExists(SHARE_FILE_PATH);
-            Files.createFile(SHARE_FILE_PATH);
-            String sharedString = "0 1 src"+FILE_SEPARATOR + "test" + FILE_SEPARATOR + "storage" + FILE_SEPARATOR + "0" +FILE_SEPARATOR + USER_FILE;
-            Files.write(SHARE_FILE_PATH, sharedString.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
+            Files.deleteIfExists(shareFilePath);
+            Files.createFile(shareFilePath);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -66,9 +66,9 @@ class IOSharedFilesDirectoryContentSenderTest {
 
     @AfterAll
     public static void clearResources() throws IOException {
-        removeFileStructure();
-        Files.deleteIfExists(SHARE_FILE_PATH);
         Files.deleteIfExists(IOUsersService.AUTH_FILE_PATH);
+        Files.deleteIfExists(shareFilePath);
+        removeFileStructure();
         try {
             serverSocket.close();
             network.closeConnection();
@@ -79,34 +79,21 @@ class IOSharedFilesDirectoryContentSenderTest {
     }
 
     @Test
-    @DisplayName("Sending shared files directory content is success")
-    void sendSharedFilesDirectoryContentSuccessTest() throws FileNotFoundException {
+    void shareFileByCommandFromClient() throws IOException {
         User user1 = new User(0, "testSender", "test");
         User user2 = new User(1, "testReceiver", "test");
         user1.setUpUser();
         user2.setUpUser();
         File userFile = createUserFile();
-
-        SharedFilesDirectoryContentSender contentSender = new IOSharedFilesDirectoryContentSender(user2, network);
-        contentSender.sendSharedFilesDirectoryContent();
-        List<FileInfo> fileInfoList = new ArrayList<>();
-        while (true){
-            byte fileLength = client.getBytesFromServer(1)[0];
-            if (fileLength== Responses.END_OF_DIR_CONTENT.getSignalByte()) break;
-            byte[] fileNameBytes = client.getBytesFromServer(fileLength);
-            String fileName = new String(fileNameBytes);
-            byte fileMark = client.getBytesFromServer(1)[0];
-            long fileSize = client.getLong();
-            fileInfoList.add(new FileInfo(fileName, fileSize, fileMark==(byte)'D'? FileInfo.Type.DIRECTORY: FileInfo.Type.FILE));
-        }
-        List<String> fileNames = fileInfoList.stream()
-                .map(FileInfo::getFileName)
-                .map(s -> {
-                    String fileName = s.substring(s.length()-userFile.getName().length());
-                    System.out.println(fileName);
-                    return fileName;
-                })
-                .collect(Collectors.toList());
-        Assertions.assertTrue(fileNames.contains(USER_FILE));
+        client.sendBytesToServer(new byte[]{(byte) user2.getLogin().length()});
+        client.sendBytesToServer(user2.getLogin().getBytes(StandardCharsets.UTF_8));
+        client.sendBytesToServer(new byte[]{(byte) userFile.getName().length()});
+        client.sendBytesToServer(userFile.getName().getBytes(StandardCharsets.UTF_8));
+        ServerFileExplorer serverFileExplorer = new IOServerFileExplorer(user1);
+        ShareFile shareFile = new IOShareFile(user1, network, serverFileExplorer);
+        shareFile.shareFileByCommandFromClient();
+        List<String> strings = Files.lines(shareFilePath).collect(Collectors.toList());
+        String sharedString = "0 1 src"+FILE_SEPARATOR + "test" + FILE_SEPARATOR + "storage" + FILE_SEPARATOR + "0" +FILE_SEPARATOR + "userFile.txt";
+        Assertions.assertTrue(strings.contains(sharedString));
     }
 }
