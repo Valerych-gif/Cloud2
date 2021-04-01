@@ -22,7 +22,7 @@ public class IOServerFileExplorer implements ServerFileExplorer {
     private File currentDirectory;
     private final File userRootDirectory;
 
-    private final Logger logger = LogManager.getLogger(IOServerFileExplorer.class);
+    private final Logger logger = LogManager.getLogger(IOServerFileExplorer.class.getName());
 
     public IOServerFileExplorer(User user) {
         userRootDirectory = user.getUserStorage();

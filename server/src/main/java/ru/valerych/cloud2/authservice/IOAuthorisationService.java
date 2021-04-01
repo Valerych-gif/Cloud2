@@ -14,7 +14,7 @@ import static ru.valerych.cloud2.authservice.IOUsersService.AUTH_FILE_PATH;
 
 public class IOAuthorisationService implements AuthorisationService {
 
-    private final Logger logger = LogManager.getLogger(IOAuthorisationService.class);
+    private final Logger logger = LogManager.getLogger(IOAuthorisationService.class.getName());
     private final File authFile;
 
     public IOAuthorisationService() {

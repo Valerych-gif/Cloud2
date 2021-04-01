@@ -24,7 +24,7 @@ public class IODirectoryContentSender implements DirectoryContentSender {
     private final Network network;
     private final ServerFileExplorer serverFileExplorer;
 
-    private final Logger logger = LogManager.getLogger(IODirectoryContentSender.class);
+    private final Logger logger = LogManager.getLogger(IODirectoryContentSender.class.getName());
 
     public IODirectoryContentSender(Network network, ServerFileExplorer serverFileExplorer) {
         this.network = network;

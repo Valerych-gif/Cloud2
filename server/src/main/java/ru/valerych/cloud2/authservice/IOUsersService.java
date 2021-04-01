@@ -35,7 +35,7 @@ public class IOUsersService implements UsersService {
     private String login;
     private String password;
 
-    private final Logger logger = LogManager.getLogger(IOUsersService.class);
+    private final Logger logger = LogManager.getLogger(IOUsersService.class.getName());
 
     public IOUsersService(Network network) {
         this.network = network;

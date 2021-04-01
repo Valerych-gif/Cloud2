@@ -22,7 +22,7 @@ public class IOFileRemoverService implements FileRemoverService {
     private final Network network;
     private final ServerFileExplorer serverFileExplorer;
 
-    private final Logger logger = LogManager.getLogger(IOFileRemoverService.class);
+    private final Logger logger = LogManager.getLogger(IOFileRemoverService.class.getName());
 
     public IOFileRemoverService(Network network, ServerFileExplorer serverFileExplorer) {
         this.network = network;

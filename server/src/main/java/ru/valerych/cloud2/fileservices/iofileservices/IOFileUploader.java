@@ -11,7 +11,7 @@ public class IOFileUploader implements FileUploader {
 
     private FileOutputStream fos;
 
-    private final Logger logger = LogManager.getLogger(IOFileUploader.class);
+    private final Logger logger = LogManager.getLogger(IOFileUploader.class.getName());
 
     public IOFileUploader(File file) {
         try {

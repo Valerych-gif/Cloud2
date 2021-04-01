@@ -21,7 +21,7 @@ public class IOFileUploaderService implements FileUploaderService {
     private final Network network;
     private final ServerFileExplorer serverFileExplorer;
 
-    private final Logger logger = LogManager.getLogger(IOFileUploaderService.class);
+    private final Logger logger = LogManager.getLogger(IOFileUploaderService.class.getName());
 
     public IOFileUploaderService(Network network, ServerFileExplorer serverFileExplorer) {
         this.network = network;

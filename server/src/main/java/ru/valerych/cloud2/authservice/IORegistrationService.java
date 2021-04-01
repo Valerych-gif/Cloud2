@@ -16,7 +16,7 @@ import static ru.valerych.cloud2.authservice.IOUsersService.AUTH_FILE_PATH;
 
 public class IORegistrationService implements RegistrationService {
 
-    private final Logger logger = LogManager.getLogger(IORegistrationService.class);
+    private final Logger logger = LogManager.getLogger(IORegistrationService.class.getName());
     private final File authFile;
 
     public IORegistrationService() {

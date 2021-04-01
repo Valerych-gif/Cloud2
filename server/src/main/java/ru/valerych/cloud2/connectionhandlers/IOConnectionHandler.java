@@ -11,7 +11,7 @@ import java.net.Socket;
 
 public class IOConnectionHandler extends ConnectionHandler {
 
-    private final Logger logger = LogManager.getLogger(IOConnectionHandler.class);
+    private final Logger logger = LogManager.getLogger(IOConnectionHandler.class.getName());
 
     public IOConnectionHandler(Socket socket){
         super();

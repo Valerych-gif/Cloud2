@@ -14,7 +14,7 @@ public class IOFileDownloader implements FileDownloader {
     private File file;
     private FileInputStream fis;
 
-    private final Logger logger = LogManager.getLogger(IOFileUploader.class);
+    private final Logger logger = LogManager.getLogger(IOFileUploader.class.getName());
 
     public IOFileDownloader(File file) {
         try {

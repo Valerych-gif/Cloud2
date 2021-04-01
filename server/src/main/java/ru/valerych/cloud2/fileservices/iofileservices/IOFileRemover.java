@@ -10,7 +10,7 @@ import java.io.FileNotFoundException;
 
 public class IOFileRemover implements FileRemover {
 
-    private final Logger logger = LogManager.getLogger(IOFileRemover.class);
+    private final Logger logger = LogManager.getLogger(IOFileRemover.class.getName());
 
     @Override
     public void deleteOneFile(String path) throws FileNotFoundException {

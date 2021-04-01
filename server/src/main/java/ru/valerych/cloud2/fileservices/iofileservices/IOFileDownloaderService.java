@@ -26,7 +26,7 @@ public class IOFileDownloaderService implements FileDownloaderService {
     private final Network network;
     private final ServerFileExplorer serverFileExplorer;
 
-    private final Logger logger = LogManager.getLogger(IOFileDownloaderService.class);
+    private final Logger logger = LogManager.getLogger(IOFileDownloaderService.class.getName());
 
     public IOFileDownloaderService(Network network, ServerFileExplorer serverFileExplorer) {
         this.network = network;

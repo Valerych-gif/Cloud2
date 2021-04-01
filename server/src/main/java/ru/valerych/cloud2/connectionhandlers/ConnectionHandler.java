@@ -21,7 +21,7 @@ import java.io.File;
 
 public abstract class ConnectionHandler implements Runnable {
 
-    private final Logger logger = LogManager.getLogger(ConnectionHandler.class);
+    private final Logger logger = LogManager.getLogger(ConnectionHandler.class.getName());
 
     protected Cloud2Server server;
     protected ConnectionHandler connectionHandler;
