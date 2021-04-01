@@ -9,15 +9,20 @@ import ru.valerych.cloud2.fileservices.iofileservices.IODirectoryContentSender;
 import ru.valerych.cloud2.network.interfaces.Network;
 import ru.valerych.cloud2.shareservice.interfaces.SharedFilesDirectoryContentSender;
 
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static ru.valerych.cloud2.settings.Cloud2ServerSettings.*;
 
 public class IOSharedFilesDirectoryContentSender implements SharedFilesDirectoryContentSender {
 
     private final Logger logger = LogManager.getLogger(IOSharedFilesDirectoryContentSender.class.getName());
-    private User user;
-    private Network network;
+    private final User user;
+    private final Network network;
 
     public IOSharedFilesDirectoryContentSender(User user, Network network) {
         this.user = user;
@@ -25,9 +30,28 @@ public class IOSharedFilesDirectoryContentSender implements SharedFilesDirectory
     }
 
     @Override
-    public void sendSharedFilesDirectoryContent() {
+    public void sendSharedFilesDirectoryContent() throws FileNotFoundException {
         List<FileInfo> filesInfo = new ArrayList<>();
+        File sharedFilesDb = new File(SERVER_MAIN_FILES_DIR + FILE_SEPARATOR + SHARED_FILE);
+        if (!sharedFilesDb.exists()) throw new FileNotFoundException(String.format("File with shared files DB '%s' isn't exists", sharedFilesDb.getAbsolutePath()));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(SERVER_MAIN_FILES_DIR + FILE_SEPARATOR + SHARED_FILE)))) {
+            filesInfo = reader.lines()
+                    .map(s -> s.split(" "))
+                    .filter(s -> (user.getId() == Integer.parseInt(s[1])))
+                    .filter(s -> new File(STORAGE_ROOT_DIR + FILE_SEPARATOR + s[0] + FILE_SEPARATOR + s[2]).exists())
+                    .map(s -> {
+                        String fileName = s[2];
+                        File file = new File(fileName);
+                        return new FileInfo(fileName, file.length(), FileInfo.Type.FILE);
+                    })
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            logger.error(e);
+        }
+        sendFileListToClient(filesInfo);
+    }
 
+    private void sendFileListToClient(List<FileInfo> filesInfo) {
         for (FileInfo fileInfo : filesInfo) {
             byte fileNameLength = (byte) fileInfo.getFileName().length();
             network.sendByteToClient(fileNameLength);
@@ -47,5 +71,4 @@ public class IOSharedFilesDirectoryContentSender implements SharedFilesDirectory
         }
         network.sendByteToClient(Responses.END_OF_DIR_CONTENT.getSignalByte());
     }
-
 }

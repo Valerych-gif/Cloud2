@@ -43,7 +43,7 @@ public class IOShareFile implements ShareFile {
             Cloud2ServerSettings.SERVER_MAIN_FILES_DIR,
             Cloud2ServerSettings.SHARED_FILE
     );
-    private final Logger logger = LogManager.getLogger(IOShareFile.class);
+    private final Logger logger = LogManager.getLogger(IOShareFile.class.getName());
 
     @Override
     public void shareFileByCommandFromClient() {

@@ -17,7 +17,7 @@ public class IOFileUploader implements FileUploader {
         try {
             this.fos = new FileOutputStream(file);
         } catch (FileNotFoundException e) {
-            logger.error(e.toString());
+            logger.error(String.format("File '%s' not found", file.getAbsolutePath()));
         }
     }
 

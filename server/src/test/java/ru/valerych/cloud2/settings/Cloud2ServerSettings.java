@@ -32,7 +32,7 @@ public class Cloud2ServerSettings {
         SERVER_MAIN_FILES_DIR = tmp!=null&&!tmp.trim().equals("")?tmp:"src/test/sfiles";
         SERVER_TYPE = "IOServer";
         PORT = 8189;
-        STORAGE_ROOT_DIR = "storage";
+        STORAGE_ROOT_DIR = "src/test/storage";
         AUTH_FILE = "auth.db";
         SHARED_FILE = "sharedfiles.db";
         BUFFER_SIZE = 1024;
