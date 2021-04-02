@@ -14,7 +14,7 @@ import ru.valerych.cloud2.network.interfaces.NetworkFactory;
 import ru.valerych.cloud2.servers.Cloud2Server;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.valerych.cloud2.shareservice.interfaces.ShareFileService;
+import ru.valerych.cloud2.shareservice.interfaces.ShareService;
 import ru.valerych.cloud2.shareservice.interfaces.ShareFileServiceFactory;
 
 import java.io.File;
@@ -32,7 +32,7 @@ public abstract class ConnectionHandler implements Runnable {
     protected ServerFileExplorer serverFileExplorer;
     protected FileService fileService;
     protected IOUsersService usersService;
-    protected ShareFileService shareFileService;
+    protected ShareService shareService;
     protected Network network;
     protected IOCommandReceiver commandReceiver;
     protected File mainStorage;
@@ -121,7 +121,7 @@ public abstract class ConnectionHandler implements Runnable {
                     case GET_SHARED_DIR_CONTENT:
                         if (user != User.UNAUTHORIZED_USER) {
                             network.sendByteToClient(Responses.OK.getSignalByte());
-                            shareFileService.sendSharedFilesDirToClient();
+                            shareService.sendSharedFilesDirToClient();
                         } else {
                             network.sendByteToClient(Responses.FAIL.getSignalByte());
                         }
@@ -129,7 +129,7 @@ public abstract class ConnectionHandler implements Runnable {
                     case SHARE:
                         if (user != User.UNAUTHORIZED_USER) {
                             network.sendByteToClient(Responses.OK.getSignalByte());
-                            shareFileService.shareFileByCommandFromClient();
+                            shareService.shareFileByCommandFromClient();
                         } else {
                             network.sendByteToClient(Responses.FAIL.getSignalByte());
                         }
@@ -151,7 +151,7 @@ public abstract class ConnectionHandler implements Runnable {
     private void setUpServices() {
         this.serverFileExplorer = serverFileExplorerFactory.createServerFileExplorer(user, network);
         this.fileService = fileServiceFactory.createFileService(network, serverFileExplorer);
-        this.shareFileService = shareFileServiceFactory.createShareFileService(user, network, serverFileExplorer);
+        this.shareService = shareFileServiceFactory.createShareFileService(user, network, serverFileExplorer);
     }
 
     public void closeConnection() {

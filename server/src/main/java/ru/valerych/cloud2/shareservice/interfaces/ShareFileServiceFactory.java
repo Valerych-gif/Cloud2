@@ -5,5 +5,5 @@ import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
 import ru.valerych.cloud2.network.interfaces.Network;
 
 public interface ShareFileServiceFactory {
-    ShareFileService createShareFileService(User user, Network network, ServerFileExplorer serverFileExplorer);
+    ShareService createShareFileService(User user, Network network, ServerFileExplorer serverFileExplorer);
 }

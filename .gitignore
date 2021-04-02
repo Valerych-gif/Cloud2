@@ -6,3 +6,5 @@
 /storage/
 /sfiles/
 /client/src/main/resources/Cloud2Files/
+/server/src/test/storage/
+/server/src/test/sfiles-test/

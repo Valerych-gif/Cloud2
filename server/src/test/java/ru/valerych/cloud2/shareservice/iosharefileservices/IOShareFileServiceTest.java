@@ -1,9 +1,6 @@
 package ru.valerych.cloud2.shareservice.iosharefileservices;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import ru.valerych.cloud2.authservice.IOUsersService;
 import ru.valerych.cloud2.entities.User;
 import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
@@ -12,7 +9,7 @@ import ru.valerych.cloud2.network.interfaces.Network;
 import ru.valerych.cloud2.network.interfaces.NetworkFactory;
 import ru.valerych.cloud2.network.ionetwork.IONetworkFactory;
 import ru.valerych.cloud2.settings.Cloud2ServerSettings;
-import ru.valerych.cloud2.shareservice.interfaces.ShareFile;
+import ru.valerych.cloud2.shareservice.interfaces.ShareFileService;
 import ru.valerych.cloud2.utils.Client;
 
 import java.io.File;
@@ -27,13 +24,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static ru.valerych.cloud2.fileservices.iofileservices.IOFileServicesConstants.FILE_TO_SHARE;
 import static ru.valerych.cloud2.settings.Cloud2ServerSettings.*;
 import static ru.valerych.cloud2.utils.ServerFileStructureUtils.createUserFile;
 import static ru.valerych.cloud2.utils.ServerFileStructureUtils.removeFileStructure;
 
-class IOShareFileTest {
+class IOShareFileServiceTest {
 
     private static Network network;
     private static Client client;
@@ -79,7 +74,8 @@ class IOShareFileTest {
     }
 
     @Test
-    void shareFileByCommandFromClient() throws IOException {
+    @DisplayName("Sharing file by command from client is success")
+    void shareFileByCommandFromClientSuccessTest() throws IOException {
         User user1 = new User(0, "testSender", "test");
         User user2 = new User(1, "testReceiver", "test");
         user1.setUpUser();
@@ -90,8 +86,8 @@ class IOShareFileTest {
         client.sendBytesToServer(new byte[]{(byte) userFile.getName().length()});
         client.sendBytesToServer(userFile.getName().getBytes(StandardCharsets.UTF_8));
         ServerFileExplorer serverFileExplorer = new IOServerFileExplorer(user1);
-        ShareFile shareFile = new IOShareFile(user1, network, serverFileExplorer);
-        shareFile.shareFileByCommandFromClient();
+        ShareFileService shareFileService = new IOShareFileService(user1, network, serverFileExplorer);
+        shareFileService.shareFileByCommandFromClient();
         List<String> strings = Files.lines(shareFilePath).collect(Collectors.toList());
         String sharedString = "0 1 src"+FILE_SEPARATOR + "test" + FILE_SEPARATOR + "storage" + FILE_SEPARATOR + "0" +FILE_SEPARATOR + "userFile.txt";
         Assertions.assertTrue(strings.contains(sharedString));
