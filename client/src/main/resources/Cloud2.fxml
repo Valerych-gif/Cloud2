@@ -1,58 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="mainPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity"
-      minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" stylesheets="@css/root-pane.css"
+<VBox fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="720.0" prefWidth="1024.0" stylesheets="@css/root-pane.css"
       xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="ru.valerych.cloud2.client.main.MainController">
+      fx:controller="ru.valerych.cloud2.client.controllers.MainWindowController">
     <MenuBar stylesheets="@css/menu-bar.css">
         <Menu mnemonicParsing="false" text="File">
-            <MenuItem fx:id="closeMenuItem" mnemonicParsing="false" onAction="#closeWindow" text="Close"/>
+            <MenuItem fx:id="closeMenuItem" mnemonicParsing="false" onAction="#closeWindow" text="Close" />
         </Menu>
         <Menu mnemonicParsing="false" text="Edit">
-            <MenuItem fx:id="settingsMenuItem" mnemonicParsing="false" onAction="#openSettings"
-                      text="Sittings"/>
+            <MenuItem fx:id="settingsMenuItem" mnemonicParsing="false" onAction="#openSettings" text="Sittings" />
         </Menu>
         <Menu mnemonicParsing="false" text="Help">
-            <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" onAction="#openAboutProgram" text="About"/>
+            <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" onAction="#openAboutProgram" text="About" />
         </Menu>
     </MenuBar>
     <HBox prefHeight="32.0">
-        <Button fx:id="refreshButton" mnemonicParsing="false" text="Refresh"/>
-        <Button fx:id="copyButton" mnemonicParsing="false" text="Copy"/>
-        <Button fx:id="cutButton" mnemonicParsing="false" text="Cut"/>
-        <Button fx:id="pasteButton" mnemonicParsing="false" text="Paste"/>
-        <Button fx:id="moveButton" mnemonicParsing="false" text="Move"/>
-        <Button fx:id="shareButton" mnemonicParsing="false" text="Share"/>
-        <Button fx:id="deleteButton" mnemonicParsing="false" text="Delete"/>
+        <Button fx:id="refreshButton" mnemonicParsing="false" text="Refresh">
+         <HBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </HBox.margin></Button>
+        <Button fx:id="copyButton" mnemonicParsing="false" text="Copy">
+         <HBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </HBox.margin></Button>
+        <Button fx:id="cutButton" mnemonicParsing="false" text="Cut">
+         <HBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </HBox.margin></Button>
+        <Button fx:id="pasteButton" mnemonicParsing="false" text="Paste">
+         <HBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </HBox.margin></Button>
+        <Button fx:id="moveButton" mnemonicParsing="false" text="Move">
+         <HBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </HBox.margin></Button>
+        <Button fx:id="shareButton" mnemonicParsing="false" text="Share">
+         <HBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </HBox.margin></Button>
+        <Button fx:id="deleteButton" mnemonicParsing="false" text="Delete">
+         <HBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </HBox.margin></Button>
     </HBox>
-    <HBox prefHeight="32.0"/>
+    <HBox prefHeight="32.0" />
     <HBox VBox.vgrow="ALWAYS">
         <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
-            <HBox prefHeight="32.0" VBox.vgrow="ALWAYS">
-                <TextField editable="false" HBox.hgrow="ALWAYS"/>
+            <HBox prefHeight="32.0">
+                <TextField fx:id="addrTextFieldLeft" disable="true" editable="false" HBox.hgrow="ALWAYS" />
             </HBox>
             <TableView VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn prefWidth="75.0" text="C1"/>
-                    <TableColumn prefWidth="75.0" text="C2"/>
+                    <TableColumn fx:id="nameColumnHeaderLeft" prefWidth="75.0" text="Name" />
+                    <TableColumn fx:id="extColumnHeaderLeft" prefWidth="75.0" text="Ext" />
+               <TableColumn fx:id="sizeColumnHeaderLeft" prefWidth="75.0" text="Size" />
+               <TableColumn fx:id="dateColumnHeaderLeft" prefWidth="75.0" text="Date" />
+               <TableColumn fx:id="attrColumnHeaderLeft" prefWidth="75.0" text="Attr" />
                 </columns>
             </TableView>
-            <TextField editable="false" prefHeight="25.0"/>
+            <TextField disable="true" editable="false" prefHeight="25.0" />
         </VBox>
         <VBox HBox.hgrow="ALWAYS">
-            <HBox prefHeight="32.0" VBox.vgrow="ALWAYS">
-                <TextField editable="false" HBox.hgrow="ALWAYS"/>
+            <HBox prefHeight="32.0">
+                <TextField fx:id="addrTextFieldRight" disable="true" editable="false" HBox.hgrow="ALWAYS" />
             </HBox>
             <TableView VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn prefWidth="75.0" text="C1"/>
-                    <TableColumn prefWidth="75.0" text="C2"/>
+                    <TableColumn fx:id="nameColumnHeaderRight" prefWidth="75.0" text="Name" />
+                    <TableColumn fx:id="extColumnHeaderRight" prefWidth="75.0" text="Ext" />
+               <TableColumn fx:id="sizeColumnHeaderRight" prefWidth="75.0" text="Size" />
+               <TableColumn fx:id="dateColumnHeaderRight" prefWidth="75.0" text="Date" />
+               <TableColumn fx:id="attrColumnHeaderRight" prefWidth="75.0" text="Attr" />
                 </columns>
             </TableView>
-            <TextField editable="false" prefHeight="25.0"/>
+            <TextField disable="true" editable="false" prefHeight="25.0" />
         </VBox>
     </HBox>
 </VBox>

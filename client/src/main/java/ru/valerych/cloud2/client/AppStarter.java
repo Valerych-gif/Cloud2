@@ -1,4 +1,4 @@
-package ru.valerych.cloud2.client.main;
+package ru.valerych.cloud2.client;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -7,12 +7,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class Main extends Application {
+public class AppStarter extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../../../../../Cloud2.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Cloud2.fxml"));
         Parent root = loader.load();
 
         primaryStage.setTitle("Cloud2");
