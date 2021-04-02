@@ -22,7 +22,7 @@ public class Cloud2ServerSettings {
     static {
         properties = new Properties();
         try {
-            properties.load(new FileInputStream("server/src/main/resources/application.properties"));
+            properties.load(new FileInputStream("server/src/ru.valerych.cloud2.client.main/resources/application.properties"));
         } catch (IOException e) {
             e.printStackTrace();
         }

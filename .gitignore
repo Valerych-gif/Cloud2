@@ -5,6 +5,6 @@
 /Logs/
 /storage/
 /sfiles/
-/client/src/main/resources/Cloud2Files/
+/client/src/ru.valerych.cloud2.client.main/resources/Cloud2Files/
 /server/src/test/storage/
 /server/src/test/sfiles-test/
