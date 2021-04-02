@@ -12,8 +12,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.client.entities.FileInfo;
 
-import static ru.valerych.cloud2.client.utils.WindowCreator.createModalWindow;
-import static ru.valerych.cloud2.client.utils.WindowCreator.createSimpleWindow;
+import static ru.valerych.cloud2.client.utils.WindowCreator.*;
 
 public class MainWindowController {
 
