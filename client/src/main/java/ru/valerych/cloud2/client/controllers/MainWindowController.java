@@ -18,7 +18,8 @@ import static ru.valerych.cloud2.client.utils.WindowCreator.createSimpleWindow;
 public class MainWindowController {
 
     private final Logger logger = org.apache.logging.log4j.LogManager.getLogger(MainWindowController.class.getName());
-    private final String ABOUT_STAGE_TEMPLATE = "/stages/about.fxml";
+    private final String ABOUT_STAGE_TEMPLATE = "/stages/aboutWindow.fxml";
+    private final String CONNECT_STAGE_TEMPLATE = "/stages/connectWindow.fxml";
 
     @FXML
     public Button refreshButton;
@@ -62,7 +63,6 @@ public class MainWindowController {
     @FXML
     public TextField addrTextFieldLeft;
 
-
     @FXML
     public TextField addrTextFieldRight;
 
@@ -71,17 +71,22 @@ public class MainWindowController {
     }
 
     public void closeWindow(ActionEvent actionEvent) {
-        logger.debug("closeWindow() " + actionEvent.getEventType().toString());
+        logger.debug("closeWindow() " + actionEvent.toString());
         Stage primaryStage = (Stage)mainPane.getScene().getWindow();
         primaryStage.close();
     }
 
     public void openSettings(ActionEvent actionEvent) {
-        logger.debug("openSettings() " + actionEvent.getEventType().toString());
+        logger.debug("openSettings() " + actionEvent.toString());
     }
 
     public void openAboutProgram(ActionEvent actionEvent) {
-        logger.debug("openAboutProgram() " + actionEvent.getEventType().toString());
+        logger.debug("openAboutProgram() " + actionEvent.toString());
         createModalWindow("About", ABOUT_STAGE_TEMPLATE);
+    }
+
+    public void connectToServer(ActionEvent actionEvent) {
+        logger.debug("connectToServer() " + actionEvent.toString());
+        createModalWindow("Connect", CONNECT_STAGE_TEMPLATE);
     }
 }
