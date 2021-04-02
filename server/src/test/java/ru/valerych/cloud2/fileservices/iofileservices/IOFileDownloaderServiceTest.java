@@ -24,7 +24,6 @@ class IOFileDownloaderServiceTest {
 
     private static Network network;
     private static Client client;
-    private static FileDownloaderService fileDownloaderService;
     private static ServerSocket serverSocket;
 
     @BeforeAll
@@ -36,10 +35,7 @@ class IOFileDownloaderServiceTest {
             Socket socket = serverSocket.accept();
             NetworkFactory networkFactory = new IONetworkFactory();
             network = networkFactory.createNetwork(socket);
-            User user = new User(0, "test", "test");
-            user.setUpUser(Paths.get("../storage/0"));
-            ServerFileExplorer serverFileExplorer = new IOServerFileExplorer(user);
-            fileDownloaderService = new IOFileDownloaderService(network, serverFileExplorer);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -61,6 +57,10 @@ class IOFileDownloaderServiceTest {
     @DisplayName("Sending of file to client is success")
     void sendFileToClientSuccessTest() {
         File userFile = createFilledUserFile();
+        User user = new User(0, "test", "test");
+        user.setUpUser();
+        ServerFileExplorer serverFileExplorer = new IOServerFileExplorer(user);
+        FileDownloaderService fileDownloaderService = new IOFileDownloaderService(network, serverFileExplorer);
         client.sendBytesToServer(new byte[]{Byte.parseByte(String.valueOf(USER_FILE.length()))});
         client.sendBytesToServer(USER_FILE.getBytes());
         fileDownloaderService.sendFileToClient();

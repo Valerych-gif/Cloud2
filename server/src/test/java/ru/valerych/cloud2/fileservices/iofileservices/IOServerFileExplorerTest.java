@@ -12,6 +12,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ru.valerych.cloud2.fileservices.iofileservices.IOFileServicesConstants.USER_DIRECTORY;
+import static ru.valerych.cloud2.settings.Cloud2ServerSettings.FILE_SEPARATOR;
 import static ru.valerych.cloud2.utils.ServerFileStructureUtils.*;
 
 class IOServerFileExplorerTest {
@@ -21,7 +23,7 @@ class IOServerFileExplorerTest {
     @BeforeAll
     static void setUpUser(){
         user = new User(0, "test", "test");
-        user.setUpUser(Paths.get("../storage/0"));
+        user.setUpUser();
     }
 
     @AfterAll
@@ -36,10 +38,10 @@ class IOServerFileExplorerTest {
         ServerFileExplorer fileExplorer = new IOServerFileExplorer(user);
         fileExplorer.goToDirectory("");
         File currentDirectory = fileExplorer.getCurrentDirectory();
-        Assertions.assertEquals(new File("../storage/0/"), currentDirectory);
+        Assertions.assertEquals(new File(USER_DIRECTORY), currentDirectory);
         fileExplorer.goToDirectory(directory.getName());
         currentDirectory = fileExplorer.getCurrentDirectory();
-        Assertions.assertEquals(new File("../storage/0/" + directory.getName()), currentDirectory);
+        Assertions.assertEquals(new File(USER_DIRECTORY + FILE_SEPARATOR + directory.getName()), currentDirectory);
 
     }
 

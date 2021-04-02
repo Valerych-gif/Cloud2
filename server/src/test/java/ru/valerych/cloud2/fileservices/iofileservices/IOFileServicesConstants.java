@@ -1,7 +1,8 @@
 package ru.valerych.cloud2.fileservices.iofileservices;
 
+import static ru.valerych.cloud2.settings.Cloud2ServerSettings.FILE_SEPARATOR;
+
 public class IOFileServicesConstants {
-    public static final String FILE_SEPARATOR = System.getProperty("file.separator");
     public static final String USER_DIRECTORY = "src" + FILE_SEPARATOR + "test" + FILE_SEPARATOR + "storage" + FILE_SEPARATOR + "0";
     public static final String USER_INNER_DIRECTORY = "innerDirectory";
     public static final String DIRECTORY_FOR_RECURSIVE_REMOVE = "directoryForRecursiveRemove";

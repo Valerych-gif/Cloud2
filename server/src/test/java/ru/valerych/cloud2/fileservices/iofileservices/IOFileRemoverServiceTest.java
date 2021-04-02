@@ -41,7 +41,7 @@ class IOFileRemoverServiceTest {
             network = networkFactory.createNetwork(socket);
 
             User user = new User(0, "test", "test");
-            user.setUpUser(Paths.get("..", "storage", "0"));
+            user.setUpUser();
             serverFileExplorer = new IOServerFileExplorer(user);
             fileRemoverService = new IOFileRemoverService(network, serverFileExplorer);
 

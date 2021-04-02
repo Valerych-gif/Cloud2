@@ -20,6 +20,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static ru.valerych.cloud2.fileservices.iofileservices.IOFileServicesConstants.*;
+import static ru.valerych.cloud2.settings.Cloud2ServerSettings.FILE_SEPARATOR;
 import static ru.valerych.cloud2.utils.ServerFileStructureUtils.removeFileStructure;
 
 class IOFileUploaderServiceTest {
@@ -40,7 +41,7 @@ class IOFileUploaderServiceTest {
             NetworkFactory networkFactory = new IONetworkFactory();
             network = networkFactory.createNetwork(socket);
             User user = new User(0, "test", "test");
-            user.setUpUser(Paths.get("../storage/0"));
+            user.setUpUser();
             ServerFileExplorer serverFileExplorer = new IOServerFileExplorer(user);
             fileUploaderService = new IOFileUploaderService(network, serverFileExplorer);
         } catch (Exception e) {

@@ -24,7 +24,6 @@ public class IODirectoryContentSenderTest {
 
     private static Network network;
     private static Client client;
-    private static DirectoryContentSender directoryContentSender;
     private static ServerSocket serverSocket;
 
     @BeforeAll
@@ -36,10 +35,6 @@ public class IODirectoryContentSenderTest {
             Socket socket = serverSocket.accept();
             NetworkFactory networkFactory = new IONetworkFactory();
             network = networkFactory.createNetwork(socket);
-            User user = new User(0, "test", "test");
-            user.setUpUser(Paths.get("../storage/0"));
-            ServerFileExplorer serverFileExplorer = new IOServerFileExplorer(user);
-            directoryContentSender = new IODirectoryContentSender(network, serverFileExplorer);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -64,8 +59,14 @@ public class IODirectoryContentSenderTest {
         createUserDirectory();
         createUserFile();
 
+        User user = new User(0, "test", "test");
+        user.setUpUser();
+        ServerFileExplorer serverFileExplorer = new IOServerFileExplorer(user);
+        DirectoryContentSender directoryContentSender = new IODirectoryContentSender(network, serverFileExplorer);
+
         client.sendBytesToServer(new byte[]{0});
         client.sendBytesToServer("".getBytes());
+
         directoryContentSender.sendDirectoryContent();
         StringBuilder stringBuilder = new StringBuilder();
         while (true) {

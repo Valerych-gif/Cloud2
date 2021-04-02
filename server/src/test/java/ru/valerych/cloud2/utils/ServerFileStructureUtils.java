@@ -10,6 +10,7 @@ import java.util.List;
 
 import static ru.valerych.cloud2.fileservices.iofileservices.IOFileServicesConstants.*;
 import static ru.valerych.cloud2.settings.Cloud2ServerSettings.BUFFER_SIZE;
+import static ru.valerych.cloud2.settings.Cloud2ServerSettings.FILE_SEPARATOR;
 
 public class ServerFileStructureUtils {
 

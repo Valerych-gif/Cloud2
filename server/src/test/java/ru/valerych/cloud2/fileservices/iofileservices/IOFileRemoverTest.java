@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 import static ru.valerych.cloud2.fileservices.iofileservices.IOFileServicesConstants.*;
+import static ru.valerych.cloud2.settings.Cloud2ServerSettings.FILE_SEPARATOR;
 import static ru.valerych.cloud2.utils.ServerFileStructureUtils.*;
 
 class IOFileRemoverTest {
@@ -18,7 +19,7 @@ class IOFileRemoverTest {
     @BeforeAll
     static void initUserDirectory() {
         User user = new User(0, "test", "test");
-        user.setUpUser(Paths.get(USER_DIRECTORY));
+        user.setUpUser();
     }
 
     @AfterAll
