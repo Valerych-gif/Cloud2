@@ -1,12 +1,8 @@
 package ru.valerych.cloud2.client.controllers;
 
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
@@ -16,8 +12,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.client.entities.FileInfo;
 
-import java.io.IOException;
-
+import static ru.valerych.cloud2.client.utils.WindowCreator.createModalWindow;
 import static ru.valerych.cloud2.client.utils.WindowCreator.createSimpleWindow;
 
 public class MainWindowController {
@@ -87,6 +82,6 @@ public class MainWindowController {
 
     public void openAboutProgram(ActionEvent actionEvent) {
         logger.debug("openAboutProgram() " + actionEvent.getEventType().toString());
-        createSimpleWindow("About", ABOUT_STAGE_TEMPLATE);
+        createModalWindow("About", ABOUT_STAGE_TEMPLATE);
     }
 }
