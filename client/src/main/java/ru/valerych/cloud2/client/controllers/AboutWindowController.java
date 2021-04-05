@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class AboutWindowController implements Initializable {
+public class AboutWindowController extends WindowController implements Initializable {
 
     private final Logger logger = org.apache.logging.log4j.LogManager.getLogger(AboutWindowController.class.getName());
 
@@ -23,5 +23,10 @@ public class AboutWindowController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         aboutTextArea.setEditable(false);
         aboutTextArea.setText("lll");
+    }
+
+    @Override
+    protected void closeWindow() {
+
     }
 }

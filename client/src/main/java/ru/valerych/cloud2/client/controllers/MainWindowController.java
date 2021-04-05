@@ -9,14 +9,17 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.client.entities.FileInfo;
+import ru.valerych.cloud2.client.network.CloudConnection;
+import ru.valerych.cloud2.client.network.ConnectionHandler;
 
 import static ru.valerych.cloud2.client.utils.WindowCreator.*;
 
-public class MainWindowController {
+public class MainWindowController extends WindowController {
 
-    private final Logger logger = org.apache.logging.log4j.LogManager.getLogger(MainWindowController.class.getName());
+    private final Logger logger = LogManager.getLogger(MainWindowController.class.getName());
     private final String ABOUT_STAGE_TEMPLATE = "/stages/aboutWindow.fxml";
     private final String CONNECT_STAGE_TEMPLATE = "/stages/connectWindow.fxml";
 
@@ -65,6 +68,9 @@ public class MainWindowController {
     @FXML
     public TextField addrTextFieldRight;
 
+    private ConnectionHandler connectionHandler;
+    private CloudConnection connection;
+
     public MainWindowController() {
 
     }
@@ -72,7 +78,7 @@ public class MainWindowController {
     public void closeWindow(ActionEvent actionEvent) {
         logger.debug("closeWindow() " + actionEvent.toString());
         Stage primaryStage = (Stage)mainPane.getScene().getWindow();
-        primaryStage.close();
+        super.closeWindow(primaryStage);
     }
 
     public void openSettings(ActionEvent actionEvent) {
@@ -86,6 +92,15 @@ public class MainWindowController {
 
     public void connectToServer(ActionEvent actionEvent) {
         logger.debug("connectToServer() " + actionEvent.toString());
-        createModalWindow("Connect", CONNECT_STAGE_TEMPLATE);
+        WindowController loginController = createModalWindow("Connect", CONNECT_STAGE_TEMPLATE);
+        connectionHandler = new ConnectionHandler(loginController);
+        new Thread(()->connection = connectionHandler.connect()).start();
+    }
+
+    @Override
+    public void closeWindow() {
+        logger.debug("closeWindow() for main window");
+        Stage primaryStage = (Stage)mainPane.getScene().getWindow();
+        super.closeWindow(primaryStage);
     }
 }

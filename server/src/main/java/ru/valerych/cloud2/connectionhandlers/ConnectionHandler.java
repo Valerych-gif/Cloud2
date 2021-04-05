@@ -4,6 +4,8 @@ import ru.valerych.cloud2.commands.Requests;
 import ru.valerych.cloud2.commands.Responses;
 import ru.valerych.cloud2.entities.User;
 import ru.valerych.cloud2.authservice.IOUsersService;
+import ru.valerych.cloud2.exceptions.UserCantBeAuthorized;
+import ru.valerych.cloud2.exceptions.UserNotFoundException;
 import ru.valerych.cloud2.fileservices.interfaces.FileService;
 import ru.valerych.cloud2.fileservices.interfaces.FileServiceFactory;
 import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
@@ -66,12 +68,14 @@ public abstract class ConnectionHandler implements Runnable {
                         break;
                     case AUTHORIZATION:
                         network.sendByteToClient(Responses.OK.getSignalByte());
-                        this.user = usersService.authUserByLoginAndPassword();
-                        if (user != User.UNAUTHORIZED_USER) {
+                        try {
+                            this.user = usersService.authUserByLoginAndPassword();
                             network.sendByteToClient(Responses.OK.getSignalByte());
                             setUpServices();
-                        } else {
+                            logger.info(String.format("User %s was logged in", user.getLogin()));
+                        } catch (UserNotFoundException | UserCantBeAuthorized e){
                             network.sendByteToClient(Responses.FAIL.getSignalByte());
+                            logger.info(String.format("User %s wasn't logged in", user.getLogin()));
                         }
                         break;
                     case REGISTRATION:

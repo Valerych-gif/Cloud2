@@ -1,16 +1,17 @@
 package ru.valerych.cloud2.client.controllers;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.net.Socket;
+public class ConnectWindowController extends WindowController {
 
-public class ConnectWindowController {
-
-    private final Logger logger = org.apache.logging.log4j.LogManager.getLogger(ConnectWindowController.class.getName());
+    private final Logger logger = LogManager.getLogger(ConnectWindowController.class.getName());
 
     @FXML
     public TextField loginTextField;
@@ -20,17 +21,17 @@ public class ConnectWindowController {
     public TextField passwordTextField;
     @FXML
     public TextField urlTextField;
-
     @FXML
-    public void connect(ActionEvent actionEvent) {
-        try {
-            Socket socket = new Socket(urlTextField.getText(), Integer.parseInt(portTextField.getText()));
-        } catch (IOException e) {
-            logger.error(e);
-        }
-    }
-
+    public Button loginButton;
     @FXML
-    public void registration(ActionEvent actionEvent) {
+    public VBox loginWindow;
+    @FXML
+    public Label errorLabel;
+
+    @Override
+    public void closeWindow() {
+        logger.debug("closeWindow() for login window");
+        Stage primaryStage = (Stage)loginWindow.getScene().getWindow();
+        super.closeWindow(primaryStage);
     }
 }

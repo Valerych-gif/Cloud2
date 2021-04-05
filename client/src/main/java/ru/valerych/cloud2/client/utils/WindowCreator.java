@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.Logger;
+import ru.valerych.cloud2.client.controllers.WindowController;
 
 import java.io.IOException;
 
@@ -13,19 +14,19 @@ public class WindowCreator {
 
     private final static Logger logger = org.apache.logging.log4j.LogManager.getLogger(WindowCreator.class.getName());
 
-    public static Stage createSimpleWindow(String windowTitle, String pathToStagePattern){
-        Stage stage = createWindow(windowTitle, pathToStagePattern, false);
+    public static WindowController createSimpleWindow(String windowTitle, String pathToStagePattern){
+        WindowController controller = createWindow(windowTitle, pathToStagePattern, false);
         logger.debug(String.format("Simple window '%s' was created", windowTitle));
-        return stage;
+        return controller;
     }
 
-    public static Stage createModalWindow(String windowTitle, String pathToStagePattern){
-        Stage stage = createWindow(windowTitle, pathToStagePattern, true);
+    public static WindowController createModalWindow(String windowTitle, String pathToStagePattern){
+        WindowController controller = createWindow(windowTitle, pathToStagePattern, true);
         logger.debug(String.format("Modal window '%s' was created", windowTitle));
-        return stage;
+        return controller;
     }
 
-    private static Stage createWindow(String windowTitle, String pathToStagePattern, boolean isModal) {
+    private static WindowController createWindow(String windowTitle, String pathToStagePattern, boolean isModal) {
         FXMLLoader loader = new FXMLLoader(WindowCreator.class.getResource(pathToStagePattern));
         Parent root;
         Stage stage = new Stage();
@@ -39,7 +40,7 @@ public class WindowCreator {
             stage.setScene(new Scene(root));
             stage.show();
             stage.setOnCloseRequest(event -> stage.close());
-            return stage;
+            return loader.getController();
         } catch (IOException e) {
             logger.error(e);
             stage.close();

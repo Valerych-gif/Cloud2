@@ -13,6 +13,9 @@ import ru.valerych.cloud2.settings.Cloud2ServerSettings;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static ru.valerych.cloud2.commands.Responses.FAIL;
+import static ru.valerych.cloud2.commands.Responses.OK;
+
 public class IOUsersService implements UsersService {
 
     private enum Stage {
@@ -74,23 +77,34 @@ public class IOUsersService implements UsersService {
                 case WAITING_FOR_LOGIN_LENGTH:
                     loginLength = network.readByteFromClient(); // max 127
                     logger.info("Login length '" + loginLength + "' was received");
+                    sendResponse(loginLength > 0);
                     stage = Stage.WAITING_FOR_LOGIN;
                     break;
                 case WAITING_FOR_LOGIN:
                     login = new String(network.readBytesFromClient(loginLength));
+                    sendResponse(!"".equals(login));
                     logger.info("Login '" + login + "' was received", logger);
                     stage = Stage.WAITING_FOR_PASSWORD_LENGTH;
                     break;
                 case WAITING_FOR_PASSWORD_LENGTH:
                     passwordLength = network.readByteFromClient(); // max 127
                     logger.info("Password length was received");
+                    sendResponse(passwordLength > 0);
                     stage = Stage.WAITING_FOR_PASSWORD;
                     break;
                 case WAITING_FOR_PASSWORD:
                     password = new String(network.readBytesFromClient(passwordLength));
                     logger.info("Password '******' was received");
+                    sendResponse(!"".equals(password));
                     return;
             }
         }
+    }
+
+    private void sendResponse(boolean condition) {
+        if (condition)
+            network.sendByteToClient(OK.getSignalByte());
+        else
+            network.sendByteToClient(FAIL.getSignalByte());
     }
 }
