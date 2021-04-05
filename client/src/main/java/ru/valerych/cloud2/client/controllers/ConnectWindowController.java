@@ -1,15 +1,22 @@
 package ru.valerych.cloud2.client.controllers;
 
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.valerych.cloud2.client.utils.Settings;
 
-public class ConnectWindowController extends WindowController {
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class ConnectWindowController extends WindowController implements Initializable {
 
     private final Logger logger = LogManager.getLogger(ConnectWindowController.class.getName());
 
@@ -27,6 +34,20 @@ public class ConnectWindowController extends WindowController {
     public VBox loginWindow;
     @FXML
     public Label errorLabel;
+    @FXML
+    public CheckBox saveData;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        try {
+            loginTextField.setText(Settings.read("login"));
+            passwordTextField.setText(Settings.read("password"));
+            urlTextField.setText(Settings.read("host"));
+            portTextField.setText(Settings.read("port"));
+        } catch (IOException e) {
+            logger.error(String.format("Can't read settings file. Cause: %s", e));
+        }
+    }
 
     @Override
     public void closeWindow() {

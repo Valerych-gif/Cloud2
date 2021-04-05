@@ -18,6 +18,7 @@
          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
       </rowConstraints>
       <VBox.margin>
          <Insets />
@@ -58,28 +59,36 @@
             <Font size="14.0" />
          </font>
       </Label>
-      <TextField fx:id="passwordTextField" GridPane.columnIndex="1" GridPane.rowIndex="1">
+      <PasswordField fx:id="passwordTextField" GridPane.columnIndex="1" GridPane.rowIndex="1">
          <GridPane.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </GridPane.margin>
-      </TextField>
+      </PasswordField>
       <TextField fx:id="urlTextField" text="localhost" GridPane.columnIndex="1" GridPane.rowIndex="2">
          <GridPane.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </GridPane.margin>
       </TextField>
-      <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+      <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
          <Button fx:id="loginButton" mnemonicParsing="false" text="Log in">
             <HBox.margin>
-               <Insets left="5.0" right="10.0" />
+               <Insets left="5.0" right="10.0" top="5.0" />
             </HBox.margin>
          </Button>
-         <Button mnemonicParsing="false" text="Registration" />
+         <Button mnemonicParsing="false" text="Registration">
+            <HBox.margin>
+               <Insets top="5.0" />
+            </HBox.margin></Button>
       </HBox>
-      <Label fx:id="errorLabel" textFill="RED" GridPane.columnIndex="1" GridPane.rowIndex="5">
+      <Label fx:id="errorLabel" textFill="RED" GridPane.columnIndex="1" GridPane.rowIndex="6">
          <font>
-            <Font size="6.0" />
+            <Font size="10.0" />
          </font>
       </Label>
+      <CheckBox fx:id="saveData" mnemonicParsing="false" selected="true" text="Save connection data" GridPane.columnIndex="1" GridPane.rowIndex="4">
+         <GridPane.margin>
+            <Insets left="5.0" />
+         </GridPane.margin>
+      </CheckBox>
    </GridPane>
 </VBox>
