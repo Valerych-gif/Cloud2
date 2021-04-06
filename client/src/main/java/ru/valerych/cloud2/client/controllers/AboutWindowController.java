@@ -26,7 +26,7 @@ public class AboutWindowController extends WindowController implements Initializ
     }
 
     @Override
-    protected void closeWindow() {
+    protected void close() {
 
     }
 }

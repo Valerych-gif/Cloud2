@@ -2,13 +2,12 @@ package ru.valerych.cloud2.client.network;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.valerych.cloud2.client.controllers.ConnectWindowController;
+import ru.valerych.cloud2.client.controllers.RegistrationWindowController;
 import ru.valerych.cloud2.client.exceptions.BadResponseException;
 import ru.valerych.cloud2.client.exceptions.LoginUnsuccessfulException;
 import ru.valerych.cloud2.client.services.LoginService;
 import ru.valerych.cloud2.client.utils.Settings;
 import ru.valerych.cloud2.commands.Requests;
-
 
 import java.io.Closeable;
 import java.io.DataInputStream;
@@ -18,21 +17,21 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConnectionHandler {
+public class RegistrationHandler {
 
-    private final Logger logger = LogManager.getLogger(ConnectionHandler.class.getName());
+    private final Logger logger = LogManager.getLogger(RegistrationHandler.class.getName());
 
     private final CloudConnection connection;
 
-    public ConnectionHandler() {
+    public RegistrationHandler() {
         connection = new CloudConnection();
     }
 
-    public CloudConnection init(ConnectWindowController controller) {
-        controller.loginButton.setOnAction((event) -> {
+    public CloudConnection init(RegistrationWindowController controller) {
+        controller.registrationButton.setOnAction((event) -> {
             try {
                 connectToServer(controller.urlTextField.getText(), controller.portTextField.getText());
-                loginToServer(controller.loginTextField.getText(), controller.passwordTextField.getText());
+                registrationToServer(controller.loginTextField.getText(), controller.passwordTextField.getText());
                 connection.setAuthorized(true);
                 controller.close();
                 if (controller.saveData.isSelected()) {
@@ -45,6 +44,7 @@ public class ConnectionHandler {
                 } else {
                     clearConnectionSettings();
                 }
+                controller.close();
             } catch (IOException e) {
                 logger.error(String.format("Connection to server %s:%s failed. Cause: %s",
                         controller.urlTextField.getText(),
@@ -52,7 +52,7 @@ public class ConnectionHandler {
                         e));
                 controller.errorLabel.setText("There is trouble with connection. Please try again later.");
                 disconnect();
-            } catch (LoginUnsuccessfulException | BadResponseException e) {
+            } catch (BadResponseException e) {
                 logger.error(String.format("Log in to server %s:%s for user %s failed. Cause: %s",
                         controller.urlTextField.getText(),
                         controller.portTextField.getText(),

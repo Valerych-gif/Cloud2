@@ -11,6 +11,7 @@ public class CloudConnection {
 
     private String login;
     private String password;
+    private boolean isAuthorized;
 
     public Socket getSocket() {
         return socket;
@@ -50,5 +51,13 @@ public class CloudConnection {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isAuthorized() {
+        return isAuthorized;
+    }
+
+    public void setAuthorized(boolean authorized) {
+        isAuthorized = authorized;
     }
 }

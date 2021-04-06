@@ -4,9 +4,9 @@ import javafx.stage.Stage;
 
 public abstract class WindowController {
 
-    protected void closeWindow(Stage stage){
+    protected void close(Stage stage){
         stage.close();
     }
 
-    protected abstract void closeWindow();
+    protected abstract void close();
 }

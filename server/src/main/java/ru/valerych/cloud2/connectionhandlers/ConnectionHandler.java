@@ -4,6 +4,7 @@ import ru.valerych.cloud2.commands.Requests;
 import ru.valerych.cloud2.commands.Responses;
 import ru.valerych.cloud2.entities.User;
 import ru.valerych.cloud2.authservice.IOUsersService;
+import ru.valerych.cloud2.exceptions.LoginIsNotFreeException;
 import ru.valerych.cloud2.exceptions.UserCantBeAuthorized;
 import ru.valerych.cloud2.exceptions.UserNotFoundException;
 import ru.valerych.cloud2.fileservices.interfaces.FileService;
@@ -73,19 +74,21 @@ public abstract class ConnectionHandler implements Runnable {
                             network.sendByteToClient(Responses.OK.getSignalByte());
                             setUpServices();
                             logger.info(String.format("User %s was logged in", user.getLogin()));
-                        } catch (UserNotFoundException | UserCantBeAuthorized e){
+                        } catch (UserNotFoundException | UserCantBeAuthorized e) {
                             network.sendByteToClient(Responses.FAIL.getSignalByte());
                             logger.info(String.format("User %s wasn't logged in", user.getLogin()));
                         }
                         break;
                     case REGISTRATION:
                         network.sendByteToClient(Responses.OK.getSignalByte());
-                        this.user = usersService.registrationUserByLoginAndPassword();
-                        if (user != User.UNAUTHORIZED_USER) {
+                        try {
+                            this.user = usersService.registrationUserByLoginAndPassword();
                             network.sendByteToClient(Responses.OK.getSignalByte());
                             setUpServices();
-                        } else {
+                            logger.info(String.format("User %s was registered and logged in", user.getLogin()));
+                        } catch (LoginIsNotFreeException e) {
                             network.sendByteToClient(Responses.FAIL.getSignalByte());
+                            logger.info(String.format("Login %s isn't free", user.getLogin()));
                         }
                         break;
                     case UPLOAD:

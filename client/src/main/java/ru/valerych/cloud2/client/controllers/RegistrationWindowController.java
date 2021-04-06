@@ -16,9 +16,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class ConnectWindowController extends WindowController implements Initializable {
+public class RegistrationWindowController extends WindowController implements Initializable {
 
-    private final Logger logger = LogManager.getLogger(ConnectWindowController.class.getName());
+    private final Logger logger = LogManager.getLogger(RegistrationWindowController.class.getName());
 
     @FXML
     public TextField loginTextField;
@@ -29,7 +29,7 @@ public class ConnectWindowController extends WindowController implements Initial
     @FXML
     public TextField urlTextField;
     @FXML
-    public Button loginButton;
+    public Button registrationButton;
     @FXML
     public VBox window;
     @FXML
@@ -52,7 +52,7 @@ public class ConnectWindowController extends WindowController implements Initial
     @Override
     public void close() {
         logger.debug("closeWindow() for login window");
-        Stage primaryStage = (Stage)window.getScene().getWindow();
+        Stage primaryStage = (Stage) window.getScene().getWindow();
         super.close(primaryStage);
     }
 }

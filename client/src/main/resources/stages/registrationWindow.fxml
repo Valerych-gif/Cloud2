@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox fx:id="window" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="220.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.valerych.cloud2.client.controllers.ConnectWindowController">
+<VBox fx:id="window" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="220.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.valerych.cloud2.client.controllers.RegistrationWindowController">
    <GridPane maxWidth="300.0" prefHeight="171.0" prefWidth="300.0">
       <columnConstraints>
          <ColumnConstraints hgrow="SOMETIMES" maxWidth="295.0" minWidth="10.0" prefWidth="111.0" />
@@ -70,11 +70,10 @@
          </GridPane.margin>
       </TextField>
       <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
-         <Button fx:id="loginButton" mnemonicParsing="false" text="Log in">
+         <Button fx:id="registrationButton" mnemonicParsing="false" text="Registration">
             <HBox.margin>
-               <Insets left="5.0" right="10.0" top="5.0" />
-            </HBox.margin>
-         </Button>
+               <Insets top="5.0" />
+            </HBox.margin></Button>
       </HBox>
       <Label fx:id="errorLabel" textFill="RED" GridPane.columnIndex="1" GridPane.rowIndex="6">
          <font>
