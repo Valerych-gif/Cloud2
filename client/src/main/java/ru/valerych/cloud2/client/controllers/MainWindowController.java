@@ -121,7 +121,7 @@ public class MainWindowController extends WindowController implements Initializa
     @FXML
     public void selectRightTableRow(MouseEvent mouseEvent) {
         FileInfo fileInfo = getFileInfo(rightFileTable);
-        if (mouseEvent.getClickCount()==2&&fileInfo.isDirectory()){
+        if (mouseEvent.getClickCount()==2&&fileInfo!=null&&fileInfo.isDirectory()){
             logger.debug("selectRightTableRow() double click detected");
             rightPanelFileExplorer.setCurrentDirectory(fileInfo.getPath());
             rightFileTable.setItems(rightPanelFileExplorer.getFileList());
