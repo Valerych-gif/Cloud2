@@ -70,7 +70,7 @@
          </GridPane.margin>
       </TextField>
       <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
-         <Button fx:id="loginButton" mnemonicParsing="false" text="Log in">
+         <Button fx:id="loginButton" mnemonicParsing="false" onAction="#login" text="Log in">
             <HBox.margin>
                <Insets left="5.0" right="10.0" top="5.0" />
             </HBox.margin>

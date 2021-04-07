@@ -13,7 +13,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.client.entities.FileInfo;
 import ru.valerych.cloud2.client.network.CloudConnection;
-import ru.valerych.cloud2.client.network.ConnectionHandler;
 import ru.valerych.cloud2.client.network.RegistrationHandler;
 import ru.valerych.cloud2.client.services.fileservices.FileExplorer;
 import ru.valerych.cloud2.client.windows.Cloud2Window;
@@ -89,16 +88,12 @@ public class MainWindowController extends WindowController implements Initializa
 
     public void connectToServer(ActionEvent actionEvent) {
         logger.debug("connectToServer() " + actionEvent.toString());
-        Cloud2Window window = windowCreator.createModalWindow("Connect", CONNECT_STAGE_TEMPLATE);
-        ConnectionHandler connectionHandler = new ConnectionHandler();
-        connection = connectionHandler.init((ConnectWindowController) window.getController());
+        windowCreator.createModalWindow("Connect", CONNECT_STAGE_TEMPLATE);
     }
 
     public void registration(ActionEvent actionEvent) {
         logger.debug("registration() " + actionEvent.toString());
-        Cloud2Window window = windowCreator.createModalWindow("Registration", REGISTRATION_STAGE_TEMPLATE);
-        RegistrationHandler registrationHandler = new RegistrationHandler();
-        connection = registrationHandler.init((RegistrationWindowController) window.getController());
+        windowCreator.createModalWindow("Registration", REGISTRATION_STAGE_TEMPLATE);
     }
 
     @Override
