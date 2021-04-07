@@ -3,6 +3,7 @@
 /server/target/
 /.idea/
 /Logs/
+/client/logs/
 /storage/
 /sfiles/
 /client/src/ru.valerych.cloud2.client.main/resources/Cloud2Files/
