@@ -90,14 +90,10 @@ public class RegistrationHandler {
     }
 
     private void writeConnectionSettings(String host, String port, String login, String password) {
-        try {
-            Settings.write("host", host);
-            Settings.write("port", port);
-            Settings.write("login", login);
-            Settings.write("password", password);
-        } catch (IOException e) {
-            logger.error(String.format("Can't write settings into settings file. Cause: %s", e));
-        }
+        Settings.write("host", host);
+        Settings.write("port", port);
+        Settings.write("login", login);
+        Settings.write("password", password);
     }
 
     private void clearConnectionSettings() {

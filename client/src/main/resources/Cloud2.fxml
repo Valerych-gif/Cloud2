@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
 <?import javafx.scene.layout.*?>
 
 <VBox fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1024.0" stylesheets="@css/root-pane.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.valerych.cloud2.client.controllers.MainWindowController">
@@ -46,12 +47,12 @@
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </HBox.margin></Button>
       <Pane HBox.hgrow="ALWAYS" />
-      <Button alignment="CENTER_RIGHT" contentDisplay="RIGHT" defaultButton="true" mnemonicParsing="false" onAction="#connectToServer" text="Connect" fx:id="connectButton">
+      <Button fx:id="connectButton" alignment="CENTER_RIGHT" contentDisplay="RIGHT" defaultButton="true" mnemonicParsing="false" onAction="#connectToServer" text="Connect">
          <HBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </HBox.margin>
       </Button>
-      <Button mnemonicParsing="false" onAction="#registration" text="Registration" fx:id="registrationButton">
+      <Button fx:id="registrationButton" mnemonicParsing="false" onAction="#registration" text="Registration">
          <HBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </HBox.margin>
@@ -59,32 +60,52 @@
     </HBox>
     <HBox prefHeight="32.0" />
     <HBox VBox.vgrow="ALWAYS">
-        <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+        <VBox fx:id="leftPanel" alignment="CENTER" HBox.hgrow="ALWAYS">
             <HBox prefHeight="32.0">
                 <TextField fx:id="addrTextFieldLeft" disable="true" editable="false" HBox.hgrow="ALWAYS" />
             </HBox>
-            <TableView VBox.vgrow="ALWAYS">
+            <TableView fx:id="leftFileTable" onMouseClicked="#selectLeftTableRow" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="nameColumnHeaderLeft" prefWidth="75.0" text="Name" />
-                    <TableColumn fx:id="extColumnHeaderLeft" prefWidth="75.0" text="Ext" />
-               <TableColumn fx:id="sizeColumnHeaderLeft" prefWidth="75.0" text="Size" />
-               <TableColumn fx:id="dateColumnHeaderLeft" prefWidth="75.0" text="Date" />
-               <TableColumn fx:id="attrColumnHeaderLeft" prefWidth="75.0" text="Attr" />
+                    <TableColumn fx:id="nameColumnHeaderLeft" prefWidth="75.0" text="Name">
+                        <cellValueFactory><PropertyValueFactory property="fileName" /></cellValueFactory>
+                    </TableColumn>
+                    <TableColumn fx:id="extColumnHeaderLeft" prefWidth="75.0" text="Ext">
+                        <cellValueFactory><PropertyValueFactory property="ext" /></cellValueFactory>
+                    </TableColumn>
+                    <TableColumn fx:id="sizeColumnHeaderLeft" prefWidth="75.0" text="Size">
+                        <cellValueFactory><PropertyValueFactory property="size" /></cellValueFactory>
+                    </TableColumn>
+                    <TableColumn fx:id="dateColumnHeaderLeft" prefWidth="75.0" text="Date">
+                        <cellValueFactory><PropertyValueFactory property="date" /></cellValueFactory>
+                    </TableColumn>
+                    <TableColumn fx:id="attrColumnHeaderLeft" prefWidth="75.0" text="Attr">
+                        <cellValueFactory><PropertyValueFactory property="attr" /></cellValueFactory>
+                    </TableColumn>
                 </columns>
             </TableView>
             <TextField disable="true" editable="false" prefHeight="25.0" />
         </VBox>
-        <VBox HBox.hgrow="ALWAYS">
+        <VBox fx:id="rightPanel" HBox.hgrow="ALWAYS">
             <HBox prefHeight="32.0">
                 <TextField fx:id="addrTextFieldRight" disable="true" editable="false" HBox.hgrow="ALWAYS" />
             </HBox>
-            <TableView VBox.vgrow="ALWAYS">
+            <TableView fx:id="rightFileTable" onMouseClicked="#selectRightTableRow" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="nameColumnHeaderRight" prefWidth="75.0" text="Name" />
-                    <TableColumn fx:id="extColumnHeaderRight" prefWidth="75.0" text="Ext" />
-               <TableColumn fx:id="sizeColumnHeaderRight" prefWidth="75.0" text="Size" />
-               <TableColumn fx:id="dateColumnHeaderRight" prefWidth="75.0" text="Date" />
-               <TableColumn fx:id="attrColumnHeaderRight" prefWidth="75.0" text="Attr" />
+                    <TableColumn fx:id="nameColumnHeaderRight" prefWidth="75.0" text="Name">
+                        <cellValueFactory><PropertyValueFactory property="fileName" /></cellValueFactory>
+                    </TableColumn>
+                    <TableColumn fx:id="extColumnHeaderRight" prefWidth="75.0" text="Ext">
+                        <cellValueFactory><PropertyValueFactory property="ext" /></cellValueFactory>
+                    </TableColumn>
+                    <TableColumn fx:id="sizeColumnHeaderRight" prefWidth="75.0" text="Size">
+                        <cellValueFactory><PropertyValueFactory property="size" /></cellValueFactory>
+                    </TableColumn>
+                    <TableColumn fx:id="dateColumnHeaderRight" prefWidth="75.0" text="Date">
+                        <cellValueFactory><PropertyValueFactory property="date" /></cellValueFactory>
+                    </TableColumn>
+                    <TableColumn fx:id="attrColumnHeaderRight" prefWidth="75.0" text="Attr">
+                        <cellValueFactory><PropertyValueFactory property="attr" /></cellValueFactory>
+                    </TableColumn>
                 </columns>
             </TableView>
             <TextField disable="true" editable="false" prefHeight="25.0" />

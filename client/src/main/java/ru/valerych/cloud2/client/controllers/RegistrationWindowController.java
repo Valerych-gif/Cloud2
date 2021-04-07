@@ -39,14 +39,10 @@ public class RegistrationWindowController extends WindowController implements In
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        try {
-            loginTextField.setText(Settings.read("login"));
-            passwordTextField.setText(Settings.read("password"));
-            urlTextField.setText(Settings.read("host"));
-            portTextField.setText(Settings.read("port"));
-        } catch (IOException e) {
-            logger.error(String.format("Can't read settings file. Cause: %s", e));
-        }
+        loginTextField.setText(Settings.read("login"));
+        passwordTextField.setText(Settings.read("password"));
+        urlTextField.setText(Settings.read("host"));
+        portTextField.setText(Settings.read("port"));
     }
 
     @Override
