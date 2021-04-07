@@ -1,0 +1,28 @@
+13:53:23.510 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.io.EOFException
+13:53:23.523 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.io.EOFException
+13:53:23.523 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Can't send bytes to server. Cause: java.net.SocketException: Software caused connection abort: socket write error
+13:53:23.524 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.io.EOFException
+13:53:23.525 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Can't send request to server. Cause: java.net.SocketException: Software caused connection abort: socket write error
+13:53:23.525 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.io.EOFException
+13:53:23.526 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Can't send bytes to server. Cause: java.net.SocketException: Software caused connection abort: socket write error
+13:53:23.526 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.io.EOFException
+13:53:23.526 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.io.EOFException
+13:56:05.212 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.io.EOFException
+13:56:05.223 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Can't send bytes to server. Cause: java.net.SocketException: Software caused connection abort: socket write error
+13:56:05.223 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.io.EOFException
+13:56:05.223 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Can't send request to server. Cause: java.net.SocketException: Software caused connection abort: socket write error
+13:56:05.224 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.io.EOFException
+13:56:05.224 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Can't send bytes to server. Cause: java.net.SocketException: Software caused connection abort: socket write error
+13:56:05.225 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.io.EOFException
+13:56:05.225 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.io.EOFException
+14:01:46.907 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Can't send bytes to server. Cause: java.net.SocketException: Software caused connection abort: socket write error
+14:01:46.918 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.net.SocketException: Software caused connection abort: recv failed
+14:01:46.918 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Can't send request to server. Cause: java.net.SocketException: Software caused connection abort: socket write error
+14:01:46.919 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.net.SocketException: Software caused connection abort: recv failed
+14:01:46.919 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Can't send bytes to server. Cause: java.net.SocketException: Software caused connection abort: socket write error
+14:01:46.919 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.net.SocketException: Software caused connection abort: recv failed
+14:01:46.919 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.net.SocketException: Software caused connection abort: recv failed
+14:07:06.753 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.io.EOFException
+14:09:36.336 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.io.EOFException
+14:12:15.009 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.io.EOFException
+14:13:19.303 [Thread-2] ERROR ru.valerych.cloud2.client.network.Network - Error of reading byte from server. Cause java.io.EOFException
