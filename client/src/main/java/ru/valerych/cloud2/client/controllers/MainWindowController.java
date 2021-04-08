@@ -68,12 +68,12 @@ public class MainWindowController extends WindowController implements Initializa
     }
 
     private void setUpRightPanel() {
-        rightPanelFileExplorer = new FileExplorer(rightPanel);
+        rightPanelFileExplorer = new FileExplorer(rightPanel.getId());
         rightFileTable.setItems(rightPanelFileExplorer.getFileList());
     }
 
     private void setUpLeftPanel() {
-        leftPanelFileExplorer = new FileExplorer(leftPanel);
+        leftPanelFileExplorer = new FileExplorer(leftPanel.getId());
         leftFileTable.setItems(leftPanelFileExplorer.getFileList());
     }
 

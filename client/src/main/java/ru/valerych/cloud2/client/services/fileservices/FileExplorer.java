@@ -1,11 +1,7 @@
 package ru.valerych.cloud2.client.services.fileservices;
 
-import com.sun.javafx.collections.ObservableListWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.control.TableView;
-import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.client.entities.FileInfo;
@@ -15,10 +11,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class FileExplorer {
 
@@ -31,12 +23,10 @@ public class FileExplorer {
     private final String RIGHT_PANEL_ID = "rightPanel";
 
     private Path currentDirectory;
-    private final VBox panel;
     private final String currentDirectorySettingName;
 
-    public FileExplorer(VBox panel) {
-        this.panel = panel;
-        currentDirectorySettingName = LEFT_PANEL_ID.equals(panel.getId()) ? LEFT_PANEL_ROOT_DIRECTORY_PROPERTY : RIGHT_PANEL_ROOT_DIRECTORY_PROPERTY;
+    public FileExplorer(String PaneId) {
+        currentDirectorySettingName = LEFT_PANEL_ID.equals(PaneId) ? LEFT_PANEL_ROOT_DIRECTORY_PROPERTY : RIGHT_PANEL_ROOT_DIRECTORY_PROPERTY;
         setUp();
     }
 
