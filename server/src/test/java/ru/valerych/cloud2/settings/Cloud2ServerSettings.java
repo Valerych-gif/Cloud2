@@ -29,7 +29,7 @@ public class Cloud2ServerSettings {
 
         String tmp;
         tmp =properties.getProperty("server.main-files-dir");
-        SERVER_MAIN_FILES_DIR = tmp!=null&&!tmp.trim().equals("")?tmp:"src/test/sfiles";
+        SERVER_MAIN_FILES_DIR = tmp!=null&&!tmp.trim().equals("")?tmp:"src/test/sfiles-test";
         SERVER_TYPE = "IOServer";
         PORT = 8189;
         STORAGE_ROOT_DIR = "src/test/storage";
