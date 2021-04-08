@@ -12,16 +12,20 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
 class FileExplorerTest {
 
-    Path testDirectory = Paths.get("test-directory");
-    Path innerDirectory1 = Paths.get("test-directory", "innerDirectory1");
-    Path innerDirectory2 = Paths.get("test-directory", "innerDirectory2");
-    Path innerDirectory3 = Paths.get("test-directory", "innerDirectory3");
+    Path rootDirectory = Paths.get("./Cloud2Directory");
+    Path testDirectory = Paths.get("./Cloud2Directory", "testDirectory");
+    Path innerDirectory1 = Paths.get("./Cloud2Directory", "testDirectory", "innerDirectory1");
+    Path innerDirectory2 = Paths.get("./Cloud2Directory", "testDirectory", "innerDirectory2");
+    Path innerDirectory3 = Paths.get("./Cloud2Directory", "testDirectory", "innerDirectory3");
 
     @BeforeEach
     void init() throws IOException {
+        if (!Files.exists(rootDirectory)) Files.createDirectory(rootDirectory);
         if (!Files.exists(testDirectory)) Files.createDirectory(testDirectory);
         if (!Files.exists(innerDirectory1)) Files.createDirectory(innerDirectory1);
         if (!Files.exists(innerDirectory2)) Files.createDirectory(innerDirectory2);
@@ -34,16 +38,33 @@ class FileExplorerTest {
         Files.deleteIfExists(innerDirectory2);
         Files.deleteIfExists(innerDirectory3);
         Files.deleteIfExists(testDirectory);
+        Files.deleteIfExists(rootDirectory);
     }
 
     @Test
-    void getFileList() throws IOException {
-        Settings.write("", testDirectory.getFileName().toString());
+    void getFileListInSimpleDirectory() throws IOException {
+        Settings.write("left-panel-current-directory", testDirectory.getFileName().toString());
         FileExplorer fileExplorer = new FileExplorer("leftPanel");
         fileExplorer.setCurrentDirectory(testDirectory);
         ObservableList<FileInfo> fileInfoObservableList = fileExplorer.getFileList();
+        List<String> fileNames = fileInfoObservableList.stream().map(FileInfo::getFileName).collect(Collectors.toList());
         int size = fileInfoObservableList.size();
         Assertions.assertEquals(Files.list(testDirectory).count()+1, size);
+        Assertions.assertTrue(fileNames.contains(".."));
+        Assertions.assertTrue(fileNames.contains("innerDirectory1"));
+        Assertions.assertTrue(fileNames.contains("innerDirectory2"));
+        Assertions.assertTrue(fileNames.contains("innerDirectory3"));
+    }
+
+    @Test
+    void getFileListInRootDirectory() throws IOException {
+        Settings.write("left-panel-current-directory", "./Cloud2Directory");
+        FileExplorer fileExplorer = new FileExplorer("leftPanel");
+        ObservableList<FileInfo> fileInfoObservableList = fileExplorer.getFileList();
+        List<String> fileNames = fileInfoObservableList.stream().map(FileInfo::getFileName).collect(Collectors.toList());
+        int size = fileInfoObservableList.size();
+        Assertions.assertEquals(Files.list(rootDirectory).count(), size);
+        Assertions.assertTrue(fileNames.contains(testDirectory.getFileName().toString()));
     }
 
     @Test
