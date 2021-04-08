@@ -13,8 +13,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.client.entities.FileInfo;
 import ru.valerych.cloud2.client.network.CloudConnection;
-import ru.valerych.cloud2.client.network.RegistrationHandler;
-import ru.valerych.cloud2.client.services.fileservices.FileExplorer;
+import ru.valerych.cloud2.client.services.fileservices.LocalFileExplorer;
+import ru.valerych.cloud2.client.services.fileservices.RemoteFileExplorer;
 import ru.valerych.cloud2.client.windows.Cloud2Window;
 import ru.valerych.cloud2.client.windows.WindowCreator;
 
@@ -29,7 +29,7 @@ public class MainWindowController extends WindowController implements Initializa
     private final String REGISTRATION_STAGE_TEMPLATE = "/stages/registrationWindow.fxml";
 
     @FXML
-    public Button refreshButton, copyButton, cutButton, pasteButton, moveButton, deleteButton, shareButton, connectButton, registrationButton;
+    public Button refreshButton, copyButton, cutButton, pasteButton, moveButton, deleteButton, shareButton, connectButton, registrationButton, swapLeftPanelButton, swapRightPanelButton;
 
     @FXML
     public VBox mainPane, leftPanel, rightPanel;
@@ -53,8 +53,14 @@ public class MainWindowController extends WindowController implements Initializa
 
     private CloudConnection connection;
     private WindowCreator windowCreator;
-    private FileExplorer leftPanelFileExplorer;
-    private FileExplorer rightPanelFileExplorer;
+    private LocalFileExplorer leftPanelLocalFileExplorer;
+    private LocalFileExplorer rightPanelLocalFileExplorer;
+    private RemoteFileExplorer leftPanelRemoteFileExplorer;
+    private RemoteFileExplorer rightPanelRemoteFileExplorer;
+    private boolean isLeftPanelRemote;
+    private boolean isRightPanelRemote;
+
+    private ConnectWindowController connectWindowController;
 
     public MainWindowController() {
 
@@ -68,13 +74,13 @@ public class MainWindowController extends WindowController implements Initializa
     }
 
     private void setUpRightPanel() {
-        rightPanelFileExplorer = new FileExplorer(rightPanel.getId());
-        rightFileTable.setItems(rightPanelFileExplorer.getFileList());
+        rightPanelLocalFileExplorer = new LocalFileExplorer(rightPanel.getId());
+        rightFileTable.setItems(rightPanelLocalFileExplorer.getFileList());
     }
 
     private void setUpLeftPanel() {
-        leftPanelFileExplorer = new FileExplorer(leftPanel.getId());
-        leftFileTable.setItems(leftPanelFileExplorer.getFileList());
+        leftPanelLocalFileExplorer = new LocalFileExplorer(leftPanel.getId());
+        leftFileTable.setItems(leftPanelLocalFileExplorer.getFileList());
     }
 
     public void openSettings(ActionEvent actionEvent) {
@@ -88,7 +94,8 @@ public class MainWindowController extends WindowController implements Initializa
 
     public void connectToServer(ActionEvent actionEvent) {
         logger.debug("connectToServer() " + actionEvent.toString());
-        windowCreator.createModalWindow("Connect", CONNECT_STAGE_TEMPLATE);
+        Cloud2Window window = windowCreator.createModalWindow("Connect", CONNECT_STAGE_TEMPLATE);
+        connectWindowController = (ConnectWindowController) window.getController();
     }
 
     public void registration(ActionEvent actionEvent) {
@@ -108,18 +115,28 @@ public class MainWindowController extends WindowController implements Initializa
         FileInfo fileInfo = getFileInfo(leftFileTable);
         if (mouseEvent.getClickCount()==2&&fileInfo.isDirectory()){
             logger.debug("selectLeftTableRow() double click detected");
-            leftPanelFileExplorer.setCurrentDirectory(fileInfo.getPath());
-            leftFileTable.setItems(leftPanelFileExplorer.getFileList());
+            if (isLeftPanelRemote){
+                leftPanelRemoteFileExplorer.setCurrentDirectory(fileInfo.getFileName());
+                leftFileTable.setItems(leftPanelRemoteFileExplorer.getFileList());
+            } else {
+                leftPanelLocalFileExplorer.setCurrentDirectory(fileInfo.getPath());
+                leftFileTable.setItems(leftPanelLocalFileExplorer.getFileList());
+            }
         }
     }
 
     @FXML
     public void selectRightTableRow(MouseEvent mouseEvent) {
         FileInfo fileInfo = getFileInfo(rightFileTable);
-        if (mouseEvent.getClickCount()==2&&fileInfo!=null&&fileInfo.isDirectory()){
+        if (mouseEvent.getClickCount()==2&&fileInfo.isDirectory()){
             logger.debug("selectRightTableRow() double click detected");
-            rightPanelFileExplorer.setCurrentDirectory(fileInfo.getPath());
-            rightFileTable.setItems(rightPanelFileExplorer.getFileList());
+            if (isRightPanelRemote){
+                rightPanelRemoteFileExplorer.setCurrentDirectory(fileInfo.getFileName());
+                rightFileTable.setItems(rightPanelRemoteFileExplorer.getFileList());
+            } else {
+                rightPanelLocalFileExplorer.setCurrentDirectory(fileInfo.getPath());
+                rightFileTable.setItems(rightPanelLocalFileExplorer.getFileList());
+            }
         }
     }
 
@@ -128,5 +145,33 @@ public class MainWindowController extends WindowController implements Initializa
         selectionModel.setSelectionMode(SelectionMode.SINGLE);
         ObservableList<FileInfo> selectedRow = selectionModel.getSelectedItems();
         return selectedRow.get(0);
+    }
+
+    public void swapLeftPanelToRemote(ActionEvent actionEvent) {
+        if (connectWindowController == null || connectWindowController.getConnection() == null) return;
+        isLeftPanelRemote=!isLeftPanelRemote;
+        if (isLeftPanelRemote) {
+            this.connection = connectWindowController.getConnection();
+            leftPanelRemoteFileExplorer = new RemoteFileExplorer(leftPanel.getId(), connection);
+            leftFileTable.setItems(leftPanelRemoteFileExplorer.getFileList());
+            swapLeftPanelButton.setText("Swap to local storage");
+        } else {
+            leftFileTable.setItems(leftPanelLocalFileExplorer.getFileList());
+            swapLeftPanelButton.setText("Swap to remote storage");
+        }
+    }
+
+    public void swapRightPanelToRemote(ActionEvent actionEvent) {
+        if (connectWindowController == null || connectWindowController.getConnection() == null) return;
+        isRightPanelRemote=!isRightPanelRemote;
+        if (isRightPanelRemote) {
+            this.connection = connectWindowController.getConnection();
+            rightPanelRemoteFileExplorer = new RemoteFileExplorer(rightPanel.getId(), connection);
+            rightFileTable.setItems(rightPanelRemoteFileExplorer.getFileList());
+            swapRightPanelButton.setText("Swap to local storage");
+        } else {
+            rightFileTable.setItems(rightPanelRemoteFileExplorer.getFileList());
+            swapRightPanelButton.setText("Swap to remote storage");
+        }
     }
 }

@@ -95,8 +95,17 @@ public class IONetwork implements Network {
         try {
             return is.readLong();
         } catch (IOException e) {
-            logger.error("Error of long from client. " + e);
+            logger.error("Error of getting long from client. " + e);
             return 0L;
+        }
+    }
+
+    @Override
+    public void sendLongToClient(long value){
+        try {
+            os.writeLong(value);
+        } catch (IOException e) {
+            logger.error("Error of sending long to client. " + e);
         }
     }
 

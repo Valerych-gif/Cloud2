@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class FileExplorerTest {
+class LocalFileExplorerTest {
 
     Path rootDirectory = Paths.get("./Cloud2Directory");
     Path testDirectory = Paths.get("./Cloud2Directory", "testDirectory");
@@ -44,9 +44,9 @@ class FileExplorerTest {
     @Test
     void getFileListInSimpleDirectory() throws IOException {
         Settings.write("left-panel-current-directory", testDirectory.getFileName().toString());
-        FileExplorer fileExplorer = new FileExplorer("leftPanel");
-        fileExplorer.setCurrentDirectory(testDirectory);
-        ObservableList<FileInfo> fileInfoObservableList = fileExplorer.getFileList();
+        LocalFileExplorer localFileExplorer = new LocalFileExplorer("leftPanel");
+        localFileExplorer.setCurrentDirectory(testDirectory);
+        ObservableList<FileInfo> fileInfoObservableList = localFileExplorer.getFileList();
         List<String> fileNames = fileInfoObservableList.stream().map(FileInfo::getFileName).collect(Collectors.toList());
         int size = fileInfoObservableList.size();
         Assertions.assertEquals(Files.list(testDirectory).count()+1, size);
@@ -59,8 +59,8 @@ class FileExplorerTest {
     @Test
     void getFileListInRootDirectory() throws IOException {
         Settings.write("left-panel-current-directory", "./Cloud2Directory");
-        FileExplorer fileExplorer = new FileExplorer("leftPanel");
-        ObservableList<FileInfo> fileInfoObservableList = fileExplorer.getFileList();
+        LocalFileExplorer localFileExplorer = new LocalFileExplorer("leftPanel");
+        ObservableList<FileInfo> fileInfoObservableList = localFileExplorer.getFileList();
         List<String> fileNames = fileInfoObservableList.stream().map(FileInfo::getFileName).collect(Collectors.toList());
         int size = fileInfoObservableList.size();
         Assertions.assertEquals(Files.list(rootDirectory).count(), size);
@@ -69,9 +69,9 @@ class FileExplorerTest {
 
     @Test
     void setCurrentDirectory() {
-        FileExplorer fileExplorer = new FileExplorer("leftPanel");
+        LocalFileExplorer localFileExplorer = new LocalFileExplorer("leftPanel");
         Path testDirectory = Paths.get("test-directory");
-        fileExplorer.setCurrentDirectory(testDirectory);
+        localFileExplorer.setCurrentDirectory(testDirectory);
         String rightPanelCurrentDirectory = Settings.read("left-panel-current-directory");
         Assertions.assertEquals("test-directory", rightPanelCurrentDirectory);
     }

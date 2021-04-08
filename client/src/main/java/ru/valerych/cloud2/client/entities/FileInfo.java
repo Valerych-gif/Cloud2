@@ -18,6 +18,15 @@ public class FileInfo {
     private Path path;
     private boolean isDirectory;
 
+    public FileInfo(String fileName, String ext, long size, String date, String attr, boolean isDirectory) {
+        this.fileName = new SimpleStringProperty(fileName);
+        this.ext = new SimpleStringProperty(ext);
+        this.size = new SimpleLongProperty(size);
+        this.date = new SimpleStringProperty(date);
+        this.attr = new SimpleStringProperty(attr);
+        this.isDirectory = isDirectory;
+    }
+
     public FileInfo(Path path, String fileName) {
         this.path = path;
         String fileNameStr = fileName!=null?fileName:path.getFileName().toString();

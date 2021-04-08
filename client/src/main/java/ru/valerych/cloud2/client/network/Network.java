@@ -46,6 +46,27 @@ public class Network {
         }
     }
 
+    public byte[] readBytesFromServer(int length) {
+        byte[] buffer = new byte[length];
+        try {
+            for (int i = 0; i < length; i++) {
+                buffer[i] = is.readByte();
+            }
+        } catch (IOException e) {
+            logger.error("Error of reading bytes from client. " + e);
+        }
+        return buffer;
+    }
+
+    public long readLongFromServer(){
+        try {
+            return is.readLong();
+        } catch (IOException e) {
+            logger.error("Error of long from client. " + e);
+            return 0L;
+        }
+    }
+
     //    @Override
 //    public void sendBufferToClient(byte[] buffer) {
 //        try {

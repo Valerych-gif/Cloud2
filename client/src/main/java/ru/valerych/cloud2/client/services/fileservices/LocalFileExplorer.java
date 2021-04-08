@@ -12,9 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class FileExplorer {
+public class LocalFileExplorer {
 
-    private static final Logger logger = LogManager.getLogger(FileExplorer.class.getName());
+    private static final Logger logger = LogManager.getLogger(LocalFileExplorer.class.getName());
 
     private final String DEFAULT_ROOT_DIRECTORY = "./Cloud2Directory";
     private final String LEFT_PANEL_ROOT_DIRECTORY_PROPERTY = "left-panel-current-directory";
@@ -25,7 +25,7 @@ public class FileExplorer {
     private Path currentDirectory;
     private final String currentDirectorySettingName;
 
-    public FileExplorer(String PaneId) {
+    public LocalFileExplorer(String PaneId) {
         currentDirectorySettingName = LEFT_PANEL_ID.equals(PaneId) ? LEFT_PANEL_ROOT_DIRECTORY_PROPERTY : RIGHT_PANEL_ROOT_DIRECTORY_PROPERTY;
         setUp();
     }

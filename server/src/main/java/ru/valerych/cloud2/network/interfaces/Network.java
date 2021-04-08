@@ -11,6 +11,8 @@ public interface Network {
 
     byte[] readBytesFromClient(int length);
 
+    void sendLongToClient(long value);
+
     void closeConnection();
 
     void sendBytesToClient(byte[] buffer);

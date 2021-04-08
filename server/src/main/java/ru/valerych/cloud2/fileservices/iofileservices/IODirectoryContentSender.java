@@ -42,11 +42,13 @@ public class IODirectoryContentSender implements DirectoryContentSender {
                 case WAITING_FOR_DIR_NAME_LENGTH:
                     dirNameLength = network.readByteFromClient();
                     logger.info("Length of directory name '" + dirNameLength + "' was received");
+                    network.sendByteToClient(Responses.OK.getSignalByte());
                     stage = Stage.WAITING_FOR_DIR_NAME;
                     break;
                 case WAITING_FOR_DIR_NAME:
                     dirName = new String(network.readBytesFromClient(dirNameLength));
                     logger.info("Directory name '" + dirName + "' was received");
+                    network.sendByteToClient(Responses.OK.getSignalByte());
                     stage = Stage.SEND_DIR_PROCESS;
                     break;
                 case SEND_DIR_PROCESS:
@@ -57,6 +59,8 @@ public class IODirectoryContentSender implements DirectoryContentSender {
                     }
                     List<FileInfo> filesInfo = serverFileExplorer.getCurrentDirectoryContent();
                     for (FileInfo fileInfo : filesInfo) {
+                        network.sendByteToClient(Responses.SEND_FILE_INFO.getSignalByte());
+
                         byte fileNameLength = (byte) fileInfo.getFileName().length();
                         network.sendByteToClient(fileNameLength);
                         logger.info("File name length '" + fileNameLength + "' was sent");
@@ -69,9 +73,10 @@ public class IODirectoryContentSender implements DirectoryContentSender {
                         network.sendByteToClient(type);
                         logger.info("File type '" + type + "' was sent");
 
-                        byte[] fileSize = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(fileInfo.getFileSize()).array();
-                        network.sendBytesToClient(fileSize);
-                        logger.info("File size '" + fileInfo.getFileSize() + "' was sent");
+//                        byte[] fileSize = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(fileInfo.getFileSize()).array();
+                        long fileSize = fileInfo.getFileSize();
+                        network.sendLongToClient(fileSize);
+                        logger.info("File size '" + fileSize + "' was sent");
                     }
                     network.sendByteToClient(Responses.END_OF_DIR_CONTENT.getSignalByte());
                     stage = Stage.WAITING_FOR_DIR_NAME_LENGTH;

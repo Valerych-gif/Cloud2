@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.client.exceptions.BadResponseException;
 import ru.valerych.cloud2.client.exceptions.LoginUnsuccessfulException;
+import ru.valerych.cloud2.client.network.CloudConnection;
 import ru.valerych.cloud2.client.network.ConnectionHandler;
 import ru.valerych.cloud2.client.utils.Settings;
 
@@ -41,6 +42,8 @@ public class ConnectWindowController extends WindowController implements Initial
     @FXML
     public CheckBox saveData;
 
+    private ConnectionHandler connectionHandler;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         loginTextField.setText(Settings.read("login"));
@@ -57,7 +60,7 @@ public class ConnectWindowController extends WindowController implements Initial
     }
 
     public void login(ActionEvent event) {
-        ConnectionHandler connectionHandler = new ConnectionHandler();
+        connectionHandler = new ConnectionHandler();
         try {
             connectionHandler.connectToServer(urlTextField.getText(), portTextField.getText());
             connectionHandler.loginToServer(loginTextField.getText(), passwordTextField.getText());
@@ -88,6 +91,10 @@ public class ConnectWindowController extends WindowController implements Initial
             errorLabel.setText("Login or password isn't correct");
             connectionHandler.disconnect();
         }
+    }
+
+    public CloudConnection getConnection(){
+        return connectionHandler.getConnection();
     }
 
     private void writeConnectionSettings(String host, String port, String login, String password) {
