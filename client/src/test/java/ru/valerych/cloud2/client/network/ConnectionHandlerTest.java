@@ -37,11 +37,11 @@ class ConnectionHandlerTest {
                 e.printStackTrace();
             }
         }).start();
-        while (connectionHandler == null) ;
-        final ServerSocket serverSocket = new ServerSocket(tmpPort);
+        while (connectionHandler==null);
+        ServerSocket serverSocket = new ServerSocket(tmpPort);
         socket = new Socket();
         socket = serverSocket.accept();
-        while (socket == null) ;
+        while (socket == null||connectionHandler.getConnection().getInputStream() == null||connectionHandler.getConnection().getOutputStream()==null);
         inputStream = new DataInputStream(socket.getInputStream());
         outputStream = new DataOutputStream(socket.getOutputStream());
     }
@@ -49,7 +49,7 @@ class ConnectionHandlerTest {
     @AfterEach
     void closeConnection() {
         try {
-            if (socket!=null) socket.close();
+            if (socket != null) socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -62,8 +62,9 @@ class ConnectionHandlerTest {
     }
 
     @Test
+    @DisplayName("Log in to server is success")
     void loginToServerSuccessTest() throws IOException {
-
+        outputStream.write(Responses.OK.getSignalByte());
         new Thread(() -> {
             try {
                 connectionHandler.loginToServer(LOGIN, PASSWORD);
@@ -72,18 +73,19 @@ class ConnectionHandlerTest {
             }
         }).start();
 
-        Map<String, String> params = serverAuthProcess(inputStream, outputStream);
+        Map<String, String> params = serverReceiveLoginAndPasswordProcess(inputStream, outputStream);
         Assertions.assertEquals(Requests.AUTHORIZATION.get(), Byte.valueOf(params.get("signalByte")));
         Assertions.assertEquals(LOGIN, params.get("login"));
         Assertions.assertEquals(PASSWORD, params.get("password"));
     }
 
     @Test
+    @DisplayName("Log in to server is fail. LoginUnsuccessfulException")
     void loginToServerLoginUnsuccessfulException() {
 
         new Thread(() -> {
             try {
-                serverAuthProcess(inputStream, outputStream);
+                serverReceiveLoginAndPasswordProcess(inputStream, outputStream);
                 outputStream.write(Responses.FAIL.getSignalByte());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -94,14 +96,65 @@ class ConnectionHandlerTest {
     }
 
     @Test
-    void registrationToServer() {
+    @DisplayName("Log in to server is fail. BadResponseException")
+    void loginToServerBadResponseException() {
+
+        new Thread(() -> {
+            try {
+                inputStream.readByte();
+                outputStream.write(Responses.FAIL.getSignalByte());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        Assertions.assertThrows(BadResponseException.class, () -> connectionHandler.loginToServer(LOGIN, PASSWORD));
     }
 
     @Test
-    void disconnect() {
+    @DisplayName("Registration is success")
+    void registrationToServer() throws IOException {
+        outputStream.write(Responses.OK.getSignalByte());
+        new Thread(() -> {
+            try {
+                connectionHandler.registrationToServer(LOGIN, PASSWORD);
+            } catch (BadResponseException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        Map<String, String> params = serverReceiveLoginAndPasswordProcess(inputStream, outputStream);
+        Assertions.assertEquals(Requests.REGISTRATION.get(), Byte.valueOf(params.get("signalByte")));
+        Assertions.assertEquals(LOGIN, params.get("login"));
+        Assertions.assertEquals(PASSWORD, params.get("password"));
     }
 
-    private Map<String, String> serverAuthProcess(DataInputStream inputStream, DataOutputStream outputStream) throws IOException {
+    @Test
+    @DisplayName("Registration is fail. BadResponseException")
+    void registrationToServerBadResponseException() {
+
+        new Thread(() -> {
+            try {
+                inputStream.readByte();
+                outputStream.write(Responses.FAIL.getSignalByte());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        Assertions.assertThrows(BadResponseException.class, () -> connectionHandler.registrationToServer(LOGIN, PASSWORD));
+    }
+
+    @Test
+    @DisplayName("Disconnection is success")
+    void disconnectSuccessTest() throws IOException {
+        outputStream.write(Responses.OK.getSignalByte());
+        connectionHandler.disconnect();
+        Assertions.assertEquals(Requests.CLOSE_CONNECTION.get(), inputStream.readByte());
+        Assertions.assertTrue(connectionHandler.getConnection().getSocket().isClosed());
+    }
+
+    private Map<String, String> serverReceiveLoginAndPasswordProcess(DataInputStream inputStream, DataOutputStream outputStream) throws IOException {
 
         Map<String, String> params = new HashMap<>();
         byte signalByte = inputStream.readByte();
