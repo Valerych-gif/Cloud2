@@ -190,7 +190,7 @@ public class MainWindowController extends WindowController implements Initializa
             rightFileTable.setItems(rightPanelRemoteFileExplorer.getFileList());
             swapRightPanelButton.setText("Swap to local storage");
         } else {
-            rightFileTable.setItems(rightPanelRemoteFileExplorer.getFileList());
+            rightFileTable.setItems(rightPanelLocalFileExplorer.getFileList());
             swapRightPanelButton.setText("Swap to remote storage");
         }
     }
@@ -199,5 +199,15 @@ public class MainWindowController extends WindowController implements Initializa
     public void connectionUpdate(CloudConnection connection) {
         this.connection = connection;
         logger.debug("MainWindowController. Connection status was changed. Authorized: " + connection.isAuthorized());
+        if (connection.isAuthorized()) {
+            registrationButton.setText("Disconnect");
+            registrationButton.setOnAction((event)->connectionHandler.disconnect());
+            connectButton.setVisible(false);
+        }
+        else {
+            registrationButton.setText("Registration");
+            registrationButton.setOnAction(this::registration);
+            connectButton.setVisible(true);
+        }
     }
 }

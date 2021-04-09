@@ -75,6 +75,7 @@ public class ConnectionHandler implements ConnectionSubject{
                 logger.error(String.format("Resource %s can't be closed. Cause: %s", r, e));
             }
         });
+        connection.setAuthorized(false);
         notifyObservers();
     }
 
