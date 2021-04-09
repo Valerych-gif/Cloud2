@@ -13,6 +13,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.client.entities.FileInfo;
 import ru.valerych.cloud2.client.network.CloudConnection;
+import ru.valerych.cloud2.client.network.ConnectionHandler;
+import ru.valerych.cloud2.client.network.ConnectionObserver;
 import ru.valerych.cloud2.client.services.fileservices.LocalFileExplorer;
 import ru.valerych.cloud2.client.services.fileservices.RemoteFileExplorer;
 import ru.valerych.cloud2.client.windows.Cloud2Window;
@@ -21,7 +23,7 @@ import ru.valerych.cloud2.client.windows.WindowCreator;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class MainWindowController extends WindowController implements Initializable {
+public class MainWindowController extends WindowController implements Initializable, ConnectionObserver {
 
     private final Logger logger = LogManager.getLogger(MainWindowController.class.getName());
     private final String ABOUT_STAGE_TEMPLATE = "/stages/aboutWindow.fxml";
@@ -61,25 +63,35 @@ public class MainWindowController extends WindowController implements Initializa
     private boolean isRightPanelRemote;
 
     private ConnectWindowController connectWindowController;
+    private final ConnectionHandler connectionHandler;
 
     public MainWindowController() {
+        connectionHandler = new ConnectionHandler();
+        connection = new CloudConnection();
+        connection.setAuthorized(false);
 
+        connectionHandler.registerObserver(this);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         windowCreator = new WindowCreator();
+
         setUpLeftPanel();
         setUpRightPanel();
     }
 
     private void setUpRightPanel() {
         rightPanelLocalFileExplorer = new LocalFileExplorer(rightPanel.getId());
+        rightPanelRemoteFileExplorer = new RemoteFileExplorer(rightPanel.getId());
+        connectionHandler.registerObserver(rightPanelRemoteFileExplorer);
         rightFileTable.setItems(rightPanelLocalFileExplorer.getFileList());
     }
 
     private void setUpLeftPanel() {
         leftPanelLocalFileExplorer = new LocalFileExplorer(leftPanel.getId());
+        leftPanelRemoteFileExplorer = new RemoteFileExplorer(leftPanel.getId());
+        connectionHandler.registerObserver(leftPanelRemoteFileExplorer);
         leftFileTable.setItems(leftPanelLocalFileExplorer.getFileList());
     }
 
@@ -96,6 +108,8 @@ public class MainWindowController extends WindowController implements Initializa
         logger.debug("connectToServer() " + actionEvent.toString());
         Cloud2Window window = windowCreator.createModalWindow("Connect", CONNECT_STAGE_TEMPLATE);
         connectWindowController = (ConnectWindowController) window.getController();
+        connectWindowController.setConnectionHandler(connectionHandler);
+        connectWindowController.show();
     }
 
     public void registration(ActionEvent actionEvent) {
@@ -104,10 +118,17 @@ public class MainWindowController extends WindowController implements Initializa
     }
 
     @Override
-    public void close() {
-        logger.debug("closeWindow() for main window");
+    protected void show() {
+        logger.debug("show() for main window");
         Stage primaryStage = (Stage)mainPane.getScene().getWindow();
-        super.close(primaryStage);
+        primaryStage.show();
+    }
+
+    @Override
+    public void close() {
+        logger.debug("close() for main window");
+        Stage primaryStage = (Stage)mainPane.getScene().getWindow();
+        primaryStage.close();
     }
 
     @FXML
@@ -148,11 +169,11 @@ public class MainWindowController extends WindowController implements Initializa
     }
 
     public void swapLeftPanelToRemote(ActionEvent actionEvent) {
-        if (connectWindowController == null || connectWindowController.getConnection() == null) return;
+        if (!connection.isAuthorized()) return;
         isLeftPanelRemote=!isLeftPanelRemote;
         if (isLeftPanelRemote) {
             this.connection = connectWindowController.getConnection();
-            leftPanelRemoteFileExplorer = new RemoteFileExplorer(leftPanel.getId(), connection);
+
             leftFileTable.setItems(leftPanelRemoteFileExplorer.getFileList());
             swapLeftPanelButton.setText("Swap to local storage");
         } else {
@@ -162,16 +183,21 @@ public class MainWindowController extends WindowController implements Initializa
     }
 
     public void swapRightPanelToRemote(ActionEvent actionEvent) {
-        if (connectWindowController == null || connectWindowController.getConnection() == null) return;
+        if (!connection.isAuthorized()) return;
         isRightPanelRemote=!isRightPanelRemote;
         if (isRightPanelRemote) {
             this.connection = connectWindowController.getConnection();
-            rightPanelRemoteFileExplorer = new RemoteFileExplorer(rightPanel.getId(), connection);
             rightFileTable.setItems(rightPanelRemoteFileExplorer.getFileList());
             swapRightPanelButton.setText("Swap to local storage");
         } else {
             rightFileTable.setItems(rightPanelRemoteFileExplorer.getFileList());
             swapRightPanelButton.setText("Swap to remote storage");
         }
+    }
+
+    @Override
+    public void connectionUpdate(CloudConnection connection) {
+        this.connection = connection;
+        logger.debug("MainWindowController. Connection status was changed. Authorized: " + connection.isAuthorized());
     }
 }

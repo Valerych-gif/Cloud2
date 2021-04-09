@@ -26,6 +26,11 @@ public class AboutWindowController extends WindowController implements Initializ
     }
 
     @Override
+    protected void show() {
+
+    }
+
+    @Override
     protected void close() {
 
     }

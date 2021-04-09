@@ -37,7 +37,6 @@ public class WindowCreator {
                 stage.setResizable(false);
             }
             stage.setScene(new Scene(root));
-            stage.show();
             stage.setOnCloseRequest(event -> stage.close());
             Cloud2Window cloud2Window = new Cloud2Window();
             cloud2Window.setStage(stage);

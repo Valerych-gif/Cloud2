@@ -7,22 +7,17 @@ import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.client.entities.FileInfo;
 import ru.valerych.cloud2.client.exceptions.BadResponseException;
 import ru.valerych.cloud2.client.network.CloudConnection;
+import ru.valerych.cloud2.client.network.ConnectionObserver;
 import ru.valerych.cloud2.client.network.Network;
 import ru.valerych.cloud2.client.utils.Settings;
 import ru.valerych.cloud2.commands.Requests;
 import ru.valerych.cloud2.commands.Responses;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RemoteFileExplorer {
+public class RemoteFileExplorer implements ConnectionObserver {
 
     private static final Logger logger = LogManager.getLogger(RemoteFileExplorer.class.getName());
 
@@ -34,17 +29,18 @@ public class RemoteFileExplorer {
 
     private String currentDirectory;
     private final String currentDirectorySettingName;
-    private final CloudConnection connection;
+    private CloudConnection connection;
+    private final String paneId;
 
-    public RemoteFileExplorer(String PaneId, CloudConnection connection) {
+    public RemoteFileExplorer(String paneId){
+        this.paneId = paneId;
         currentDirectory = DEFAULT_ROOT_DIRECTORY;
-        this.connection = connection;
-        if (LEFT_PANEL_ID.equals(PaneId)){
+        if (LEFT_PANEL_ID.equals(paneId)){
             currentDirectorySettingName =  LEFT_PANEL_ROOT_DIRECTORY_PROPERTY;
-        } else if (RIGHT_PANEL_ID.equals(PaneId)){
+        } else if (RIGHT_PANEL_ID.equals(paneId)){
             currentDirectorySettingName = RIGHT_PANEL_ROOT_DIRECTORY_PROPERTY;
         } else {
-            throw new IllegalArgumentException(PaneId);
+            throw new IllegalArgumentException(paneId);
         }
     }
 
@@ -94,5 +90,12 @@ public class RemoteFileExplorer {
     public void setCurrentDirectory(String path) {
         currentDirectory = path;
         Settings.write(currentDirectorySettingName, currentDirectory);
+    }
+
+    @Override
+    public void connectionUpdate(CloudConnection connection) {
+        logger.debug("RemoteFileExplorer for " + paneId + ". Connection status was changed. Authorized: " + connection.isAuthorized());
+        this.connection = connection;
+
     }
 }

@@ -85,10 +85,17 @@ public class RegistrationWindowController extends WindowController implements In
     }
 
     @Override
-    public void close() {
-        logger.debug("closeWindow() for login window");
+    protected void show() {
+        logger.debug("show() for registration window");
         Stage primaryStage = (Stage) window.getScene().getWindow();
-        super.close(primaryStage);
+        primaryStage.show();
+    }
+
+    @Override
+    public void close() {
+        logger.debug("close() for registration window");
+        Stage primaryStage = (Stage) window.getScene().getWindow();
+        primaryStage.close();
     }
 
     private void writeConnectionSettings(String host, String port, String login, String password) {

@@ -18,13 +18,16 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConnectionHandler {
+public class ConnectionHandler implements ConnectionSubject{
 
     private final Logger logger = LogManager.getLogger(ConnectionHandler.class.getName());
 
     private final CloudConnection connection;
 
+    private final List<ConnectionObserver> observers;
+
     public ConnectionHandler() {
+        observers = new ArrayList<>();
         connection = new CloudConnection();
     }
 
@@ -33,6 +36,7 @@ public class ConnectionHandler {
         connection.setSocket(socket);
         connection.setInputStream(new DataInputStream(socket.getInputStream()));
         connection.setOutputStream(new DataOutputStream(socket.getOutputStream()));
+        notifyObservers();
     }
 
     public void loginToServer(String login, String password) throws LoginUnsuccessfulException, BadResponseException {
@@ -41,6 +45,7 @@ public class ConnectionHandler {
         LoginService loginService = new LoginService(connection);
         loginService.login();
         connection.setAuthorized(true);
+        notifyObservers();
     }
 
     public void registrationToServer(String login, String password) throws BadResponseException {
@@ -48,6 +53,8 @@ public class ConnectionHandler {
         connection.setPassword(password);
         LoginService loginService = new LoginService(connection);
         loginService.registration();
+        connection.setAuthorized(true);
+        notifyObservers();
     }
 
     public void disconnect() {
@@ -68,9 +75,25 @@ public class ConnectionHandler {
                 logger.error(String.format("Resource %s can't be closed. Cause: %s", r, e));
             }
         });
+        notifyObservers();
     }
 
     public CloudConnection getConnection() {
         return connection;
+    }
+
+    @Override
+    public void registerObserver(ConnectionObserver observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(ConnectionObserver observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers() {
+        observers.forEach(observer -> observer.connectionUpdate(connection));
     }
 }

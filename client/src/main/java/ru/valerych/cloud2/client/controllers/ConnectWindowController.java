@@ -53,14 +53,24 @@ public class ConnectWindowController extends WindowController implements Initial
     }
 
     @Override
-    public void close() {
-        logger.debug("closeWindow() for login window");
+    protected void show() {
+        logger.debug("show() for login window");
         Stage primaryStage = (Stage)window.getScene().getWindow();
-        super.close(primaryStage);
+        primaryStage.show();
+    }
+
+    @Override
+    public void close() {
+        logger.debug("close() for login window");
+        Stage primaryStage = (Stage)window.getScene().getWindow();
+        primaryStage.close();
+    }
+
+    public void setConnectionHandler(ConnectionHandler connectionHandler) {
+        this.connectionHandler = connectionHandler;
     }
 
     public void login(ActionEvent event) {
-        connectionHandler = new ConnectionHandler();
         try {
             connectionHandler.connectToServer(urlTextField.getText(), portTextField.getText());
             connectionHandler.loginToServer(loginTextField.getText(), passwordTextField.getText());
