@@ -1,5 +1,6 @@
 package ru.valerych.cloud2.fileservices.iofileservices;
 
+import ru.valerych.cloud2.commands.Responses;
 import ru.valerych.cloud2.entities.FileInfo;
 import ru.valerych.cloud2.fileservices.interfaces.FileDownloaderService;
 import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
@@ -44,11 +45,13 @@ public class IOFileDownloaderService implements FileDownloaderService {
                 case WAITING_FOR_FILE_NAME_LENGTH:
                     fileNameLength = network.readByteFromClient();
                     logger.info("Length of file name '" + fileNameLength + "' was received");
+                    network.sendByteToClient(Responses.OK.getSignalByte());
                     stage = Stage.WAITING_FOR_FILE_NAME;
                     break;
                 case WAITING_FOR_FILE_NAME:
                     fileName = new String(network.readBytesFromClient(fileNameLength));
                     logger.info("File name '" + fileName + "' was received");
+                    network.sendByteToClient(Responses.OK.getSignalByte());
                     stage = Stage.SENDING_FILE_INFO;
                     break;
                 case SENDING_FILE_INFO:
@@ -57,10 +60,11 @@ public class IOFileDownloaderService implements FileDownloaderService {
                     byte type = fileInfo.getType().getMark();
                     network.sendByteToClient(type);
                     logger.info("File type '" + type + "' was sent");
+                    network.sendByteToClient(Responses.OK.getSignalByte());
 
-                    byte[] fileSizeBytes = longToByteArray(fileInfo.getFileSize());
-                    network.sendBytesToClient(fileSizeBytes);
+                    network.sendLongToClient(fileInfo.getFileSize());
                     logger.info("File size '" + fileInfo.getFileSize() + "' was sent");
+                    network.sendByteToClient(Responses.OK.getSignalByte());
                     stage = Stage.FILE_SEND_PROCESS;
 
                     break;

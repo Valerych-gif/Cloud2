@@ -11,8 +11,8 @@ public class Network {
 
     private final Logger logger = LogManager.getLogger(Network.class.getName());
 
-    private DataInputStream is;
-    private DataOutputStream os;
+    private final DataInputStream is;
+    private final DataOutputStream os;
 
     public Network(CloudConnection connection) {
         this.is = connection.getInputStream();

@@ -62,4 +62,8 @@ public class LocalFileExplorer {
         currentDirectory = path;
         Settings.write(currentDirectorySettingName, currentDirectory.toString());
     }
+
+    public Path getCurrentDirectory() {
+        return currentDirectory;
+    }
 }

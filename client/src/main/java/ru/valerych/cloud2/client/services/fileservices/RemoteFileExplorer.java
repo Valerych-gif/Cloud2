@@ -58,6 +58,7 @@ public class RemoteFileExplorer implements ConnectionObserver {
     }
 
     private List<FileInfo> getFileInfoList() throws BadResponseException {
+        if (!connection.isAuthorized()) throw new RuntimeException("You are disconnected from server");
         List<FileInfo> fileInfoList = new ArrayList<>();
         Network network = new Network(connection);
 
@@ -70,7 +71,8 @@ public class RemoteFileExplorer implements ConnectionObserver {
         network.sendBytesToServer(currentDirectory.getBytes(StandardCharsets.UTF_8));
         if (network.readByteFromServer() == Responses.FAIL.getSignalByte()) throw new BadResponseException("Can't send remote directory name");
 
-        while (network.readByteFromServer()==Responses.SEND_FILE_INFO.getSignalByte()){
+        byte signalByte = network.readByteFromServer();
+        while (signalByte==Responses.SEND_FILE_INFO.getSignalByte()){
             byte fileNameLength = network.readByteFromServer();
 
             byte[] fileNameBytes = network.readBytesFromServer(fileNameLength);
@@ -82,6 +84,7 @@ public class RemoteFileExplorer implements ConnectionObserver {
             long fileSize = network.readLongFromServer();
 
             fileInfoList.add(new FileInfo(fileName, "ext", fileSize, "", "", isDirectory));
+            signalByte = network.readByteFromServer();
         }
 
         return fileInfoList;
