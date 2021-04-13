@@ -61,9 +61,15 @@ class IOFileDownloaderServiceTest {
         user.setUpUser();
         ServerFileExplorer serverFileExplorer = new IOServerFileExplorer(user);
         FileDownloaderService fileDownloaderService = new IOFileDownloaderService(network, serverFileExplorer);
-        client.sendBytesToServer(new byte[]{Byte.parseByte(String.valueOf(USER_FILE.length()))});
-        client.sendBytesToServer(USER_FILE.getBytes());
+        new Thread(()->{
+            client.sendBytesToServer(new byte[]{Byte.parseByte(String.valueOf(USER_FILE.length()))});
+            client.getBytesFromServer(1); // Ok signal byte
+            client.sendBytesToServer(USER_FILE.getBytes());
+
+        }).start();
         fileDownloaderService.sendFileToClient();
+        client.getBytesFromServer(1); // Ok signal byte
+
         byte type = client.getBytesFromServer(1)[0];
         long fileSize = client.getLong();
         Assertions.assertEquals(70, type);

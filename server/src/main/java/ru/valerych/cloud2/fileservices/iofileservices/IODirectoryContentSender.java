@@ -60,6 +60,7 @@ public class IODirectoryContentSender implements DirectoryContentSender {
                     List<FileInfo> filesInfo = serverFileExplorer.getCurrentDirectoryContent();
                     for (FileInfo fileInfo : filesInfo) {
                         network.sendByteToClient(Responses.SEND_FILE_INFO.getSignalByte());
+                        logger.info("Signal byte [" + Responses.SEND_FILE_INFO + "] was sent");
 
                         byte fileNameLength = (byte) fileInfo.getFileName().length();
                         network.sendByteToClient(fileNameLength);

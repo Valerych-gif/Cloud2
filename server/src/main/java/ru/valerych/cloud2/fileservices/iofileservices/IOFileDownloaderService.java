@@ -60,11 +60,9 @@ public class IOFileDownloaderService implements FileDownloaderService {
                     byte type = fileInfo.getType().getMark();
                     network.sendByteToClient(type);
                     logger.info("File type '" + type + "' was sent");
-                    network.sendByteToClient(Responses.OK.getSignalByte());
 
                     network.sendLongToClient(fileInfo.getFileSize());
                     logger.info("File size '" + fileInfo.getFileSize() + "' was sent");
-                    network.sendByteToClient(Responses.OK.getSignalByte());
                     stage = Stage.FILE_SEND_PROCESS;
 
                     break;

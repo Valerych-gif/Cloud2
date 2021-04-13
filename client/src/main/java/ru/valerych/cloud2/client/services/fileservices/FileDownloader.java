@@ -51,11 +51,9 @@ public class FileDownloader implements ConnectionObserver {
         
         byte fileMark = network.readByteFromServer();
         boolean isDirectory = fileMark == 'D';
-        if (network.readByteFromServer()== Responses.FAIL.getSignalByte()) throw new BadResponseException("Server didn't send file mark.");
         logger.debug("File mark " + fileMark + " was received");
         
         long fileSize = network.readLongFromServer();
-        if (network.readByteFromServer()== Responses.FAIL.getSignalByte()) throw new BadResponseException("Server didn't send file size.");
         logger.debug("File size " + fileSize + " was received");
         
         putFileIntoLocalStorage(network, currentLocalDirectory, requestedFileName, fileSize);
@@ -67,7 +65,7 @@ public class FileDownloader implements ConnectionObserver {
         if (!Files.exists(filePath))
             Files.createFile(filePath);
         else
-            throw new FileAlreadyExistsException("File already exists");
+            throw new FileAlreadyExistsException("File already exists"); //TODO If file exists stop download process and send stop command to server
         byte[] buffer;
         int parcelsQuantity = (int) fileSize/BUFFER_SIZE;
         logger.debug("File was splitted to " + parcelsQuantity + " parcels");
