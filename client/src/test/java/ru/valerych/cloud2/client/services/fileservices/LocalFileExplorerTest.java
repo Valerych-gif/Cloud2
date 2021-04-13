@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.valerych.cloud2.client.entities.FileInfo;
-import ru.valerych.cloud2.client.utils.Settings;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,30 +14,21 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ru.valerych.cloud2.client.utils.FilesStructure.*;
+
 class LocalFileExplorerTest {
 
-    Path rootDirectory = Paths.get("./Cloud2Directory");
-    Path testDirectory = Paths.get("./Cloud2Directory", "testDirectory");
-    Path innerDirectory1 = Paths.get("./Cloud2Directory", "testDirectory", "innerDirectory1");
-    Path innerDirectory2 = Paths.get("./Cloud2Directory", "testDirectory", "innerDirectory2");
-    Path innerDirectory3 = Paths.get("./Cloud2Directory", "testDirectory", "innerDirectory3");
+    private final Path rootDirectory = ROOT_DIRECTORY;
+    private final Path testDirectory = TEST_DIRECTORY;
 
     @BeforeEach
-    void init() throws IOException {
-        if (!Files.exists(rootDirectory)) Files.createDirectory(rootDirectory);
-        if (!Files.exists(testDirectory)) Files.createDirectory(testDirectory);
-        if (!Files.exists(innerDirectory1)) Files.createDirectory(innerDirectory1);
-        if (!Files.exists(innerDirectory2)) Files.createDirectory(innerDirectory2);
-        if (!Files.exists(innerDirectory3)) Files.createDirectory(innerDirectory3);
+    void init() {
+        create();
     }
 
     @AfterEach
-    void drop() throws IOException {
-        Files.deleteIfExists(innerDirectory1);
-        Files.deleteIfExists(innerDirectory2);
-        Files.deleteIfExists(innerDirectory3);
-        Files.deleteIfExists(testDirectory);
-        Files.deleteIfExists(rootDirectory);
+    void drop() {
+        delete();
     }
 
     @Test

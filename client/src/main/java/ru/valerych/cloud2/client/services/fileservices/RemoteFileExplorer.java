@@ -25,15 +25,7 @@ public class RemoteFileExplorer implements ConnectionObserver {
     private CloudConnection connection;
 
     public RemoteFileExplorer(String currentDirectory){
-//        this.paneId = paneId;
         this.currentDirectory = currentDirectory;
-//        if (LEFT_PANEL_ID.equals(paneId)){
-//            currentDirectorySettingName =  LEFT_PANEL_ROOT_DIRECTORY_PROPERTY;
-//        } else if (RIGHT_PANEL_ID.equals(paneId)){
-//            currentDirectorySettingName = RIGHT_PANEL_ROOT_DIRECTORY_PROPERTY;
-//        } else {
-//            throw new IllegalArgumentException(paneId);
-//        }
     }
 
     public ObservableList<FileInfo> getFileList() {
