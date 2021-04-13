@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 
 class LocalFileExplorerTest {
 
-    Path rootDirectory = Paths.get("./Cloud2Directory");
-    Path testDirectory = Paths.get("./Cloud2Directory", "testDirectory");
-    Path innerDirectory1 = Paths.get("./Cloud2Directory", "testDirectory", "innerDirectory1");
-    Path innerDirectory2 = Paths.get("./Cloud2Directory", "testDirectory", "innerDirectory2");
-    Path innerDirectory3 = Paths.get("./Cloud2Directory", "testDirectory", "innerDirectory3");
+    Path rootDirectory = Paths.get("Cloud2Directory");
+    Path testDirectory = Paths.get("Cloud2Directory", "testDirectory");
+    Path innerDirectory1 = Paths.get("Cloud2Directory", "testDirectory", "innerDirectory1");
+    Path innerDirectory2 = Paths.get("Cloud2Directory", "testDirectory", "innerDirectory2");
+    Path innerDirectory3 = Paths.get("Cloud2Directory", "testDirectory", "innerDirectory3");
 
     @BeforeEach
     void init() throws IOException {
@@ -43,9 +43,8 @@ class LocalFileExplorerTest {
 
     @Test
     void getFileListInSimpleDirectory() throws IOException {
-        Settings.write("left-panel-current-directory", testDirectory.getFileName().toString());
-        LocalFileExplorer localFileExplorer = new LocalFileExplorer("leftPanel");
-        localFileExplorer.setCurrentDirectory(testDirectory);
+        LocalFileExplorer localFileExplorer = new LocalFileExplorer("./Cloud2Directory");
+        localFileExplorer.setCurrentDirectory(testDirectory.getFileName().toString());
         ObservableList<FileInfo> fileInfoObservableList = localFileExplorer.getFileList();
         List<String> fileNames = fileInfoObservableList.stream().map(FileInfo::getFileName).collect(Collectors.toList());
         int size = fileInfoObservableList.size();
@@ -58,8 +57,7 @@ class LocalFileExplorerTest {
 
     @Test
     void getFileListInRootDirectory() throws IOException {
-        Settings.write("left-panel-current-directory", "./Cloud2Directory");
-        LocalFileExplorer localFileExplorer = new LocalFileExplorer("leftPanel");
+        LocalFileExplorer localFileExplorer = new LocalFileExplorer("./Cloud2Directory");
         ObservableList<FileInfo> fileInfoObservableList = localFileExplorer.getFileList();
         List<String> fileNames = fileInfoObservableList.stream().map(FileInfo::getFileName).collect(Collectors.toList());
         int size = fileInfoObservableList.size();
@@ -69,10 +67,9 @@ class LocalFileExplorerTest {
 
     @Test
     void setCurrentDirectory() {
-        LocalFileExplorer localFileExplorer = new LocalFileExplorer("leftPanel");
+        LocalFileExplorer localFileExplorer = new LocalFileExplorer("./Cloud2Directory");
         Path testDirectory = Paths.get("test-directory");
-        localFileExplorer.setCurrentDirectory(testDirectory);
-        String rightPanelCurrentDirectory = Settings.read("left-panel-current-directory");
-        Assertions.assertEquals("test-directory", rightPanelCurrentDirectory);
+        localFileExplorer.setCurrentDirectory("test-directory");
+        Assertions.assertEquals(Paths.get("Cloud2Directory","test-directory"), localFileExplorer.getCurrentDirectory());
     }
 }

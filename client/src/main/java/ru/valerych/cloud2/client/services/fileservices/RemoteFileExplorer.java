@@ -21,27 +21,19 @@ public class RemoteFileExplorer implements ConnectionObserver {
 
     private static final Logger logger = LogManager.getLogger(RemoteFileExplorer.class.getName());
 
-    private final String DEFAULT_ROOT_DIRECTORY = "";
-    private final String LEFT_PANEL_ROOT_DIRECTORY_PROPERTY = "left-panel-remote-current-directory";
-    private final String RIGHT_PANEL_ROOT_DIRECTORY_PROPERTY = "right-panel-remote-current-directory";
-    private final String LEFT_PANEL_ID = "leftPanel";
-    private final String RIGHT_PANEL_ID = "rightPanel";
-
     private String currentDirectory;
-    private final String currentDirectorySettingName;
     private CloudConnection connection;
-    private final String paneId;
 
-    public RemoteFileExplorer(String paneId){
-        this.paneId = paneId;
-        currentDirectory = DEFAULT_ROOT_DIRECTORY;
-        if (LEFT_PANEL_ID.equals(paneId)){
-            currentDirectorySettingName =  LEFT_PANEL_ROOT_DIRECTORY_PROPERTY;
-        } else if (RIGHT_PANEL_ID.equals(paneId)){
-            currentDirectorySettingName = RIGHT_PANEL_ROOT_DIRECTORY_PROPERTY;
-        } else {
-            throw new IllegalArgumentException(paneId);
-        }
+    public RemoteFileExplorer(String currentDirectory){
+//        this.paneId = paneId;
+        this.currentDirectory = currentDirectory;
+//        if (LEFT_PANEL_ID.equals(paneId)){
+//            currentDirectorySettingName =  LEFT_PANEL_ROOT_DIRECTORY_PROPERTY;
+//        } else if (RIGHT_PANEL_ID.equals(paneId)){
+//            currentDirectorySettingName = RIGHT_PANEL_ROOT_DIRECTORY_PROPERTY;
+//        } else {
+//            throw new IllegalArgumentException(paneId);
+//        }
     }
 
     public ObservableList<FileInfo> getFileList() {
@@ -92,12 +84,11 @@ public class RemoteFileExplorer implements ConnectionObserver {
 
     public void setCurrentDirectory(String path) {
         currentDirectory = path;
-        Settings.write(currentDirectorySettingName, currentDirectory);
     }
 
     @Override
     public void connectionUpdate(CloudConnection connection) {
-        logger.debug("RemoteFileExplorer for " + paneId + ". Connection status was changed. Authorized: " + connection.isAuthorized());
+        logger.debug("RemoteFileExplorer. Connection status was changed. Authorized: " + connection.isAuthorized());
         this.connection = connection;
 
     }

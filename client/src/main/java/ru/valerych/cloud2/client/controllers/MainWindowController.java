@@ -19,6 +19,7 @@ import ru.valerych.cloud2.client.network.ConnectionObserver;
 import ru.valerych.cloud2.client.services.fileservices.FileDownloader;
 import ru.valerych.cloud2.client.services.fileservices.LocalFileExplorer;
 import ru.valerych.cloud2.client.services.fileservices.RemoteFileExplorer;
+import ru.valerych.cloud2.client.utils.Settings;
 import ru.valerych.cloud2.client.windows.Cloud2Window;
 import ru.valerych.cloud2.client.windows.WindowCreator;
 
@@ -28,6 +29,13 @@ import java.util.ResourceBundle;
 
 public class MainWindowController extends WindowController implements Initializable, ConnectionObserver {
     private final Logger logger = LogManager.getLogger(MainWindowController.class.getName());
+
+    public static final String DEFAULT_REMOTE_ROOT_DIRECTORY = "";
+    public static final String DEFAULT_LOCAL_ROOT_DIRECTORY = "Cloud2Directory";
+    public static final String LEFT_PANEL_REMOTE_CURRENT_DIRECTORY_PROPERTY = "left-panel-remote-current-directory";
+    public static final String RIGHT_PANEL_REMOTE_CURRENT_DIRECTORY_PROPERTY = "right-panel-remote-current-directory";
+    public static final String LEFT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY = "left-panel-local-current-directory";
+    public static final String RIGHT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY = "right-panel-local-current-directory";
 
     private static final String ERROR_WINDOW = "/modalWindows/errorDownloadProcess.fxml";
     private static final String ABOUT_STAGE_TEMPLATE = "/modalWindows/aboutWindow.fxml";
@@ -92,15 +100,23 @@ public class MainWindowController extends WindowController implements Initializa
     }
 
     private void setUpRightPanel() {
-        rightPanelLocalFileExplorer = new LocalFileExplorer(rightPanel.getId());
-        rightPanelRemoteFileExplorer = new RemoteFileExplorer(rightPanel.getId());
+        String remoteCurrentDirectoryProperty = Settings.read(RIGHT_PANEL_REMOTE_CURRENT_DIRECTORY_PROPERTY);
+        String localCurrentDirectoryProperty = Settings.read(RIGHT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY);
+        String rightPanelRemoteCurrentDirectory = remoteCurrentDirectoryProperty==null||"".equals(remoteCurrentDirectoryProperty)?DEFAULT_REMOTE_ROOT_DIRECTORY:remoteCurrentDirectoryProperty;
+        String rightPanelLocalCurrentDirectory = localCurrentDirectoryProperty==null||"".equals(localCurrentDirectoryProperty)?DEFAULT_LOCAL_ROOT_DIRECTORY:localCurrentDirectoryProperty;
+        rightPanelLocalFileExplorer = new LocalFileExplorer(rightPanelLocalCurrentDirectory);
+        rightPanelRemoteFileExplorer = new RemoteFileExplorer(rightPanelRemoteCurrentDirectory);
         connectionHandler.registerObserver(rightPanelRemoteFileExplorer);
         rightFileTable.setItems(rightPanelLocalFileExplorer.getFileList());
     }
 
     private void setUpLeftPanel() {
-        leftPanelLocalFileExplorer = new LocalFileExplorer(leftPanel.getId());
-        leftPanelRemoteFileExplorer = new RemoteFileExplorer(leftPanel.getId());
+        String remoteCurrentDirectoryProperty = Settings.read(LEFT_PANEL_REMOTE_CURRENT_DIRECTORY_PROPERTY);
+        String localCurrentDirectoryProperty = Settings.read(LEFT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY);
+        String leftPanelRemoteCurrentDirectory = remoteCurrentDirectoryProperty==null||"".equals(remoteCurrentDirectoryProperty)?DEFAULT_REMOTE_ROOT_DIRECTORY:remoteCurrentDirectoryProperty;
+        String leftPanelLocalCurrentDirectory = localCurrentDirectoryProperty==null||"".equals(localCurrentDirectoryProperty)?DEFAULT_LOCAL_ROOT_DIRECTORY:localCurrentDirectoryProperty;
+        leftPanelLocalFileExplorer = new LocalFileExplorer(leftPanelLocalCurrentDirectory);
+        leftPanelRemoteFileExplorer = new RemoteFileExplorer(leftPanelRemoteCurrentDirectory);
         connectionHandler.registerObserver(leftPanelRemoteFileExplorer);
         leftFileTable.setItems(leftPanelLocalFileExplorer.getFileList());
     }
@@ -144,14 +160,16 @@ public class MainWindowController extends WindowController implements Initializa
     @FXML
     public void selectLeftTableRow(MouseEvent mouseEvent) {
         FileInfo fileInfo = getFileInfo(leftFileTable);
+        String currentDirectory = fileInfo.getFileName();
         if (mouseEvent.getClickCount()==2&&fileInfo.isDirectory()){
             logger.debug("selectLeftTableRow() double click detected");
             if (isLeftPanelRemote){
                 if (!connection.isAuthorized()) return;
-                leftPanelRemoteFileExplorer.setCurrentDirectory(fileInfo.getFileName());
+                leftPanelRemoteFileExplorer.setCurrentDirectory(currentDirectory);
                 leftFileTable.setItems(leftPanelRemoteFileExplorer.getFileList());
             } else {
-                leftPanelLocalFileExplorer.setCurrentDirectory(fileInfo.getPath());
+                leftPanelLocalFileExplorer.setCurrentDirectory(currentDirectory);
+                Settings.write(LEFT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY, leftPanelLocalFileExplorer.getCurrentDirectory().getFileName().toString());
                 leftFileTable.setItems(leftPanelLocalFileExplorer.getFileList());
             }
         }
@@ -160,14 +178,16 @@ public class MainWindowController extends WindowController implements Initializa
     @FXML
     public void selectRightTableRow(MouseEvent mouseEvent) {
         FileInfo fileInfo = getFileInfo(rightFileTable);
+        String currentDirectory = fileInfo.getFileName();
         if (mouseEvent.getClickCount()==2&&fileInfo.isDirectory()){
             logger.debug("selectRightTableRow() double click detected");
             if (isRightPanelRemote){
                 if (!connection.isAuthorized()) return;
-                rightPanelRemoteFileExplorer.setCurrentDirectory(fileInfo.getFileName());
+                rightPanelRemoteFileExplorer.setCurrentDirectory(currentDirectory);
                 rightFileTable.setItems(rightPanelRemoteFileExplorer.getFileList());
             } else {
-                rightPanelLocalFileExplorer.setCurrentDirectory(fileInfo.getPath());
+                rightPanelLocalFileExplorer.setCurrentDirectory(currentDirectory);
+                Settings.write(RIGHT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY,  rightPanelLocalFileExplorer.getCurrentDirectory().getFileName().toString());
                 rightFileTable.setItems(rightPanelLocalFileExplorer.getFileList());
             }
         }
