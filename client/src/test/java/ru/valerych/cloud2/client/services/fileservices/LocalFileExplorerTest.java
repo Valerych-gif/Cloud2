@@ -33,7 +33,7 @@ class LocalFileExplorerTest {
 
     @Test
     void getFileListInSimpleDirectory() throws IOException {
-        LocalFileExplorer localFileExplorer = new LocalFileExplorer("Cloud2Directory");
+        LocalFileExplorer localFileExplorer = new LocalFileExplorer("");
         localFileExplorer.setCurrentDirectory(testDirectory.getFileName().toString());
         ObservableList<FileInfo> fileInfoObservableList = localFileExplorer.getFileList();
         List<String> fileNames = fileInfoObservableList.stream().map(FileInfo::getFileName).collect(Collectors.toList());
@@ -47,7 +47,7 @@ class LocalFileExplorerTest {
 
     @Test
     void getFileListInRootDirectory() throws IOException {
-        LocalFileExplorer localFileExplorer = new LocalFileExplorer("Cloud2Directory");
+        LocalFileExplorer localFileExplorer = new LocalFileExplorer("");
         ObservableList<FileInfo> fileInfoObservableList = localFileExplorer.getFileList();
         List<String> fileNames = fileInfoObservableList.stream().map(FileInfo::getFileName).collect(Collectors.toList());
         int size = fileInfoObservableList.size();
@@ -57,8 +57,8 @@ class LocalFileExplorerTest {
 
     @Test
     void setCurrentDirectory() {
-        LocalFileExplorer localFileExplorer = new LocalFileExplorer("Cloud2Directory");
+        LocalFileExplorer localFileExplorer = new LocalFileExplorer("");
         localFileExplorer.setCurrentDirectory("test-directory");
-        Assertions.assertEquals(Paths.get("Cloud2Directory","test-directory"), localFileExplorer.getCurrentDirectory());
+        Assertions.assertEquals(Paths.get("\\test-directory"), localFileExplorer.getCurrentDirectory());
     }
 }
