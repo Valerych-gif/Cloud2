@@ -69,7 +69,9 @@ public class IOFileUploaderService implements FileUploaderService {
         byte[] buffer = new byte[byteBufferSize];
 
         long numberOfParcels = fileSize / byteBufferSize;
+        logger.info("File was splitted to " + numberOfParcels + " parcels");
         int tailSize = (int) (fileSize - (numberOfParcels * byteBufferSize));
+        logger.info("File has tail " + tailSize);
 
         File fileToUpload = new File(
                 serverFileExplorer.getCurrentDirectory().getPath()
@@ -78,6 +80,7 @@ public class IOFileUploaderService implements FileUploaderService {
         IOFileUploader fileUploader = new IOFileUploader(fileToUpload);
 
         for (int i = 0; i < numberOfParcels; i++) {
+            logger.info("Parcel " + i +"/" + numberOfParcels);
             network.readBufferFromClient(buffer);
             fileUploader.writeBufferToFile(buffer);
         }

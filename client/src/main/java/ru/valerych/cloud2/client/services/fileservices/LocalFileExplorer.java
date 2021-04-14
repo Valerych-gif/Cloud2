@@ -44,12 +44,8 @@ public class LocalFileExplorer {
     }
 
     private void setUp() {
-        try {
-            if (!Files.exists(currentDirectory))
-                Files.createDirectory(currentDirectory);
-        } catch (IOException e) {
-            logger.error(e);
-        }
+        if (!Files.exists(Paths.get(DEFAULT_LOCAL_ROOT_DIRECTORY, currentDirectory.toString())))
+            currentDirectory = Paths.get("");
     }
 
     public void setCurrentDirectory(String path) {

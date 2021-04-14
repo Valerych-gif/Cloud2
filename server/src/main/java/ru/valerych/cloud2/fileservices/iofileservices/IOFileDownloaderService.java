@@ -83,15 +83,14 @@ public class IOFileDownloaderService implements FileDownloaderService {
 
         long numberOfParcels = fileSize / byteBufferSize;
         int tailSize = (int) (fileSize - (numberOfParcels * byteBufferSize));
-
-        for (int i = 0; i < numberOfParcels; i++) {
-            try {
+        try {
+            for (int i = 0; i < numberOfParcels; i++) {
                 fileDownloader.readBufferFromFile(buffer);
-            } catch (IOException e) {
-                logger.error(e);
-                return;
+                network.sendBufferToClient(buffer);
             }
-            network.sendBufferToClient(buffer);
+        } catch (IOException e) {
+            logger.error(e);
+            return;
         }
         try {
             buffer = fileDownloader.readBytesFromFile(tailSize);
@@ -104,7 +103,7 @@ public class IOFileDownloaderService implements FileDownloaderService {
     }
 
     private byte[] longToByteArray(long value) {
-        return new byte[] {
+        return new byte[]{
                 (byte) (value >> 56),
                 (byte) (value >> 48),
                 (byte) (value >> 40),

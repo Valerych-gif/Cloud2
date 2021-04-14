@@ -9,6 +9,8 @@ import ru.valerych.cloud2.client.network.Network;
 import ru.valerych.cloud2.commands.Requests;
 import ru.valerych.cloud2.commands.Responses;
 
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -74,11 +76,16 @@ public class FileDownloader implements ConnectionObserver {
         logger.debug("File was splitted to " + parcelsQuantity + " parcels");
         int tailLength = (int) (fileSize - parcelsQuantity*BUFFER_SIZE);
         logger.debug("File has tail length " + tailLength);
+//        DataOutputStream outputStream = new DataOutputStream(new FileOutputStream(filePath.toString()));
         for (int i =0; i<parcelsQuantity; i++){
             buffer = network.readBytesFromServer(BUFFER_SIZE);
+            logger.debug("Parcel " + i +"/" + parcelsQuantity);
+//            outputStream.write(buffer, 0, BUFFER_SIZE);
             Files.write(filePath, buffer, StandardOpenOption.APPEND);
         }
         buffer = network.readBytesFromServer(tailLength);
+//        outputStream.write(buffer, 0, tailLength);
         Files.write(filePath, buffer, StandardOpenOption.APPEND);
+//        outputStream.close();
     }
 }

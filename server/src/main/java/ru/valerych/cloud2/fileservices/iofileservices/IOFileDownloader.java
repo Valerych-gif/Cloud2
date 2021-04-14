@@ -27,13 +27,8 @@ public class IOFileDownloader implements FileDownloader {
 
     @Override
     public void readBufferFromFile(byte[] buffer) throws IOException {
-        int read = 0;
-        try {
-            read = fis.read(buffer);
-        } catch (IOException e) {
-            logger.error(e.toString());
-        }
-        if (read==-1){
+        int read = fis.read(buffer);
+        if (read == -1) {
             throw new IOException(String.format("Can't read buffer from file. Nothing to read from file %s", file.getAbsolutePath()));
         }
     }
@@ -54,7 +49,7 @@ public class IOFileDownloader implements FileDownloader {
         } catch (IOException e) {
             logger.error(e.toString());
         }
-        if (read==-1){
+        if (read == -1) {
             throw new IOException(String.format("Can't read bytes from file. Nothing to read from file %s", file.getAbsolutePath()));
         }
 

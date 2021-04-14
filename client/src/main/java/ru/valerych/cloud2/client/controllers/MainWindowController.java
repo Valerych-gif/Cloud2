@@ -274,6 +274,7 @@ public class MainWindowController extends WindowController implements Initializa
         } catch (BadResponseException e) {
             serverDidNotReceiveFileSignaler(e);
         }
+        remoteFileExplorer.setCurrentDirectory("");
         toTable.setItems(remoteFileExplorer.getFileList());
     }
 

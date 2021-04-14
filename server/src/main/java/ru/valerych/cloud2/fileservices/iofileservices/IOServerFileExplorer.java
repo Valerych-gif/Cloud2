@@ -60,7 +60,6 @@ public class IOServerFileExplorer implements ServerFileExplorer {
     public List<FileInfo> getCurrentDirectoryContent() {
         List<FileInfo> filesInfo = new ArrayList<>();
         if (!currentDirectory.equals(userRootDirectory)) {
-            System.out.println(currentDirectory + " " + userRootDirectory);
             filesInfo.add(new FileInfo(ROOT_DIR_MARK, 0, FileInfo.Type.DIRECTORY));
             filesInfo.add(new FileInfo(PARENT_DIR_MARK, 0, FileInfo.Type.DIRECTORY));
         }
