@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static ru.valerych.cloud2.client.controllers.MainWindowController.DEFAULT_LOCAL_ROOT_DIRECTORY;
 
@@ -26,13 +28,14 @@ public class LocalFileExplorer {
 
     public ObservableList<FileInfo> getFileList() {
         ObservableList<FileInfo> fileInfoObservableList = FXCollections.observableArrayList();
-        if (!currentDirectory.equals(Paths.get(DEFAULT_LOCAL_ROOT_DIRECTORY))){
-            Path parent = currentDirectory.getParent()==null?Paths.get(DEFAULT_LOCAL_ROOT_DIRECTORY):currentDirectory.getParent();
-            fileInfoObservableList.add(new FileInfo(parent, ".."));
+        if (!currentDirectory.equals(Paths.get(""))){
+            fileInfoObservableList.add(new FileInfo(Paths.get(""), ".."));
         }
         try {
-            Files.list(currentDirectory)
-                    .forEach(p->fileInfoObservableList.add(new FileInfo(p)));
+            Path current = Paths.get(DEFAULT_LOCAL_ROOT_DIRECTORY, currentDirectory.toString());
+            List<Path> pathList = Files.list(current)
+                    .collect(Collectors.toList());
+            if (pathList.size()>0) pathList.forEach(p->fileInfoObservableList.add(new FileInfo(p)));
             return FXCollections.observableArrayList(fileInfoObservableList);
         } catch (IOException e) {
             e.printStackTrace();
@@ -51,12 +54,12 @@ public class LocalFileExplorer {
 
     public void setCurrentDirectory(String path) {
         if (".".equals(path)){
-            currentDirectory = Paths.get(DEFAULT_LOCAL_ROOT_DIRECTORY);
+            currentDirectory = Paths.get("");
             return;
         }
         if ("..".equals(path)){
             Path parent = currentDirectory.getParent();
-            currentDirectory = parent!=null?parent:Paths.get(DEFAULT_LOCAL_ROOT_DIRECTORY);
+            currentDirectory = parent!=null?parent:Paths.get("");
             return;
         }
         currentDirectory = Paths.get(currentDirectory.getFileName().toString() + System.getProperty("file.separator") + path);

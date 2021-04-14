@@ -1,5 +1,6 @@
 package ru.valerych.cloud2.fileservices.iofileservices;
 
+import ru.valerych.cloud2.commands.Responses;
 import ru.valerych.cloud2.fileservices.interfaces.FileUploaderService;
 import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
 import ru.valerych.cloud2.network.interfaces.Network;
@@ -38,16 +39,19 @@ public class IOFileUploaderService implements FileUploaderService {
             switch (stage) {
                 case WAITING_FOR_FILE_NAME_LENGTH:
                     fileNameLength = network.readByteFromClient();
+                    network.sendByteToClient(Responses.OK.getSignalByte());
                     logger.info("Length of file name '" + fileNameLength + "' was received");
                     stage = Stage.WAITING_FOR_FILE_NAME;
                     break;
                 case WAITING_FOR_FILE_NAME:
                     fileName = new String(network.readBytesFromClient(fileNameLength));
+                    network.sendByteToClient(Responses.OK.getSignalByte());
                     logger.info("File name '" + fileName + "' was received");
                     stage = Stage.WAITING_FOR_FILE_SIZE;
                     break;
                 case WAITING_FOR_FILE_SIZE:
                     fileSize = network.getLongFromClient();
+                    network.sendByteToClient(Responses.OK.getSignalByte());
                     logger.info("File size '" + fileSize + "' was received");
                     stage = Stage.FILE_RECEIVE_PROCESS;
                     break;

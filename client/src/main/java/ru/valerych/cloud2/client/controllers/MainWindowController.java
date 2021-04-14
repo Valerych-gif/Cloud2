@@ -17,6 +17,7 @@ import ru.valerych.cloud2.client.network.CloudConnection;
 import ru.valerych.cloud2.client.network.ConnectionHandler;
 import ru.valerych.cloud2.client.network.ConnectionObserver;
 import ru.valerych.cloud2.client.services.fileservices.FileDownloader;
+import ru.valerych.cloud2.client.services.fileservices.FileUploader;
 import ru.valerych.cloud2.client.services.fileservices.LocalFileExplorer;
 import ru.valerych.cloud2.client.services.fileservices.RemoteFileExplorer;
 import ru.valerych.cloud2.client.utils.Settings;
@@ -73,8 +74,10 @@ public class MainWindowController extends WindowController implements Initializa
     private RemoteFileExplorer rightPanelRemoteFileExplorer;
     private boolean isLeftPanelRemote;
     private boolean isRightPanelRemote;
+    private boolean isLeftPanelActive, isRightPanelActive;
 
     private final FileDownloader fileDownloader;
+    private final FileUploader fileUploader;
 
     private ConnectWindowController connectWindowController;
     private final ConnectionHandler connectionHandler;
@@ -85,9 +88,11 @@ public class MainWindowController extends WindowController implements Initializa
         connection.setAuthorized(false);
 
         fileDownloader = new FileDownloader();
+        fileUploader = new FileUploader();
 
         connectionHandler.registerObserver(this);
         connectionHandler.registerObserver(fileDownloader);
+        connectionHandler.registerObserver(fileUploader);
 
     }
 
@@ -103,7 +108,7 @@ public class MainWindowController extends WindowController implements Initializa
         String remoteCurrentDirectoryProperty = Settings.read(RIGHT_PANEL_REMOTE_CURRENT_DIRECTORY_PROPERTY);
         String localCurrentDirectoryProperty = Settings.read(RIGHT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY);
         String rightPanelRemoteCurrentDirectory = remoteCurrentDirectoryProperty==null||"".equals(remoteCurrentDirectoryProperty)?DEFAULT_REMOTE_ROOT_DIRECTORY:remoteCurrentDirectoryProperty;
-        String rightPanelLocalCurrentDirectory = localCurrentDirectoryProperty==null||"".equals(localCurrentDirectoryProperty)?DEFAULT_LOCAL_ROOT_DIRECTORY:localCurrentDirectoryProperty;
+        String rightPanelLocalCurrentDirectory = localCurrentDirectoryProperty==null||"".equals(localCurrentDirectoryProperty)?"":localCurrentDirectoryProperty;
         rightPanelLocalFileExplorer = new LocalFileExplorer(rightPanelLocalCurrentDirectory);
         rightPanelRemoteFileExplorer = new RemoteFileExplorer(rightPanelRemoteCurrentDirectory);
         connectionHandler.registerObserver(rightPanelRemoteFileExplorer);
@@ -114,7 +119,7 @@ public class MainWindowController extends WindowController implements Initializa
         String remoteCurrentDirectoryProperty = Settings.read(LEFT_PANEL_REMOTE_CURRENT_DIRECTORY_PROPERTY);
         String localCurrentDirectoryProperty = Settings.read(LEFT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY);
         String leftPanelRemoteCurrentDirectory = remoteCurrentDirectoryProperty==null||"".equals(remoteCurrentDirectoryProperty)?DEFAULT_REMOTE_ROOT_DIRECTORY:remoteCurrentDirectoryProperty;
-        String leftPanelLocalCurrentDirectory = localCurrentDirectoryProperty==null||"".equals(localCurrentDirectoryProperty)?DEFAULT_LOCAL_ROOT_DIRECTORY:localCurrentDirectoryProperty;
+        String leftPanelLocalCurrentDirectory = localCurrentDirectoryProperty==null||"".equals(localCurrentDirectoryProperty)?"":localCurrentDirectoryProperty;
         leftPanelLocalFileExplorer = new LocalFileExplorer(leftPanelLocalCurrentDirectory);
         leftPanelRemoteFileExplorer = new RemoteFileExplorer(leftPanelRemoteCurrentDirectory);
         connectionHandler.registerObserver(leftPanelRemoteFileExplorer);
@@ -160,8 +165,8 @@ public class MainWindowController extends WindowController implements Initializa
     @FXML
     public void selectLeftTableRow(MouseEvent mouseEvent) {
         FileInfo fileInfo = getFileInfo(leftFileTable);
-        String currentDirectory = fileInfo.getFileName();
         if (mouseEvent.getClickCount()==2&&fileInfo.isDirectory()){
+            String currentDirectory = fileInfo.getFileName();
             logger.debug("selectLeftTableRow() double click detected");
             if (isLeftPanelRemote){
                 if (!connection.isAuthorized()) return;
@@ -169,7 +174,7 @@ public class MainWindowController extends WindowController implements Initializa
                 leftFileTable.setItems(leftPanelRemoteFileExplorer.getFileList());
             } else {
                 leftPanelLocalFileExplorer.setCurrentDirectory(currentDirectory);
-                Settings.write(LEFT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY, leftPanelLocalFileExplorer.getCurrentDirectory().getFileName().toString());
+                Settings.write(LEFT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY, leftPanelLocalFileExplorer.getCurrentDirectory().toString());
                 leftFileTable.setItems(leftPanelLocalFileExplorer.getFileList());
             }
         }
@@ -178,8 +183,8 @@ public class MainWindowController extends WindowController implements Initializa
     @FXML
     public void selectRightTableRow(MouseEvent mouseEvent) {
         FileInfo fileInfo = getFileInfo(rightFileTable);
-        String currentDirectory = fileInfo.getFileName();
         if (mouseEvent.getClickCount()==2&&fileInfo.isDirectory()){
+            String currentDirectory = fileInfo.getFileName();
             logger.debug("selectRightTableRow() double click detected");
             if (isRightPanelRemote){
                 if (!connection.isAuthorized()) return;
@@ -187,7 +192,7 @@ public class MainWindowController extends WindowController implements Initializa
                 rightFileTable.setItems(rightPanelRemoteFileExplorer.getFileList());
             } else {
                 rightPanelLocalFileExplorer.setCurrentDirectory(currentDirectory);
-                Settings.write(RIGHT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY,  rightPanelLocalFileExplorer.getCurrentDirectory().getFileName().toString());
+                Settings.write(RIGHT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY,  rightPanelLocalFileExplorer.getCurrentDirectory().toString());
                 rightFileTable.setItems(rightPanelLocalFileExplorer.getFileList());
             }
         }
@@ -204,8 +209,8 @@ public class MainWindowController extends WindowController implements Initializa
         if (!connection.isAuthorized()) return;
         isLeftPanelRemote=!isLeftPanelRemote;
         if (isLeftPanelRemote) {
-            this.connection = connectWindowController.getConnection();
-            leftFileTable.setItems(leftPanelRemoteFileExplorer.getFileList());
+            ObservableList<FileInfo> fileInfoObservableList = leftPanelRemoteFileExplorer.getFileList();
+            leftFileTable.setItems(fileInfoObservableList);
             swapLeftPanelButton.setText("Swap to local storage");
         } else {
             leftFileTable.setItems(leftPanelLocalFileExplorer.getFileList());
@@ -217,7 +222,6 @@ public class MainWindowController extends WindowController implements Initializa
         if (!connection.isAuthorized()) return;
         isRightPanelRemote=!isRightPanelRemote;
         if (isRightPanelRemote) {
-            this.connection = connectWindowController.getConnection();
             rightFileTable.setItems(rightPanelRemoteFileExplorer.getFileList());
             swapRightPanelButton.setText("Swap to local storage");
         } else {
@@ -245,37 +249,58 @@ public class MainWindowController extends WindowController implements Initializa
     public void copy(ActionEvent event) {
         if (isLeftPanelRemote&&!isRightPanelRemote){
             if (!connection.isAuthorized()) return;
-            FileInfo fileInfo = getFileInfo (leftFileTable);
-            if (fileInfo == null) return;
-            String fileName = fileInfo.getFileName();
-            try {
-                fileDownloader.download(fileName, rightPanelLocalFileExplorer.getCurrentDirectory());
-            } catch (IOException e) {
-                networkProblemSignaler(e);
-            } catch (BadResponseException e){
-                setverDidNotSendFileSignaler(e);
-            }
-            rightFileTable.setItems(rightPanelLocalFileExplorer.getFileList());
+            if (isLeftPanelActive&&!isRightPanelActive)
+                downloadFile(leftFileTable, rightFileTable, rightPanelLocalFileExplorer);
+            if (isRightPanelActive&&!isLeftPanelActive)
+                upload(rightFileTable, leftFileTable, rightPanelLocalFileExplorer, leftPanelRemoteFileExplorer);
         }
         if (!isLeftPanelRemote&&isRightPanelRemote){
             if (!connection.isAuthorized()) return;
-            FileInfo fileInfo = getFileInfo (rightFileTable);
-            if (fileInfo == null) return;
-            String fileName = fileInfo.getFileName();
-            try {
-                fileDownloader.download(fileName, leftPanelLocalFileExplorer.getCurrentDirectory());
-            } catch (IOException e) {
-                networkProblemSignaler(e);
-            } catch (BadResponseException e){
-                setverDidNotSendFileSignaler(e);
-            }
-            leftFileTable.setItems(leftPanelLocalFileExplorer.getFileList());
+            if (isRightPanelActive&&!isLeftPanelActive)
+                downloadFile(rightFileTable, leftFileTable, leftPanelLocalFileExplorer);
+            if (isLeftPanelActive&&!isRightPanelActive)
+                upload(leftFileTable, rightFileTable, leftPanelLocalFileExplorer, rightPanelRemoteFileExplorer);
         }
     }
 
-    private void setverDidNotSendFileSignaler(BadResponseException e) {
+    private void upload(TableView<FileInfo> fromTable, TableView<FileInfo> toTable, LocalFileExplorer localFileExplorer, RemoteFileExplorer remoteFileExplorer) {
+        FileInfo fileInfo = getFileInfo(fromTable);
+        if (fileInfo == null) return;
+        String fileName = fileInfo.getFileName();
+        try {
+            fileUploader.upload(fileName, localFileExplorer.getCurrentDirectory());
+        } catch (IOException e) {
+            networkProblemSignaler(e);
+        } catch (BadResponseException e) {
+            serverDidNotReceiveFileSignaler(e);
+        }
+        toTable.setItems(remoteFileExplorer.getFileList());
+    }
+
+    private void downloadFile(TableView<FileInfo> fromTable, TableView<FileInfo> toTable, LocalFileExplorer localFileExplorer) {
+        FileInfo fileInfo = getFileInfo(fromTable);
+        if (fileInfo == null) return;
+        String fileName = fileInfo.getFileName();
+        try {
+            fileDownloader.download(fileName, localFileExplorer.getCurrentDirectory());
+        } catch (IOException e) {
+            networkProblemSignaler(e);
+        } catch (BadResponseException e) {
+            serverDidNotSendFileSignaler(e);
+        }
+        toTable.setItems(localFileExplorer.getFileList());
+    }
+
+    private void serverDidNotSendFileSignaler(BadResponseException e) {
         ErrorWindowController controller = (ErrorWindowController) (windowCreator.createModalWindow("Error", ERROR_WINDOW).getController());
         controller.errorMessage.setText("Download incomplete. Server can't send file");
+        controller.show();
+        logger.error(e);
+    }
+
+    private void serverDidNotReceiveFileSignaler(BadResponseException e) {
+        ErrorWindowController controller = (ErrorWindowController) (windowCreator.createModalWindow("Error", ERROR_WINDOW).getController());
+        controller.errorMessage.setText("Upload incomplete. Server can't receive file");
         controller.show();
         logger.error(e);
     }
@@ -285,5 +310,15 @@ public class MainWindowController extends WindowController implements Initializa
         controller.errorMessage.setText("Download incomplete. There was network problem. Try again later");
         controller.show();
         logger.error(e);
+    }
+
+    public void setLeftPanelActive(MouseEvent mouseEvent) {
+        isLeftPanelActive = true;
+        isRightPanelActive = false;
+    }
+
+    public void setRightPanelActive(MouseEvent mouseEvent) {
+        isRightPanelActive = true;
+        isLeftPanelActive = false;
     }
 }

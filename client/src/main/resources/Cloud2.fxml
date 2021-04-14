@@ -70,7 +70,7 @@
             <HBox prefHeight="32.0">
                 <TextField fx:id="addrTextFieldLeft" disable="true" editable="false" HBox.hgrow="ALWAYS" />
             </HBox>
-            <TableView fx:id="leftFileTable" onMouseClicked="#selectLeftTableRow" VBox.vgrow="ALWAYS">
+            <TableView fx:id="leftFileTable" onMouseClicked="#selectLeftTableRow" onMousePressed="#setLeftPanelActive" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="nameColumnHeaderLeft" prefWidth="75.0" text="Name">
                         <cellValueFactory><PropertyValueFactory property="fileName" /></cellValueFactory>
@@ -102,7 +102,7 @@
             <HBox prefHeight="32.0">
                 <TextField fx:id="addrTextFieldRight" disable="true" editable="false" HBox.hgrow="ALWAYS" />
             </HBox>
-            <TableView fx:id="rightFileTable" onMouseClicked="#selectRightTableRow" VBox.vgrow="ALWAYS">
+            <TableView fx:id="rightFileTable" onMouseClicked="#selectRightTableRow" onMousePressed="#setRightPanelActive" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="nameColumnHeaderRight" prefWidth="75.0" text="Name">
                         <cellValueFactory><PropertyValueFactory property="fileName" /></cellValueFactory>

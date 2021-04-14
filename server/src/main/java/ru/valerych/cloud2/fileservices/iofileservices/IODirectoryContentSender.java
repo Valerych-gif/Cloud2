@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.FileNotFoundException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class IODirectoryContentSender implements DirectoryContentSender {
@@ -62,20 +63,20 @@ public class IODirectoryContentSender implements DirectoryContentSender {
                         network.sendByteToClient(Responses.SEND_FILE_INFO.getSignalByte());
                         logger.info("Signal byte [" + Responses.SEND_FILE_INFO + "] was sent");
 
-                        byte fileNameLength = (byte) fileInfo.getFileName().length();
+                        byte[] fileName = fileInfo.getFileName().getBytes(StandardCharsets.UTF_8);
+                        byte fileNameLength = (byte) fileName.length;
+                        byte type = fileInfo.getType().getMark();
+                        long fileSize = fileInfo.getFileSize();
+
                         network.sendByteToClient(fileNameLength);
                         logger.info("File name length '" + fileNameLength + "' was sent");
 
-                        byte[] fileName = fileInfo.getFileName().getBytes();
                         network.sendBytesToClient(fileName);
                         logger.info("File name '" + new String(fileName) + "' was sent");
 
-                        byte type = fileInfo.getType().getMark();
                         network.sendByteToClient(type);
                         logger.info("File type '" + type + "' was sent");
 
-//                        byte[] fileSize = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(fileInfo.getFileSize()).array();
-                        long fileSize = fileInfo.getFileSize();
                         network.sendLongToClient(fileSize);
                         logger.info("File size '" + fileSize + "' was sent");
                     }

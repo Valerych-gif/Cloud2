@@ -14,6 +14,8 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 
+import static ru.valerych.cloud2.client.controllers.MainWindowController.DEFAULT_LOCAL_ROOT_DIRECTORY;
+
 public class FileDownloader implements ConnectionObserver {
 
     private static final int BUFFER_SIZE = 1024;
@@ -42,11 +44,12 @@ public class FileDownloader implements ConnectionObserver {
         network.sendByteToServer(Requests.DOWNLOAD.get());
         if (network.readByteFromServer()== Responses.FAIL.getSignalByte()) throw new BadResponseException("Server isn't ready to send file.");
 
-        int fileNameSize = requestedFileName.length();
+        byte[] fileNameBytes = requestedFileName.getBytes(StandardCharsets.UTF_8);
+        int fileNameSize = fileNameBytes.length;
         network.sendByteToServer((byte)fileNameSize);
         if (network.readByteFromServer()== Responses.FAIL.getSignalByte()) throw new BadResponseException("Server didn't get filename size.");
 
-        network.sendBytesToServer(requestedFileName.getBytes(StandardCharsets.UTF_8));
+        network.sendBytesToServer(fileNameBytes);
         if (network.readByteFromServer()== Responses.FAIL.getSignalByte()) throw new BadResponseException("Server didn't get filename.");
         
         byte fileMark = network.readByteFromServer();
@@ -61,7 +64,7 @@ public class FileDownloader implements ConnectionObserver {
     }
 
     private void putFileIntoLocalStorage(Network network, Path currentLocalDirectory, String fileName, long fileSize) throws IOException {
-        Path filePath = Paths.get(currentLocalDirectory.getFileName().toString(), fileName);
+        Path filePath = Paths.get(DEFAULT_LOCAL_ROOT_DIRECTORY, currentLocalDirectory.toString(), fileName);
         if (!Files.exists(filePath))
             Files.createFile(filePath);
         else
