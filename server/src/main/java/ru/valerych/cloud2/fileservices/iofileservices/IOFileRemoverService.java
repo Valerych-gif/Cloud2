@@ -1,5 +1,6 @@
 package ru.valerych.cloud2.fileservices.iofileservices;
 
+import ru.valerych.cloud2.commands.Responses;
 import ru.valerych.cloud2.fileservices.interfaces.FileRemover;
 import ru.valerych.cloud2.fileservices.interfaces.FileRemoverService;
 import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
@@ -38,11 +39,13 @@ public class IOFileRemoverService implements FileRemoverService {
             switch (stage) {
                 case WAITING_FOR_FILE_NAME_LENGTH:
                     fileNameLength = network.readByteFromClient();
+                    network.sendByteToClient(Responses.OK.getSignalByte());
                     logger.info("Length of file name '" + fileNameLength + "' was received");
                     stage = Stage.WAITING_FOR_FILE_NAME;
                     break;
                 case WAITING_FOR_FILE_NAME:
                     fileName = new String(network.readBytesFromClient(fileNameLength));
+                    network.sendByteToClient(Responses.OK.getSignalByte());
                     logger.info("File name '" + fileName + "' was received");
                     stage = Stage.FILE_DELETE_PROCESS;
                     break;

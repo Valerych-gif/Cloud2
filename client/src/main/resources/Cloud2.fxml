@@ -18,15 +18,7 @@
         </Menu>
     </MenuBar>
     <HBox prefHeight="32.0">
-        <Button fx:id="refreshButton" mnemonicParsing="false" text="Refresh">
-         <HBox.margin>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </HBox.margin></Button>
         <Button fx:id="copyButton" mnemonicParsing="false" onAction="#copy" text="Copy">
-         <HBox.margin>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </HBox.margin></Button>
-        <Button fx:id="moveButton" mnemonicParsing="false" text="Move">
          <HBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </HBox.margin></Button>
@@ -34,7 +26,7 @@
          <HBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </HBox.margin></Button>
-        <Button fx:id="deleteButton" mnemonicParsing="false" text="Delete">
+        <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#delete" text="Delete">
          <HBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </HBox.margin></Button>

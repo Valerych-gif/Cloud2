@@ -78,6 +78,7 @@ public class MainWindowController extends WindowController implements Initializa
     private final FileUploader fileUploader;
     private final FileSharer fileSharer;
     private final SharedFileExplorer sharedFileExplorer;
+    private final RemoteFileRemover remoteFileRemover;
 
     private final ConnectionHandler connectionHandler;
 
@@ -90,12 +91,14 @@ public class MainWindowController extends WindowController implements Initializa
         fileUploader = new FileUploader();
         fileSharer = new FileSharer();
         sharedFileExplorer = new SharedFileExplorer();
+        remoteFileRemover = new RemoteFileRemover();
 
         connectionHandler.registerObserver(this);
         connectionHandler.registerObserver(fileDownloader);
         connectionHandler.registerObserver(fileUploader);
         connectionHandler.registerObserver(fileSharer);
         connectionHandler.registerObserver(sharedFileExplorer);
+        connectionHandler.registerObserver(remoteFileRemover);
 
     }
 
@@ -110,8 +113,8 @@ public class MainWindowController extends WindowController implements Initializa
     private void setUpRightPanel() {
         String remoteCurrentDirectoryProperty = Settings.read(RIGHT_PANEL_REMOTE_CURRENT_DIRECTORY_PROPERTY);
         String localCurrentDirectoryProperty = Settings.read(RIGHT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY);
-        String rightPanelRemoteCurrentDirectory = remoteCurrentDirectoryProperty==null||"".equals(remoteCurrentDirectoryProperty)?DEFAULT_REMOTE_ROOT_DIRECTORY:remoteCurrentDirectoryProperty;
-        String rightPanelLocalCurrentDirectory = localCurrentDirectoryProperty==null||"".equals(localCurrentDirectoryProperty)?"":localCurrentDirectoryProperty;
+        String rightPanelRemoteCurrentDirectory = remoteCurrentDirectoryProperty == null || "".equals(remoteCurrentDirectoryProperty) ? DEFAULT_REMOTE_ROOT_DIRECTORY : remoteCurrentDirectoryProperty;
+        String rightPanelLocalCurrentDirectory = localCurrentDirectoryProperty == null || "".equals(localCurrentDirectoryProperty) ? "" : localCurrentDirectoryProperty;
         rightPanelLocalFileExplorer = new LocalFileExplorer(rightPanelLocalCurrentDirectory);
         rightPanelRemoteFileExplorer = new RemoteFileExplorer(rightPanelRemoteCurrentDirectory);
         connectionHandler.registerObserver(rightPanelRemoteFileExplorer);
@@ -121,8 +124,8 @@ public class MainWindowController extends WindowController implements Initializa
     private void setUpLeftPanel() {
         String remoteCurrentDirectoryProperty = Settings.read(LEFT_PANEL_REMOTE_CURRENT_DIRECTORY_PROPERTY);
         String localCurrentDirectoryProperty = Settings.read(LEFT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY);
-        String leftPanelRemoteCurrentDirectory = remoteCurrentDirectoryProperty==null||"".equals(remoteCurrentDirectoryProperty)?DEFAULT_REMOTE_ROOT_DIRECTORY:remoteCurrentDirectoryProperty;
-        String leftPanelLocalCurrentDirectory = localCurrentDirectoryProperty==null||"".equals(localCurrentDirectoryProperty)?"":localCurrentDirectoryProperty;
+        String leftPanelRemoteCurrentDirectory = remoteCurrentDirectoryProperty == null || "".equals(remoteCurrentDirectoryProperty) ? DEFAULT_REMOTE_ROOT_DIRECTORY : remoteCurrentDirectoryProperty;
+        String leftPanelLocalCurrentDirectory = localCurrentDirectoryProperty == null || "".equals(localCurrentDirectoryProperty) ? "" : localCurrentDirectoryProperty;
         leftPanelLocalFileExplorer = new LocalFileExplorer(leftPanelLocalCurrentDirectory);
         leftPanelRemoteFileExplorer = new RemoteFileExplorer(leftPanelRemoteCurrentDirectory);
         connectionHandler.registerObserver(leftPanelRemoteFileExplorer);
@@ -154,24 +157,24 @@ public class MainWindowController extends WindowController implements Initializa
     @Override
     protected void show() {
         logger.debug("show() for main window");
-        Stage primaryStage = (Stage)mainPane.getScene().getWindow();
+        Stage primaryStage = (Stage) mainPane.getScene().getWindow();
         primaryStage.show();
     }
 
     @Override
     public void close() {
         logger.debug("close() for main window");
-        Stage primaryStage = (Stage)mainPane.getScene().getWindow();
+        Stage primaryStage = (Stage) mainPane.getScene().getWindow();
         primaryStage.close();
     }
 
     @FXML
     public void selectLeftTableRow(MouseEvent mouseEvent) {
         FileInfo fileInfo = getFileInfo(leftFileTable);
-        if (mouseEvent.getClickCount()==2&&fileInfo.isDirectory()){
+        if (mouseEvent.getClickCount() == 2 && fileInfo.isDirectory()) {
             String currentDirectory = fileInfo.getFileName();
             logger.debug("selectLeftTableRow() double click detected");
-            if (isLeftPanelRemote){
+            if (isLeftPanelRemote) {
                 if (!connection.isAuthorized()) return;
                 leftPanelRemoteFileExplorer.setCurrentDirectory(currentDirectory);
                 leftFileTable.setItems(leftPanelRemoteFileExplorer.getFileList());
@@ -186,16 +189,16 @@ public class MainWindowController extends WindowController implements Initializa
     @FXML
     public void selectRightTableRow(MouseEvent mouseEvent) {
         FileInfo fileInfo = getFileInfo(rightFileTable);
-        if (mouseEvent.getClickCount()==2&&fileInfo.isDirectory()){
+        if (mouseEvent.getClickCount() == 2 && fileInfo.isDirectory()) {
             String currentDirectory = fileInfo.getFileName();
             logger.debug("selectRightTableRow() double click detected");
-            if (isRightPanelRemote){
+            if (isRightPanelRemote) {
                 if (!connection.isAuthorized()) return;
                 rightPanelRemoteFileExplorer.setCurrentDirectory(currentDirectory);
                 rightFileTable.setItems(rightPanelRemoteFileExplorer.getFileList());
             } else {
                 rightPanelLocalFileExplorer.setCurrentDirectory(currentDirectory);
-                Settings.write(RIGHT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY,  rightPanelLocalFileExplorer.getCurrentDirectory().toString());
+                Settings.write(RIGHT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY, rightPanelLocalFileExplorer.getCurrentDirectory().toString());
                 rightFileTable.setItems(rightPanelLocalFileExplorer.getFileList());
             }
         }
@@ -253,25 +256,25 @@ public class MainWindowController extends WindowController implements Initializa
     }
 
     private void setRightPanelShared() {
-        isRightPanelRemote=false;
-        isRightPanelLocal=false;
-        isRightPanelShared=true;
+        isRightPanelRemote = false;
+        isRightPanelLocal = false;
+        isRightPanelShared = true;
         rightFileTable.setItems(sharedFileExplorer.getFileList());
         swapRightPanelButton.setText("Swap to local storage");
     }
 
     private void setRightPanelLocal() {
-        isRightPanelRemote=false;
-        isRightPanelLocal=true;
-        isRightPanelShared=false;
+        isRightPanelRemote = false;
+        isRightPanelLocal = true;
+        isRightPanelShared = false;
         rightFileTable.setItems(rightPanelLocalFileExplorer.getFileList());
         swapRightPanelButton.setText("Swap to remote storage");
     }
 
     private void setRightPanelRemote() {
-        isRightPanelRemote=true;
-        isRightPanelLocal=false;
-        isRightPanelShared=false;
+        isRightPanelRemote = true;
+        isRightPanelLocal = false;
+        isRightPanelShared = false;
         rightFileTable.setItems(rightPanelRemoteFileExplorer.getFileList());
         swapRightPanelButton.setText("Swap to shared files");
     }
@@ -282,10 +285,9 @@ public class MainWindowController extends WindowController implements Initializa
         logger.debug("MainWindowController. Connection status was changed. Authorized: " + connection.isAuthorized());
         if (connection.isAuthorized()) {
             registrationButton.setText("Disconnect");
-            registrationButton.setOnAction((event)->connectionHandler.disconnect());
+            registrationButton.setOnAction((event) -> connectionHandler.disconnect());
             connectButton.setVisible(false);
-        }
-        else {
+        } else {
             registrationButton.setText("Registration");
             registrationButton.setOnAction(this::registration);
             connectButton.setVisible(true);
@@ -293,18 +295,18 @@ public class MainWindowController extends WindowController implements Initializa
     }
 
     public void copy(ActionEvent event) {
-        if (isLeftPanelRemote&&!isRightPanelRemote){
+        if (isLeftPanelRemote && !isRightPanelRemote) {
             if (!connection.isAuthorized()) return;
-            if (isLeftPanelActive&&!isRightPanelActive)
+            if (isLeftPanelActive && !isRightPanelActive)
                 downloadFile(leftFileTable, rightFileTable, rightPanelLocalFileExplorer);
-            if (isRightPanelActive&&!isLeftPanelActive)
+            if (isRightPanelActive && !isLeftPanelActive)
                 upload(rightFileTable, leftFileTable, rightPanelLocalFileExplorer, leftPanelRemoteFileExplorer);
         }
-        if (!isLeftPanelRemote&&isRightPanelRemote){
+        if (!isLeftPanelRemote && isRightPanelRemote) {
             if (!connection.isAuthorized()) return;
-            if (isRightPanelActive&&!isLeftPanelActive)
+            if (isRightPanelActive && !isLeftPanelActive)
                 downloadFile(rightFileTable, leftFileTable, leftPanelLocalFileExplorer);
-            if (isLeftPanelActive&&!isRightPanelActive)
+            if (isLeftPanelActive && !isRightPanelActive)
                 upload(leftFileTable, rightFileTable, leftPanelLocalFileExplorer, rightPanelRemoteFileExplorer);
         }
     }
@@ -371,13 +373,13 @@ public class MainWindowController extends WindowController implements Initializa
 
     public void shareFile(ActionEvent event) {
         FileInfo fileInfo = null;
-        if (isLeftPanelActive&&isLeftPanelRemote)
+        if (isLeftPanelActive && isLeftPanelRemote)
             fileInfo = getFileInfo(leftFileTable);
-        if (isRightPanelActive&&isRightPanelRemote)
+        if (isRightPanelActive && isRightPanelRemote)
             fileInfo = getFileInfo(rightFileTable);
-        if (fileInfo==null) return;
+        if (fileInfo == null) return;
         String fileName = fileInfo.getFileName();
-        ShareWindowController controller = (ShareWindowController)(windowCreator.createModalWindow("Enter the username you are sharing the file with", SHARE_WINDOW).getController());
+        ShareWindowController controller = (ShareWindowController) (windowCreator.createModalWindow("Enter the username you are sharing the file with", SHARE_WINDOW).getController());
         controller.shareFileLabel.setText("File will shared: " + fileInfo.getFileName());
         controller.show();
         controller.shareButton.setOnAction(event1 -> {
@@ -391,6 +393,37 @@ public class MainWindowController extends WindowController implements Initializa
     }
 
     private void shareProblemSignaler(BadResponseException e) {
+        ErrorWindowController controller = (ErrorWindowController) (windowCreator.createModalWindow("Error", ERROR_WINDOW).getController());
+        controller.errorMessage.setText("There was problem with file share. Try again later");
+        controller.show();
+        logger.error(e);
+    }
+
+    public void delete(ActionEvent event) {
+        FileInfo fileInfo;
+        if (isLeftPanelRemote&&isLeftPanelActive) {
+            fileInfo = getFileInfo(leftFileTable);
+            deleteRemoteFile(fileInfo);
+            leftFileTable.setItems(leftPanelRemoteFileExplorer.getFileList());
+        }
+        if (isRightPanelRemote&&isRightPanelActive) {
+            fileInfo = getFileInfo(rightFileTable);
+            deleteRemoteFile(fileInfo);
+            rightFileTable.setItems(rightPanelRemoteFileExplorer.getFileList());
+        }
+
+    }
+
+    private void deleteRemoteFile(FileInfo fileInfo) {
+        try {
+            if (fileInfo == null) return;
+            remoteFileRemover.delete(fileInfo.getFileName());
+        } catch (BadResponseException e) {
+            deleteProblemSignaler(e);
+        }
+    }
+
+    private void deleteProblemSignaler(BadResponseException e) {
         ErrorWindowController controller = (ErrorWindowController) (windowCreator.createModalWindow("Error", ERROR_WINDOW).getController());
         controller.errorMessage.setText("There was problem with file share. Try again later");
         controller.show();
