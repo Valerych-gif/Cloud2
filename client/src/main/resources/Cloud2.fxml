@@ -26,19 +26,11 @@
          <HBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </HBox.margin></Button>
-        <Button fx:id="cutButton" mnemonicParsing="false" text="Cut">
-         <HBox.margin>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </HBox.margin></Button>
-        <Button fx:id="pasteButton" mnemonicParsing="false" text="Paste">
-         <HBox.margin>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </HBox.margin></Button>
         <Button fx:id="moveButton" mnemonicParsing="false" text="Move">
          <HBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </HBox.margin></Button>
-        <Button fx:id="shareButton" mnemonicParsing="false" text="Share">
+        <Button fx:id="shareButton" mnemonicParsing="false" onAction="#shareFile" text="Share">
          <HBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </HBox.margin></Button>
@@ -73,7 +65,7 @@
             <TableView fx:id="leftFileTable" onMouseClicked="#selectLeftTableRow" onMousePressed="#setLeftPanelActive" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="nameColumnHeaderLeft" prefWidth="75.0" text="Name">
-                        <cellValueFactory><PropertyValueFactory property="fileName" /></cellValueFactory>
+                        <cellValueFactory><PropertyValueFactory property="displayedFileName" /></cellValueFactory>
                     </TableColumn>
                     <TableColumn fx:id="extColumnHeaderLeft" prefWidth="75.0" text="Ext">
                         <cellValueFactory><PropertyValueFactory property="ext" /></cellValueFactory>
@@ -105,7 +97,7 @@
             <TableView fx:id="rightFileTable" onMouseClicked="#selectRightTableRow" onMousePressed="#setRightPanelActive" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="nameColumnHeaderRight" prefWidth="75.0" text="Name">
-                        <cellValueFactory><PropertyValueFactory property="fileName" /></cellValueFactory>
+                        <cellValueFactory><PropertyValueFactory property="displayedFileName" /></cellValueFactory>
                     </TableColumn>
                     <TableColumn fx:id="extColumnHeaderRight" prefWidth="75.0" text="Ext">
                         <cellValueFactory><PropertyValueFactory property="ext" /></cellValueFactory>

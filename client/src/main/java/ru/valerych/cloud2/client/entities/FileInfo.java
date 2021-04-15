@@ -10,6 +10,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 public class FileInfo {
     private SimpleStringProperty fileName;
+    private SimpleStringProperty displayedFileName;
     private SimpleStringProperty ext;
     private SimpleLongProperty size;
     private SimpleStringProperty date;
@@ -20,6 +21,7 @@ public class FileInfo {
 
     public FileInfo(String fileName, String ext, long size, String date, String attr, boolean isDirectory) {
         this.fileName = new SimpleStringProperty(fileName);
+        this.displayedFileName = new SimpleStringProperty(getDisplayedFilName(fileName));
         this.ext = new SimpleStringProperty(ext);
         this.size = new SimpleLongProperty(size);
         this.date = new SimpleStringProperty(date);
@@ -27,16 +29,23 @@ public class FileInfo {
         this.isDirectory = isDirectory;
     }
 
+    private String getDisplayedFilName(String fileName) {
+        String[] parts = fileName.split("[\\\\/]");
+        return parts[parts.length-1];
+    }
+
     public FileInfo(Path path, String fileName) {
         this.path = path;
         String fileNameStr = fileName!=null?fileName:path.getFileName().toString();
         this.fileName = new SimpleStringProperty(fileNameStr);
+        this.displayedFileName = new SimpleStringProperty(getDisplayedFilName(fileNameStr));
         getAttributes(path);
     }
 
     public FileInfo(Path path) {
         this.path = path;
         this.fileName = new SimpleStringProperty(path.getFileName().toString());
+        this.displayedFileName = new SimpleStringProperty(getDisplayedFilName(path.getFileName().toString()));
         getAttributes(path);
     }
 
@@ -66,6 +75,10 @@ public class FileInfo {
 
     public String getFileName() {
         return fileName.get();
+    }
+
+    public String getDisplayedFileName(){
+        return displayedFileName.get();
     }
 
     public SimpleStringProperty fileNameProperty() {

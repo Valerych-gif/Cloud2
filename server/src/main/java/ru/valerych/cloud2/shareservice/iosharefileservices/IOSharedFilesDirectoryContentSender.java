@@ -11,6 +11,7 @@ import ru.valerych.cloud2.shareservice.interfaces.SharedFilesDirectoryContentSen
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -56,11 +57,15 @@ public class IOSharedFilesDirectoryContentSender implements SharedFilesDirectory
 
     private void sendFileListToClient(List<FileInfo> filesInfo) {
         for (FileInfo fileInfo : filesInfo) {
-            byte fileNameLength = (byte) fileInfo.getFileName().length();
+
+            network.sendByteToClient(Responses.SEND_FILE_INFO.getSignalByte());
+            logger.info("Signal byte [" + Responses.SEND_FILE_INFO + "] was sent");
+
+            byte[] fileName = fileInfo.getFileName().getBytes(StandardCharsets.UTF_8);
+            byte fileNameLength = (byte) fileName.length;
             network.sendByteToClient(fileNameLength);
             logger.info("File name length '" + fileNameLength + "' was sent");
 
-            byte[] fileName = fileInfo.getFileName().getBytes();
             network.sendBytesToClient(fileName);
             logger.info("File name '" + new String(fileName) + "' was sent");
 

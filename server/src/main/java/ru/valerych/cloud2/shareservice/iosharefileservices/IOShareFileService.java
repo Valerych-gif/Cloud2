@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.valerych.cloud2.authservice.IOAuthorisationService;
 import ru.valerych.cloud2.authservice.interfaces.AuthorisationService;
+import ru.valerych.cloud2.commands.Responses;
 import ru.valerych.cloud2.entities.User;
 import ru.valerych.cloud2.exceptions.UserNotFoundException;
 import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
@@ -53,21 +54,25 @@ public class IOShareFileService implements ShareFileService {
             switch (stage) {
                 case WAITING_FOR_USERNAME_LENGTH:
                     userNameLength = network.readByteFromClient();
+                    network.sendByteToClient(Responses.OK.getSignalByte());
                     logger.info("Length of username '" + userNameLength + "' was received");
                     stage = Stage.WAITING_FOR_USERNAME;
                     break;
                 case WAITING_FOR_USERNAME:
                     userName = new String(network.readBytesFromClient(userNameLength));
+                    network.sendByteToClient(Responses.OK.getSignalByte());
                     logger.info("Username '" + userName + "' was received");
                     stage = Stage.WAITING_FOR_FILENAME_LENGTH;
                     break;
                 case WAITING_FOR_FILENAME_LENGTH:
                     fileNameLength = network.readByteFromClient();
+                    network.sendByteToClient(Responses.OK.getSignalByte());
                     logger.info("Length of file name '" + fileNameLength + "' was received");
                     stage = Stage.WAITING_FOR_FILENAME;
                     break;
                 case WAITING_FOR_FILENAME:
                     fileName = new String(network.readBytesFromClient(fileNameLength));
+                    network.sendByteToClient(Responses.OK.getSignalByte());
                     logger.info("File name '" + fileName + "' was received");
                     stage = Stage.SHARE_FILE_PROCESS;
                     break;

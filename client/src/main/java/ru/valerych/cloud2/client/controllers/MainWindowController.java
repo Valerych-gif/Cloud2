@@ -16,10 +16,7 @@ import ru.valerych.cloud2.client.exceptions.BadResponseException;
 import ru.valerych.cloud2.client.network.CloudConnection;
 import ru.valerych.cloud2.client.network.ConnectionHandler;
 import ru.valerych.cloud2.client.network.ConnectionObserver;
-import ru.valerych.cloud2.client.services.fileservices.FileDownloader;
-import ru.valerych.cloud2.client.services.fileservices.FileUploader;
-import ru.valerych.cloud2.client.services.fileservices.LocalFileExplorer;
-import ru.valerych.cloud2.client.services.fileservices.RemoteFileExplorer;
+import ru.valerych.cloud2.client.services.fileservices.*;
 import ru.valerych.cloud2.client.utils.Settings;
 import ru.valerych.cloud2.client.windows.Cloud2Window;
 import ru.valerych.cloud2.client.windows.WindowCreator;
@@ -42,6 +39,7 @@ public class MainWindowController extends WindowController implements Initializa
     private static final String ABOUT_STAGE_TEMPLATE = "/modalWindows/aboutWindow.fxml";
     private static final String CONNECT_STAGE_TEMPLATE = "/modalWindows/connectWindow.fxml";
     private static final String REGISTRATION_STAGE_TEMPLATE = "/modalWindows/registrationWindow.fxml";
+    private static final String SHARE_WINDOW = "/modalWindows/shareWindow.fxml";
 
     @FXML
     public Button refreshButton, copyButton, cutButton, pasteButton, moveButton, deleteButton, shareButton, connectButton, registrationButton, swapLeftPanelButton, swapRightPanelButton;
@@ -72,14 +70,15 @@ public class MainWindowController extends WindowController implements Initializa
     private LocalFileExplorer rightPanelLocalFileExplorer;
     private RemoteFileExplorer leftPanelRemoteFileExplorer;
     private RemoteFileExplorer rightPanelRemoteFileExplorer;
-    private boolean isLeftPanelRemote;
-    private boolean isRightPanelRemote;
+    private boolean isLeftPanelRemote, isLeftPanelLocal, isLeftPanelShared;
+    private boolean isRightPanelRemote, isRightPanelLocal, isRightPanelShared;
     private boolean isLeftPanelActive, isRightPanelActive;
 
     private final FileDownloader fileDownloader;
     private final FileUploader fileUploader;
+    private final FileSharer fileSharer;
+    private final SharedFileExplorer sharedFileExplorer;
 
-    private ConnectWindowController connectWindowController;
     private final ConnectionHandler connectionHandler;
 
     public MainWindowController() {
@@ -89,10 +88,14 @@ public class MainWindowController extends WindowController implements Initializa
 
         fileDownloader = new FileDownloader();
         fileUploader = new FileUploader();
+        fileSharer = new FileSharer();
+        sharedFileExplorer = new SharedFileExplorer();
 
         connectionHandler.registerObserver(this);
         connectionHandler.registerObserver(fileDownloader);
         connectionHandler.registerObserver(fileUploader);
+        connectionHandler.registerObserver(fileSharer);
+        connectionHandler.registerObserver(sharedFileExplorer);
 
     }
 
@@ -138,7 +141,7 @@ public class MainWindowController extends WindowController implements Initializa
     public void connectToServer(ActionEvent actionEvent) {
         logger.debug("connectToServer() " + actionEvent.toString());
         Cloud2Window window = windowCreator.createModalWindow("Connect", CONNECT_STAGE_TEMPLATE);
-        connectWindowController = (ConnectWindowController) window.getController();
+        ConnectWindowController connectWindowController = (ConnectWindowController) window.getController();
         connectWindowController.setConnectionHandler(connectionHandler);
         connectWindowController.show();
     }
@@ -207,27 +210,70 @@ public class MainWindowController extends WindowController implements Initializa
 
     public void swapLeftPanelToRemote(ActionEvent actionEvent) {
         if (!connection.isAuthorized()) return;
-        isLeftPanelRemote=!isLeftPanelRemote;
-        if (isLeftPanelRemote) {
-            ObservableList<FileInfo> fileInfoObservableList = leftPanelRemoteFileExplorer.getFileList();
-            leftFileTable.setItems(fileInfoObservableList);
-            swapLeftPanelButton.setText("Swap to local storage");
-        } else {
-            leftFileTable.setItems(leftPanelLocalFileExplorer.getFileList());
-            swapLeftPanelButton.setText("Swap to remote storage");
-        }
+        if (isLeftPanelRemote)
+            setLeftPanelShared();
+        else if (isLeftPanelShared)
+            setLeftPanelLocal();
+        else
+            setLeftPanelRemote();
+    }
+
+    private void setLeftPanelRemote() {
+        isLeftPanelRemote = true;
+        isLeftPanelShared = false;
+        isLeftPanelLocal = false;
+        leftFileTable.setItems(leftPanelRemoteFileExplorer.getFileList());
+        swapLeftPanelButton.setText("Swap to shared files");
+    }
+
+    private void setLeftPanelLocal() {
+        isLeftPanelLocal = true;
+        isLeftPanelRemote = false;
+        isLeftPanelShared = false;
+        leftFileTable.setItems(leftPanelLocalFileExplorer.getFileList());
+        swapLeftPanelButton.setText("Swap to remote storage");
+    }
+
+    private void setLeftPanelShared() {
+        isLeftPanelShared = true;
+        isLeftPanelLocal = false;
+        isLeftPanelRemote = false;
+        leftFileTable.setItems(sharedFileExplorer.getFileList());
+        swapLeftPanelButton.setText("Swap to local storage");
     }
 
     public void swapRightPanelToRemote(ActionEvent actionEvent) {
         if (!connection.isAuthorized()) return;
-        isRightPanelRemote=!isRightPanelRemote;
-        if (isRightPanelRemote) {
-            rightFileTable.setItems(rightPanelRemoteFileExplorer.getFileList());
-            swapRightPanelButton.setText("Swap to local storage");
-        } else {
-            rightFileTable.setItems(rightPanelLocalFileExplorer.getFileList());
-            swapRightPanelButton.setText("Swap to remote storage");
-        }
+        if (isRightPanelRemote)
+            setRightPanelShared();
+        else if (isRightPanelShared)
+            setRightPanelLocal();
+        else
+            setRightPanelRemote();
+    }
+
+    private void setRightPanelShared() {
+        isRightPanelRemote=false;
+        isRightPanelLocal=false;
+        isRightPanelShared=true;
+        rightFileTable.setItems(sharedFileExplorer.getFileList());
+        swapRightPanelButton.setText("Swap to local storage");
+    }
+
+    private void setRightPanelLocal() {
+        isRightPanelRemote=false;
+        isRightPanelLocal=true;
+        isRightPanelShared=false;
+        rightFileTable.setItems(rightPanelLocalFileExplorer.getFileList());
+        swapRightPanelButton.setText("Swap to remote storage");
+    }
+
+    private void setRightPanelRemote() {
+        isRightPanelRemote=true;
+        isRightPanelLocal=false;
+        isRightPanelShared=false;
+        rightFileTable.setItems(rightPanelRemoteFileExplorer.getFileList());
+        swapRightPanelButton.setText("Swap to shared files");
     }
 
     @Override
@@ -321,5 +367,33 @@ public class MainWindowController extends WindowController implements Initializa
     public void setRightPanelActive(MouseEvent mouseEvent) {
         isRightPanelActive = true;
         isLeftPanelActive = false;
+    }
+
+    public void shareFile(ActionEvent event) {
+        FileInfo fileInfo = null;
+        if (isLeftPanelActive&&isLeftPanelRemote)
+            fileInfo = getFileInfo(leftFileTable);
+        if (isRightPanelActive&&isRightPanelRemote)
+            fileInfo = getFileInfo(rightFileTable);
+        if (fileInfo==null) return;
+        String fileName = fileInfo.getFileName();
+        ShareWindowController controller = (ShareWindowController)(windowCreator.createModalWindow("Enter the username you are sharing the file with", SHARE_WINDOW).getController());
+        controller.shareFileLabel.setText("File will shared: " + fileInfo.getFileName());
+        controller.show();
+        controller.shareButton.setOnAction(event1 -> {
+            try {
+                fileSharer.share(controller.usernameField.getText(), fileName);
+            } catch (BadResponseException e) {
+                shareProblemSignaler(e);
+            }
+            controller.close();
+        });
+    }
+
+    private void shareProblemSignaler(BadResponseException e) {
+        ErrorWindowController controller = (ErrorWindowController) (windowCreator.createModalWindow("Error", ERROR_WINDOW).getController());
+        controller.errorMessage.setText("There was problem with file share. Try again later");
+        controller.show();
+        logger.error(e);
     }
 }
