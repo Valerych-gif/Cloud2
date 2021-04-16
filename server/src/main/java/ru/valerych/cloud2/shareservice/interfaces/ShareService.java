@@ -4,4 +4,6 @@ public interface ShareService {
     void shareFileByCommandFromClient();
 
     void sendSharedFilesDirToClient();
+
+    void sendSharedFileToClient();
 }

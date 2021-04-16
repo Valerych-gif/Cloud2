@@ -10,7 +10,8 @@ public enum Requests {
     GET_SHARED_DIR_CONTENT((byte)60),
     AUTHORIZATION ((byte)70),
     REGISTRATION ((byte)80),
-    SHARE ((byte)90);
+    SHARE ((byte)90),
+    DOWNLOAD_SHARED_FILE((byte) 100);
 
     private final Byte signalByte;
 

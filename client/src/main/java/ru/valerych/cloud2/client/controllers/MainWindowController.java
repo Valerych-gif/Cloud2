@@ -61,8 +61,8 @@ public class MainWindowController extends WindowController implements Initializa
     public TextField addrTextFieldLeft;
     @FXML
     public TextField addrTextFieldRight;
-    public TableView<FileInfo> leftFileTable;
-    public TableView<FileInfo> rightFileTable;
+    @FXML
+    public TableView<FileInfo> leftFileTable, rightFileTable;
 
     private CloudConnection connection;
     private WindowCreator windowCreator;
@@ -74,7 +74,8 @@ public class MainWindowController extends WindowController implements Initializa
     private boolean isRightPanelRemote, isRightPanelLocal, isRightPanelShared;
     private boolean isLeftPanelActive, isRightPanelActive;
 
-    private final FileDownloader fileDownloader;
+    private final RemoteFileDownloader remoteFileDownloader;
+    private final SharedFileDownloader sharedFileDownloader;
     private final FileUploader fileUploader;
     private final FileSharer fileSharer;
     private final SharedFileExplorer sharedFileExplorer;
@@ -87,19 +88,20 @@ public class MainWindowController extends WindowController implements Initializa
         connection = new CloudConnection();
         connection.setAuthorized(false);
 
-        fileDownloader = new FileDownloader();
+        remoteFileDownloader = new RemoteFileDownloader();
+        sharedFileDownloader = new SharedFileDownloader();
         fileUploader = new FileUploader();
         fileSharer = new FileSharer();
         sharedFileExplorer = new SharedFileExplorer();
         remoteFileRemover = new RemoteFileRemover();
 
         connectionHandler.registerObserver(this);
-        connectionHandler.registerObserver(fileDownloader);
+        connectionHandler.registerObserver(remoteFileDownloader);
+        connectionHandler.registerObserver(sharedFileDownloader);
         connectionHandler.registerObserver(fileUploader);
         connectionHandler.registerObserver(fileSharer);
         connectionHandler.registerObserver(sharedFileExplorer);
         connectionHandler.registerObserver(remoteFileRemover);
-
     }
 
     @Override
@@ -111,6 +113,7 @@ public class MainWindowController extends WindowController implements Initializa
     }
 
     private void setUpRightPanel() {
+        isRightPanelLocal = true;
         String remoteCurrentDirectoryProperty = Settings.read(RIGHT_PANEL_REMOTE_CURRENT_DIRECTORY_PROPERTY);
         String localCurrentDirectoryProperty = Settings.read(RIGHT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY);
         String rightPanelRemoteCurrentDirectory = remoteCurrentDirectoryProperty == null || "".equals(remoteCurrentDirectoryProperty) ? DEFAULT_REMOTE_ROOT_DIRECTORY : remoteCurrentDirectoryProperty;
@@ -122,6 +125,7 @@ public class MainWindowController extends WindowController implements Initializa
     }
 
     private void setUpLeftPanel() {
+        isLeftPanelLocal = true;
         String remoteCurrentDirectoryProperty = Settings.read(LEFT_PANEL_REMOTE_CURRENT_DIRECTORY_PROPERTY);
         String localCurrentDirectoryProperty = Settings.read(LEFT_PANEL_LOCAL_CURRENT_DIRECTORY_PROPERTY);
         String leftPanelRemoteCurrentDirectory = remoteCurrentDirectoryProperty == null || "".equals(remoteCurrentDirectoryProperty) ? DEFAULT_REMOTE_ROOT_DIRECTORY : remoteCurrentDirectoryProperty;
@@ -309,6 +313,28 @@ public class MainWindowController extends WindowController implements Initializa
             if (isLeftPanelActive && !isRightPanelActive)
                 upload(leftFileTable, rightFileTable, leftPanelLocalFileExplorer, rightPanelRemoteFileExplorer);
         }
+        if (isLeftPanelShared&&isLeftPanelActive&&isRightPanelLocal){
+            if (!connection.isAuthorized()) return;
+            downloadShareFile(leftFileTable, rightFileTable, rightPanelLocalFileExplorer);
+        }
+        if (isRightPanelShared&&isRightPanelActive&&isLeftPanelLocal){
+            if (!connection.isAuthorized()) return;
+            downloadShareFile(rightFileTable, leftFileTable, leftPanelLocalFileExplorer);
+        }
+    }
+
+    private void downloadShareFile(TableView<FileInfo> fromTable, TableView<FileInfo> toTable, LocalFileExplorer localFileExplorer) {
+        FileInfo fileInfo = getFileInfo(fromTable);
+        if (fileInfo == null) return;
+        String fileName = fileInfo.getFileName();
+        try {
+            sharedFileDownloader.download(fileName, localFileExplorer.getCurrentDirectory());
+        } catch (IOException e) {
+            networkProblemSignaler(e);
+        } catch (BadResponseException e) {
+            serverDidNotSendFileSignaler(e);
+        }
+        toTable.setItems(localFileExplorer.getFileList());
     }
 
     private void upload(TableView<FileInfo> fromTable, TableView<FileInfo> toTable, LocalFileExplorer localFileExplorer, RemoteFileExplorer remoteFileExplorer) {
@@ -331,7 +357,7 @@ public class MainWindowController extends WindowController implements Initializa
         if (fileInfo == null) return;
         String fileName = fileInfo.getFileName();
         try {
-            fileDownloader.download(fileName, localFileExplorer.getCurrentDirectory());
+            remoteFileDownloader.download(fileName, localFileExplorer.getCurrentDirectory());
         } catch (IOException e) {
             networkProblemSignaler(e);
         } catch (BadResponseException e) {

@@ -141,6 +141,14 @@ public abstract class ConnectionHandler implements Runnable {
                             network.sendByteToClient(Responses.FAIL.getSignalByte());
                         }
                         break;
+                    case DOWNLOAD_SHARED_FILE:
+                        if (user != User.UNAUTHORIZED_USER) {
+                            network.sendByteToClient(Responses.OK.getSignalByte());
+                            shareService.sendSharedFileToClient();
+                        } else {
+                            network.sendByteToClient(Responses.FAIL.getSignalByte());
+                        }
+                        break;
                     case CLOSE_CONNECTION:
                         closeConnection();
                         break;

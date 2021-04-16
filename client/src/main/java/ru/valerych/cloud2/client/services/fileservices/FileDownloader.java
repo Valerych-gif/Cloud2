@@ -23,7 +23,8 @@ public class FileDownloader implements ConnectionObserver {
     private static final int BUFFER_SIZE = 1024;
     private final Logger logger = LogManager.getLogger(FileDownloader.class.getName());
 
-    private CloudConnection connection;
+    protected CloudConnection connection;
+    protected Network network;
 
     public FileDownloader() {
         connection = new CloudConnection();
@@ -37,14 +38,6 @@ public class FileDownloader implements ConnectionObserver {
     }
 
     public void download(String requestedFileName, Path currentLocalDirectory) throws IOException, BadResponseException {
-        Socket socket = connection.getSocket();
-        if (!connection.isAuthorized()||socket==null||requestedFileName==null) return;
-        logger.debug("Start of downloading of file " + requestedFileName);
-
-        Network network = new Network(connection);
-
-        network.sendByteToServer(Requests.DOWNLOAD.get());
-        if (network.readByteFromServer()== Responses.FAIL.getSignalByte()) throw new BadResponseException("Server isn't ready to send file.");
 
         byte[] fileNameBytes = requestedFileName.getBytes(StandardCharsets.UTF_8);
         int fileNameSize = fileNameBytes.length;
@@ -65,7 +58,9 @@ public class FileDownloader implements ConnectionObserver {
         if (network.readByteFromServer()== Responses.FAIL.getSignalByte()) throw new BadResponseException("Server didn't send file.");
     }
 
-    private void putFileIntoLocalStorage(Network network, Path currentLocalDirectory, String fileName, long fileSize) throws IOException {
+    private void putFileIntoLocalStorage(Network network, Path currentLocalDirectory, String requestedFileName, long fileSize) throws IOException {
+        String[] parts = requestedFileName.split("[\\\\/]");
+        String fileName = parts[parts.length-1];
         Path filePath = Paths.get(DEFAULT_LOCAL_ROOT_DIRECTORY, currentLocalDirectory.toString(), fileName);
         if (!Files.exists(filePath))
             Files.createFile(filePath);
@@ -76,16 +71,13 @@ public class FileDownloader implements ConnectionObserver {
         logger.debug("File was splitted to " + parcelsQuantity + " parcels");
         int tailLength = (int) (fileSize - parcelsQuantity*BUFFER_SIZE);
         logger.debug("File has tail length " + tailLength);
-//        DataOutputStream outputStream = new DataOutputStream(new FileOutputStream(filePath.toString()));
         for (int i =0; i<parcelsQuantity; i++){
             buffer = network.readBytesFromServer(BUFFER_SIZE);
             logger.debug("Parcel " + i +"/" + parcelsQuantity);
-//            outputStream.write(buffer, 0, BUFFER_SIZE);
             Files.write(filePath, buffer, StandardOpenOption.APPEND);
         }
         buffer = network.readBytesFromServer(tailLength);
-//        outputStream.write(buffer, 0, tailLength);
         Files.write(filePath, buffer, StandardOpenOption.APPEND);
-//        outputStream.close();
+        logger.debug("File [" + fileName + "] download completely");
     }
 }

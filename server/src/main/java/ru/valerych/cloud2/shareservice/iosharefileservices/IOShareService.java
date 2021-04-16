@@ -7,6 +7,7 @@ import ru.valerych.cloud2.fileservices.interfaces.ServerFileExplorer;
 import ru.valerych.cloud2.network.interfaces.Network;
 import ru.valerych.cloud2.shareservice.interfaces.ShareFileService;
 import ru.valerych.cloud2.shareservice.interfaces.ShareService;
+import ru.valerych.cloud2.shareservice.interfaces.SharedFileDownloaderSender;
 import ru.valerych.cloud2.shareservice.interfaces.SharedFilesDirectoryContentSender;
 
 import java.io.FileNotFoundException;
@@ -15,12 +16,14 @@ public class IOShareService implements ShareService {
 
     private final SharedFilesDirectoryContentSender sharedFilesDirectoryContentSender;
     private final ShareFileService shareFileService;
+    private final SharedFileDownloaderSender sharedFileDownloaderSender;
 
     private final Logger logger = LogManager.getLogger(IOShareService.class.getName());
 
     public IOShareService(User user, Network network, ServerFileExplorer serverFileExplorer) {
         this.sharedFilesDirectoryContentSender = new IOSharedFilesDirectoryContentSender(user, network);
         this.shareFileService = new IOShareFileService(user, network, serverFileExplorer);
+        this.sharedFileDownloaderSender = new IOSharedFileDownloaderService(network, user);
     }
 
     @Override
@@ -35,6 +38,11 @@ public class IOShareService implements ShareService {
         } catch (FileNotFoundException e){
             logger.error(e);
         }
+    }
+
+    @Override
+    public void sendSharedFileToClient() {
+        sharedFileDownloaderSender.sendFileToClient();
     }
 
 }
