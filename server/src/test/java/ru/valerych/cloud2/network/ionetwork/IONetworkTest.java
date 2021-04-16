@@ -140,7 +140,7 @@ public class IONetworkTest {
         byte[] sentByte2 = new byte[]{90};
         client.sendBytesToServer(sentByte2);
         Requests receivedCommand2 = ioCommandReceiver.getCommandFromClient();
-        byte[] sentByte3 = new byte[]{100};
+        byte[] sentByte3 = new byte[]{110};
         client.sendBytesToServer(sentByte3);
         Requests receivedCommand3 = ioCommandReceiver.getCommandFromClient();
         Assertions.assertEquals(receivedCommand1, Requests.GET_DIR_CONTENT);

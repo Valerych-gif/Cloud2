@@ -90,9 +90,8 @@ class IOSharedFilesDirectoryContentSenderTest {
         SharedFilesDirectoryContentSender contentSender = new IOSharedFilesDirectoryContentSender(user2, network);
         contentSender.sendSharedFilesDirectoryContent();
         List<FileInfo> fileInfoList = new ArrayList<>();
-        while (true){
+        while (client.getBytesFromServer(1)[0]==Responses.SEND_FILE_INFO.getSignalByte()){
             byte fileLength = client.getBytesFromServer(1)[0];
-            if (fileLength== Responses.END_OF_DIR_CONTENT.getSignalByte()) break;
             byte[] fileNameBytes = client.getBytesFromServer(fileLength);
             String fileName = new String(fileNameBytes);
             byte fileMark = client.getBytesFromServer(1)[0];
