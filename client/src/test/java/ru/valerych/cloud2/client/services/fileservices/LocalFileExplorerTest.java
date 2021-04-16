@@ -59,6 +59,6 @@ class LocalFileExplorerTest {
     void setCurrentDirectory() {
         LocalFileExplorer localFileExplorer = new LocalFileExplorer("");
         localFileExplorer.setCurrentDirectory("test-directory");
-        Assertions.assertEquals(Paths.get("\\test-directory"), localFileExplorer.getCurrentDirectory());
+        Assertions.assertEquals(Paths.get("test-directory"), localFileExplorer.getCurrentDirectory());
     }
 }
