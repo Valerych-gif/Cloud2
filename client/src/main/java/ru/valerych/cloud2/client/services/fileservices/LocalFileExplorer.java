@@ -68,13 +68,13 @@ public class LocalFileExplorer {
 
     public void localCopy(String fileName, Path targetDirectory) throws IOException {
         Path sourcePath = Paths.get(DEFAULT_LOCAL_ROOT_DIRECTORY, currentDirectory.getFileName().toString(), fileName);
-        Path targetPath = Paths.get(DEFAULT_LOCAL_ROOT_DIRECTORY, targetDirectory.getFileName().toString(), fileName);
+        Path targetPath = Paths.get(DEFAULT_LOCAL_ROOT_DIRECTORY, targetDirectory.toString(), fileName);
         Path newFilePath = Files.copy(sourcePath, targetPath);
         logger.debug("File " + newFilePath + " was copied");
     }
 
     public void localDelete(String fileName) throws IOException {
-        Path targetPath = Paths.get(DEFAULT_LOCAL_ROOT_DIRECTORY, currentDirectory.getFileName().toString(), fileName);
+        Path targetPath = Paths.get(DEFAULT_LOCAL_ROOT_DIRECTORY, currentDirectory.toString(), fileName);
         if (Files.deleteIfExists(targetPath)){
             logger.debug("File " + targetPath + " was deleted");
         }
