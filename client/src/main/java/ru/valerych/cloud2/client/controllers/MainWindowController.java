@@ -321,6 +321,24 @@ public class MainWindowController extends WindowController implements Initializa
             if (!connection.isAuthorized()) return;
             downloadShareFile(rightFileTable, leftFileTable, leftPanelLocalFileExplorer);
         }
+        if (isLeftPanelLocal&&isRightPanelLocal&&isLeftPanelActive){
+            localCopy(leftFileTable, rightFileTable, leftPanelLocalFileExplorer, rightPanelLocalFileExplorer);
+        }
+        if (isRightPanelLocal&&isLeftPanelLocal&&isRightPanelActive){
+            localCopy(rightFileTable, leftFileTable, rightPanelLocalFileExplorer, leftPanelLocalFileExplorer);
+        }
+    }
+
+    private void localCopy(TableView<FileInfo> fromTable, TableView<FileInfo> toTable, LocalFileExplorer fromLocalFileExplorer, LocalFileExplorer toLocalFileExplorer){
+        FileInfo fileInfo = getFileInfo(fromTable);
+        if (fileInfo == null) return;
+        String fileName = fileInfo.getFileName();
+        try {
+            fromLocalFileExplorer.localCopy(fileName, toLocalFileExplorer.getCurrentDirectory());
+        } catch (IOException e) {
+            logger.error(e);
+        }
+        toTable.setItems(toLocalFileExplorer.getFileList());
     }
 
     private void downloadShareFile(TableView<FileInfo> fromTable, TableView<FileInfo> toTable, LocalFileExplorer localFileExplorer) {
@@ -437,7 +455,12 @@ public class MainWindowController extends WindowController implements Initializa
             deleteRemoteFile(fileInfo);
             rightFileTable.setItems(rightPanelRemoteFileExplorer.getFileList());
         }
-
+        if (isLeftPanelLocal&&isLeftPanelActive){
+            deleteLocalFile(leftFileTable, leftPanelLocalFileExplorer);
+        }
+        if (isRightPanelLocal&&isRightPanelActive){
+            deleteLocalFile(rightFileTable, rightPanelLocalFileExplorer);
+        }
     }
 
     private void deleteRemoteFile(FileInfo fileInfo) {
@@ -447,6 +470,18 @@ public class MainWindowController extends WindowController implements Initializa
         } catch (BadResponseException e) {
             deleteProblemSignaler(e);
         }
+    }
+
+    private void deleteLocalFile(TableView<FileInfo> fromTable, LocalFileExplorer localFileExplorer){
+        FileInfo fileInfo = getFileInfo(fromTable);
+        if (fileInfo == null) return;
+        String fileName = fileInfo.getFileName();
+        try {
+            localFileExplorer.localDelete(fileName);
+        } catch (IOException e) {
+            logger.error(e);
+        }
+        fromTable.setItems(localFileExplorer.getFileList());
     }
 
     private void deleteProblemSignaler(BadResponseException e) {

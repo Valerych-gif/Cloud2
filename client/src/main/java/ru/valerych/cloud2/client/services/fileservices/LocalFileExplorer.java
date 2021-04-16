@@ -58,10 +58,25 @@ public class LocalFileExplorer {
             currentDirectory = parent!=null?parent:Paths.get("");
             return;
         }
-        currentDirectory = Paths.get(currentDirectory.getFileName().toString() + System.getProperty("file.separator") + path);
+        String currentDirectoryStr = currentDirectory.getFileName().toString();
+        currentDirectory = Paths.get(currentDirectoryStr, path);
     }
 
     public Path getCurrentDirectory() {
         return currentDirectory;
+    }
+
+    public void localCopy(String fileName, Path targetDirectory) throws IOException {
+        Path sourcePath = Paths.get(DEFAULT_LOCAL_ROOT_DIRECTORY, currentDirectory.getFileName().toString(), fileName);
+        Path targetPath = Paths.get(DEFAULT_LOCAL_ROOT_DIRECTORY, targetDirectory.getFileName().toString(), fileName);
+        Path newFilePath = Files.copy(sourcePath, targetPath);
+        logger.debug("File " + newFilePath + " was copied");
+    }
+
+    public void localDelete(String fileName) throws IOException {
+        Path targetPath = Paths.get(DEFAULT_LOCAL_ROOT_DIRECTORY, currentDirectory.getFileName().toString(), fileName);
+        if (Files.deleteIfExists(targetPath)){
+            logger.debug("File " + targetPath + " was deleted");
+        }
     }
 }
